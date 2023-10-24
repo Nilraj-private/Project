@@ -217,7 +217,7 @@ $cities = $model->select('city_location');
               <div class="card">
                 <div class="card-header">
                   <h3 class="float-left res_mt5 res_fs22">Search Device</h3>
-                  <a type="button" class="btn btn-primary float-right" href="/app/views/register/create_inward.php">Create Inward</a>
+                  <a type="button" class="btn btn-primary float-right" href="/anil_vaja/data_reovery_admin_panel/app/views/register/create_inward.php?type=<?= isset($_GET['type']) ? $_GET['type'] : '' ?>">Create Inward</a>
                 </div>
                 <form id="register_filter_form">
                   <div class="card-body res_col_form">
