@@ -38,7 +38,7 @@ if (!isset($_SESSION['user_id'])) {
             </div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="/app/views/dashboard.php">Home</a></li>
                 <li class="breadcrumb-item "><a href="create_inward.html"> Register</a> </li>
                 <li class="breadcrumb-item active"> Inward</li>
                 <li class="breadcrumb-item active"> Details #19190</li>

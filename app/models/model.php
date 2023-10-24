@@ -11,8 +11,9 @@ class Model
     var $conn = '';
     function __construct()
     {
-        $this->conn = mysqli_connect($this->servername, $this->username, $this->password, $this->db_name);
-
+        if (!$this->conn) {
+            $this->conn = mysqli_connect($this->servername, $this->username, $this->password, $this->db_name);
+        }
         if (!$this->conn) {
             die("Connection failed: " . mysqli_connect_error());
         }

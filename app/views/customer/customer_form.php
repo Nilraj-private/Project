@@ -6,7 +6,7 @@ use app\models\Model;
 if (!isset($_SESSION['user_id'])) {
   header("Location: ../auth/login.php");
 }
-$_SESSION['page'] = 'customer_form.php';
+$_SESSION['page'] = 'customer_index.php';
 
 if (isset($_GET['id']) && !empty($_GET['id'])) {
 
