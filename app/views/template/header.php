@@ -12,7 +12,7 @@
 
   <!-- Right navbar links -->
   <ul class="navbar-nav ml-auto mr5">
-    <a href="../controllers/logout.php" class="btn btn-primary float-left mr10">Sign Out <i class='fa fa-sign-out ml5'></i></a>
+    <a href="/app/controllers/logout.php/controllers/logout.php" class="btn btn-primary float-left mr10">Sign Out <i class='fa fa-sign-out ml5'></i></a>
   </ul>
 </nav>
 <!-- /.navbar -->

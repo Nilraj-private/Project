@@ -5,8 +5,7 @@ namespace app\models;
 class Model
 {
     var $servername = "localhost";
-    var $db_name = "recoveryniki_new_db";
-    // var $db_name = "recoveryniki_old_db";
+    var $db_name = "recoveryniki_db";
     var $username = "root";
     var $password = "";
     var $conn = '';
