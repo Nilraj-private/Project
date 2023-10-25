@@ -54,7 +54,7 @@ $_SESSION['page'] = 'change_password.php';
       <ul class="navbar-nav">
 
         <li class="nav-item d-sm-inline-block">
-          <a href="/app/views/dashboard.php" class="nav-link ">Home</a>
+          <a href="<?= $_SESSION['url_path'] ?>/app/views/dashboard.php" class="nav-link ">Home</a>
         </li>
       </ul>
 

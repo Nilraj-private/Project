@@ -38,7 +38,7 @@ if (!isset($_SESSION['user_id'])) {
             </div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="/app/views/dashboard.php">Home</a></li>
+                <li class="breadcrumb-item"><a href="<?= $_SESSION['url_path'] ?>/app/views/dashboard.php">Home</a></li>
                 <li class="breadcrumb-item "><a href="create_inward.html"> Register</a> </li>
                 <li class="breadcrumb-item active"> Inward</li>
                 <li class="breadcrumb-item active"> Details #19190</li>
@@ -437,35 +437,35 @@ if (!isset($_SESSION['user_id'])) {
   </div>
   <!-- ./wrapper -->
 
-  <script src="/public//jquery/jquery.min.js"></script>
-  <script src="/public//bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/public//datatables/jquery.dataTables.min.js"></script>
-  <script src="/public//datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-  <script src="/public//datatables-responsive/js/dataTables.responsive.min.js"></script>
-  <script src="/public//datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-  <script src="/public//datatables-buttons/js/dataTables.buttons.min.js"></script>
-  <script src="/public//datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-  <script src="/public//jszip/jszip.min.js"></script>
-  <script src="/public//pdfmake/pdfmake.min.js"></script>
-  <script src="/public//pdfmake/vfs_fonts.js"></script>
-  <script src="/public//datatables-buttons/js/buttons.html5.min.js"></script>
-  <script src="/public//datatables-buttons/js/buttons.print.min.js"></script>
-  <script src="/public//datatables-buttons/js/buttons.colVis.min.js"></script>
-  <script src="/public/js/adminlte.min.js"></script>
-  <script src="/public/js/demo.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//jquery/jquery.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//datatables/jquery.dataTables.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//jszip/jszip.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//pdfmake/pdfmake.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//pdfmake/vfs_fonts.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/buttons.html5.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/buttons.print.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/buttons.colVis.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/js/adminlte.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/js/demo.js"></script>
   <!-- Page specific script -->
 
 
-  <script src="/public//select2/js/select2.full.min.js"></script>
-  <script src="/public//bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
-  <script src="/public//moment/moment.min.js"></script>
-  <script src="/public//inputmask/jquery.inputmask.min.js"></script>
-  <script src="/public//daterangepicker/daterangepicker.js"></script>
-  <script src="/public//bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
-  <script src="/public//tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-  <script src="/public//bootstrap-switch/js/bootstrap-switch.min.js"></script>
-  <script src="/public//bs-stepper/js/bs-stepper.min.js"></script>
-  <script src="/public//dropzone/min/dropzone.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//select2/js/select2.full.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//moment/moment.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//inputmask/jquery.inputmask.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//daterangepicker/daterangepicker.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//bootstrap-switch/js/bootstrap-switch.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//bs-stepper/js/bs-stepper.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public//dropzone/min/dropzone.min.js"></script>
 
 
 

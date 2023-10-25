@@ -3,6 +3,8 @@
 if (isset($_SESSION['user_id'])) {
     header("Location: app/views/dashboard.php");
 }
+$_SESSION['url_path'] = '';
+
 ?>
 <?php include('../template/head.php') ?>
 
@@ -10,7 +12,7 @@ if (isset($_SESSION['user_id'])) {
     <div class="login-box">
         <div class="card">
             <div class="card-header text-center">
-                <img src="/../../public/images/logo2.jpg" alt="Niki Data Recovery Services" class="brand-image" style="height:164px;">
+                <img src="<?= $_SESSION['url_path'] ?>/public/images/logo2.jpg" alt="Niki Data Recovery Services" class="brand-image" style="height:164px;">
             </div>
             <div class="card-body login-card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
@@ -59,9 +61,9 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <script src="/../../public/plugins/jquery/jquery.min.js"></script>
-    <script src="/../../public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/../../public/js/adminlte.min.js?v=3.2.0"></script>
+    <script src="<?= $_SESSION['url_path'] ?>/public/plugins/jquery/jquery.min.js"></script>
+    <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= $_SESSION['url_path'] ?>/public/js/adminlte.min.js?v=3.2.0"></script>
     <!-- 
     <script>
         $(document).ready(function() {

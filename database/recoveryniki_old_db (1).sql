@@ -82,7 +82,7 @@ CREATE TABLE `auth_itemchild` (
 
 CREATE TABLE `case_register` (
   `id` int(11) NOT NULL,
-  `device_serial_number` varchar(30) NOT NULL,
+  `device_serial_number` varchar(30) DEFAULT NULL,
   `device_internal_serial_number` varchar(20) DEFAULT NULL,
   `device_maker_id` int(11) DEFAULT NULL,
   `device_model` varchar(25) DEFAULT NULL,
@@ -93,24 +93,24 @@ CREATE TABLE `case_register` (
   `crash_type` varchar(10) DEFAULT NULL,
   `inward_remarks` varchar(2048) DEFAULT NULL,
   `outward_remarks` varchar(2048) DEFAULT NULL,
-  `customer_remarks` varchar(512) NOT NULL,
+  `customer_remarks` varchar(512) DEFAULT NULL,
   `files_to_recover` varchar(512) DEFAULT NULL,
   `service_options` varchar(10) DEFAULT NULL,
-  `case_register_state` tinyint(4) NOT NULL COMMENT 'will store only (in, out, register) ',
-  `case_status` tinyint(4) NOT NULL COMMENT 'case status (OPEN,INPROCESS,PROCESSED<CLOSED)',
-  `case_result` tinyint(4) NOT NULL COMMENT 'value should be(WIN,LOSS)',
+  `case_register_state` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'will store only (in, out, register) ',
+  `case_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'case status (OPEN,INPROCESS,PROCESSED<CLOSED)',
+  `case_result` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'value should be(WIN,LOSS)',
   `estimate_amount` float DEFAULT NULL,
   `estimate_approved_by_customer` tinyint(4) DEFAULT NULL,
   `case_received_date` datetime DEFAULT NULL,
   `case_return_date` datetime DEFAULT NULL,
-  `sd_hddno` varchar(20) NOT NULL,
-  `sd_size` varchar(12) NOT NULL,
-  `sd_remarks` varchar(256) NOT NULL,
-  `st_logic_cards_status` tinyint(4) NOT NULL,
-  `st_hdd_assembly_status` tinyint(4) NOT NULL,
-  `st_location` varchar(25) NOT NULL,
+  `sd_hddno` varchar(20) DEFAULT NULL,
+  `sd_size` varchar(12) DEFAULT NULL,
+  `sd_remarks` varchar(256) DEFAULT NULL,
+  `st_logic_cards_status` tinyint(4) NOT NULL DEFAULT 0,
+  `st_hdd_assembly_status` tinyint(4) NOT NULL DEFAULT 0,
+  `st_location` varchar(25) DEFAULT NULL,
   `case_created_date` timestamp NOT NULL DEFAULT current_timestamp(),
-  `customer_id` int(11) NOT NULL
+  `customer_id` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------

@@ -1,4 +1,7 @@
 <?php
+
+$_SESSION['url_path'] = '';
+
 if (!isset($_SESSION['user_id'])) {
   header("Location: auth/login.php");
 }
@@ -42,7 +45,7 @@ $_SESSION['page'] = 'dashboard.php';
                 </div>
                 <div class="div_info">
                   <p>Inward Register</p>
-                  <a href="/app/views/register/register.php?type=inward" class="button btn_1">More Info</a>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?type=inward" class="button btn_1">More Info</a>
                 </div>
               </div>
             </div>
@@ -54,7 +57,7 @@ $_SESSION['page'] = 'dashboard.php';
                 </div>
                 <div class="div_info">
                   <p>Outward Register</p>
-                  <a href="/app/views/register/register.php?type=outward" class="button btn_1">More Info</a>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?type=outward" class="button btn_1">More Info</a>
                 </div>
               </div>
             </div>
@@ -66,7 +69,7 @@ $_SESSION['page'] = 'dashboard.php';
                 </div>
                 <div class="div_info">
                   <p>New Inward Form</p>
-                  <a href="/app/views/register/create_inward.php" class="button btn_1">More Info</a>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/create_inward.php" class="button btn_1">More Info</a>
                 </div>
               </div>
             </div>
@@ -81,7 +84,7 @@ $_SESSION['page'] = 'dashboard.php';
                 </div>
                 <div class="div_info">
                   <p>Recent State</p>
-                  <a href="/app/views/register/register.php?case_status=open" class="button btn_1 btn_2">More Info</a>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?case_status=open" class="button btn_1 btn_2">More Info</a>
                 </div>
               </div>
             </div>
@@ -93,7 +96,7 @@ $_SESSION['page'] = 'dashboard.php';
                 </div>
                 <div class="div_info">
                   <p>Inprocess State</p>
-                  <a href="/app/views/register/register.php?case_status=inprogress" class="button btn_1 btn_2">More Info</a>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?case_status=inprogress" class="button btn_1 btn_2">More Info</a>
                 </div>
               </div>
             </div>
@@ -105,7 +108,7 @@ $_SESSION['page'] = 'dashboard.php';
                 </div>
                 <div class="div_info">
                   <p>Proceeds State</p>
-                  <a href="/app/views/register/register.php?case_status=processed" class="button btn_1 btn_2">More Info</a>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?case_status=processed" class="button btn_1 btn_2">More Info</a>
                 </div>
               </div>
             </div>
@@ -117,7 +120,7 @@ $_SESSION['page'] = 'dashboard.php';
                 </div>
                 <div class="div_info">
                   <p>Close State</p>
-                  <a href="/app/views/register/register.php?case_status=close" class="button btn_1 btn_2">More Info</a>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?case_status=close" class="button btn_1 btn_2">More Info</a>
                 </div>
               </div>
             </div>
@@ -134,7 +137,7 @@ $_SESSION['page'] = 'dashboard.php';
                     </div>
                     <div class="div_info">
                       <p>Outward Details</p>
-                      <a href="/app/views/customer/customer_index.php" class="button btn_1 btn_4">More Info</a>
+                      <a href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_index.php" class="button btn_1 btn_4">More Info</a>
                     </div>
                   </div>
                 </div>
@@ -146,7 +149,7 @@ $_SESSION['page'] = 'dashboard.php';
                     </div>
                     <div class="div_info">
                       <p>Outward Details</p>
-                      <a href="/app/views/customer/customer_form.php" class="button btn_1 btn_4">More Info</a>
+                      <a href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_form.php" class="button btn_1 btn_4">More Info</a>
                     </div>
                   </div>
                 </div>
@@ -180,17 +183,17 @@ $_SESSION['page'] = 'dashboard.php';
   </div>
   <!-- ./wrapper -->
 
-  <script src="/public/plugins/jquery/jquery.min.js"></script>
-  <script src="/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/public/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-  <script src="/public/plugins/jszip/jszip.min.js"></script>
-  <script src="/public/plugins/pdfmake/pdfmake.min.js"></script>
-  <script src="/public/plugins/pdfmake/vfs_fonts.js"></script>
-  <script src="/public/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-  <script src="/public/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-  <script src="/public/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-  <script src="/public/js/adminlte.min.js"></script>
-  <script src="/public/js/demo.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/jquery/jquery.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/jszip/jszip.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/pdfmake/pdfmake.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/pdfmake/vfs_fonts.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/js/adminlte.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/js/demo.js"></script>
 </body>
 
 </html>

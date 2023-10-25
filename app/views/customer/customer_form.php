@@ -115,7 +115,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                       <div class="col-3 mt25px res_auto_btn max_width100 flex_100">
                         <div class="form-group">
                           <button type="submit" class="btn btn-success mr10"><?= (!isset($_GET['id']) ? 'Add' : 'Update') ?> </button>
-                          <a type="button" href="/app/views/customer/customer_index.php" class="btn btn-danger">Cancel</a>
+                          <a type="button" href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_index.php" class="btn btn-danger">Cancel</a>
                         </div>
                       </div>
                     </div>
@@ -133,8 +133,8 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   </div>
   <!-- ./wrapper -->
 
-  <script src="/public/plugins/jquery/jquery.min.js"></script>
-  <script src="/public/js/adminlte.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/jquery/jquery.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/js/adminlte.min.js"></script>
   <!-- Page specific script -->
 
   <script type="text/javascript">
