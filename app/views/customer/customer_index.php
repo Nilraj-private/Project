@@ -11,7 +11,17 @@ $_SESSION['page'] = 'customer_index.php';
 
 $model = (new Model());
 $join = " left join city_location as cl on cl.id=c.customer_city_location ";
-$customers = $model->select('customer as c', ' c.*,cl.city_name ', '', $join);
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $where = '';
+  foreach ($_POST as $key => $value) {
+    if ($value != '')
+      $where .= (($where == '') ? '' : ' AND ') . " $key = '" . $value . "' ";
+  }
+  $customers = $model->select('customer as c', ' c.*,cl.city_name ', $where, $join);
+} else {
+  $customers = $model->select('customer as c', ' c.*,cl.city_name ', '', $join);
+}
 $cities = $model->select('city_location');
 ?>
 <?php include('../template/head.php') ?>
@@ -101,19 +111,27 @@ $cities = $model->select('city_location');
                   <h3 class="float-left res_mt5 res_fs22">Search Customer </h3>
                   <a type="button" class="btn btn-primary float-right" href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_form.php"><i class="fa fa-plus"></i> Add Customer</a>
                 </div>
-                <form>
+                <form method="post" action="customer_index.php">
                   <div class="card-body res_col_form">
                     <div class="row">
-                      <div class="col-2"><input type="text" class="form-control" placeholder="Company Name"></div>
-                      <div class="col-2"><input type="text" class="form-control" placeholder="Customer Name"></div>
-                      <div class="col-2"><input type="email" class="form-control" placeholder="Email Id"></div>
-                      <div class="col-2"><input type="tel" class="form-control" placeholder="Mobile No."></div>
+                      <div class="col-2">
+                        <input type="text" class="form-control" name="company_name" id="company_name" placeholder="Company Name" value="<?= (isset($_POST) ? ($_POST['company_name'] ?? '') : '') ?>">
+                      </div>
+                      <div class="col-2">
+                        <input type="text" class="form-control" name="customer_name" id="customer_name" placeholder="Customer Name" value="<?= (isset($_POST) ? ($_POST['customer_name'] ?? '') : '') ?>">
+                      </div>
+                      <div class="col-2">
+                        <input type="email" class="form-control" name="customer_primary_email_id" id="customer_primary_email_id" placeholder="Email Id" value="<?= (isset($_POST) ? ($_POST['customer_primary_email_id'] ?? '') : '') ?>">
+                      </div>
+                      <div class="col-2">
+                        <input type="tel" class="form-control" name="customer_mobile_no1" id="customer_mobile_no1" placeholder="Mobile No." value="<?= (isset($_POST) ? ($_POST['customer_mobile_no1'] ?? '') : '') ?>">
+                      </div>
 
                       <div class="col-2">
-                        <select class="form-control" placeholder="Select City">
-                          <option>Select City</option>
+                        <select class="form-control" name="customer_city_location" id="customer_city_location" placeholder="Select City">
+                          <option value="">Select City</option>
                           <?php foreach ($cities as $city) { ?>
-                            <option value="<?= $city['id'] ?>"><?= $city['city_name'] ?></option>
+                            <option value="<?= $city['id'] ?>" <?= (isset($_POST) && ($_POST['customer_city_location'] ?? '') == $city['id']) ? 'selected' : ''; ?>><?= $city['city_name'] ?></option>
                           <?php } ?>
                         </select>
                       </div>

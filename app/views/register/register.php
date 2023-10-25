@@ -7,19 +7,28 @@ if (!isset($_SESSION['user_id'])) {
   header("Location: ../auth/login.php");
 }
 
-$_SESSION['page'] = 'register.php?type=' . (isset($_GET['type']) ? $_GET['type'] : '');
+$_SESSION['page'] = 'register.php' . (isset($_GET['type']) ? '?type=' . $_GET['type'] : '');
 
 $model = (new Model());
 $where = '';
+
 if (isset($_GET["type"]) && ($_GET["type"] == 'inward' || $_GET["type"] == 'outward')) {
   $type = $_GET["type"];
-  $where = " case_register_state=" . ($_GET['type'] == 'outward' ? 2 : ($_GET['type'] == 'inward' ? 1 : 3));
+  $where .= " case_register_state=" . ($_GET['type'] == 'outward' ? 2 : ($_GET['type'] == 'inward' ? 1 : 3));
 } elseif (!isset($_GET["type"])) {
   $type = '';
 }
 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  foreach ($_POST as $key => $value) {
+    if ($value != '') {
+      $where .= (($where == '') ? '' : ' AND ') . " $key = '" . $value . "' ";
+    }
+  }
+}
+
 $join = ' LEFT JOIN customer as c on c.id=cr.customer_id ';
-$case_registers = $model->select('case_register as cr', 'cr.*,c.company_name', $where, $join);
+$case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name', $where, $join);
 $manufacturers = $model->select('device_manufacturer');
 $cities = $model->select('city_location');
 ?>
@@ -216,32 +225,32 @@ $cities = $model->select('city_location');
               <div class="card">
                 <div class="card-header">
                   <h3 class="float-left res_mt5 res_fs22">Search Device</h3>
-                  <a type="button" class="btn btn-primary float-right" href="<?= $_SESSION['url_path'] ?>/app/views/register/create_inward.php?type=<?= isset($_GET['type']) ? $_GET['type'] : '' ?>">Create Inward</a>
+                  <a type="button" class="btn btn-primary float-right" href="<?= $_SESSION['url_path'] ?>/app/views/register/create_inward.php<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>">Create Inward</a>
                 </div>
-                <form id="register_filter_form">
+                <form method="post" action="register.php<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>">
                   <div class="card-body res_col_form">
                     <div class="row">
                       <div class="col-2">
-                        <select class="form-control" placeholder="All Register">
+                        <select class="form-control" name="case_register_state" id="case_register_state" placeholder="All Register">
                           <option value="">All Register</option>
-                          <option value="1">Inward</option>
-                          <option value="2">Outward</option>
+                          <option value="1" <?= (($_SERVER["REQUEST_METHOD"] == 'GET') && isset($_GET) && ($_GET['type'] == 'inward')) ? 'selected' : ''; ?> <?= (isset($_POST) && ($_POST['case_register_state'] ?? '') == 1) ? 'selected' : ''; ?>>Inward</option>
+                          <option value="2" <?= (($_SERVER["REQUEST_METHOD"] == 'GET') && isset($_GET) && ($_GET['type'] == 'outward')) ? 'selected' : ''; ?> <?= (isset($_POST) && ($_POST['case_register_state'] ?? '') == 2) ? 'selected' : ''; ?>>Outward</option>
                         </select>
                       </div>
                       <div class="col-2">
-                        <input type="text" class="form-control" name="id" id="id" placeholder="Inward Id">
+                        <input type="text" class="form-control" name="cr.id" id="cr.id" placeholder="Inward Id" value="<?= (isset($_POST) ? ($_POST['cr.id'] ?? '') : '') ?>">
                       </div>
                       <div class="col-2">
-                        <input type="text" class="form-control" name="device_serial_number" id="device_serial_number" placeholder="Serial #">
+                        <input type="text" class="form-control" name="device_serial_number" id="device_serial_number" placeholder="Serial #" value="<?= (isset($_POST) ? ($_POST['device_serial_number'] ?? '') : '') ?>">
                       </div>
                       <div class="col-2">
-                        <input type="text" class="form-control" name="device_model" id="device_model" placeholder="Model No.">
+                        <input type="text" class="form-control" name="device_model" id="device_model" placeholder="Model No." value="<?= (isset($_POST) ? ($_POST['device_model'] ?? '') : '') ?>">
                       </div>
                       <div class="col-2">
-                        <input type="text" class="form-control" name="company_name" id="company_name" placeholder="Company Name">
+                        <input type="text" class="form-control" name="c.company_name" id="c.company_name" placeholder="Company Name" value="<?= (isset($_POST) ? ($_POST['c.company_name'] ?? '') : '') ?>">
                       </div>
                       <div class="col-2">
-                        <input type="text" class="form-control" name="customer_name" id="customer_name" placeholder="Customer Name">
+                        <input type="text" class="form-control" name="c.customer_name" id="c.customer_name" placeholder="Customer Name" value="<?= (isset($_POST) ? ($_POST['c.customer_name'] ?? '') : '') ?>">
                       </div>
                     </div>
                     <div class="row mt25px res_mt0">
@@ -271,7 +280,7 @@ $cities = $model->select('city_location');
                         <select class="form-control" name="device_maker_id" id="device_maker_id" placeholder="Select Manufacturer">
                           <option value="">Select Manufacturer</option>
                           <?php foreach ($manufacturers as $manufacturer) { ?>
-                            <option value="<?= $manufacturer['id'] ?>" <?= (($customers['device_maker_id'] ?? '') == $manufacturer['id'] ? 'selected' : '') ?>><?= $manufacturer['manufacturer_name'] ?></option>
+                            <option value="<?= $manufacturer['id'] ?>" <?= (isset($_POST) && ($_POST['device_maker_id'] ?? '') == $manufacturer['id']) ? 'selected' : ''; ?>><?= $manufacturer['manufacturer_name'] ?></option>
                           <?php } ?>
                         </select>
                       </div>
@@ -279,26 +288,26 @@ $cities = $model->select('city_location');
                       <div class="col-2">
                         <select class="form-control" name="case_status" id="case_status" placeholder="Device Status">
                           <option value="">Device Status</option>
-                          <option value="1">Open</option>
-                          <option value="2">Inprocess</option>
-                          <option value="3">Processed</option>
-                          <option value="4">Close</option>
+                          <option value="1" <?= (isset($_POST) && ($_POST['case_status'] ?? '') == 1) ? 'selected' : ''; ?>>Open</option>
+                          <option value="2" <?= (isset($_POST) && ($_POST['case_status'] ?? '') == 2) ? 'selected' : ''; ?>>Inprocess</option>
+                          <option value="3" <?= (isset($_POST) && ($_POST['case_status'] ?? '') == 3) ? 'selected' : ''; ?>>Processed</option>
+                          <option value="4" <?= (isset($_POST) && ($_POST['case_status'] ?? '') == 4) ? 'selected' : ''; ?>>Close</option>
                         </select>
                       </div>
 
                       <div class="col-2">
                         <select class="form-control" name="case_result" id="case_result" placeholder="Recovery Status">
                           <option value="">Recovery Status</option>
-                          <option value="1">Recovered</option>
-                          <option value="0">Not Recovered</option>
+                          <option value="1" <?= (isset($_POST) && ($_POST['case_result'] ?? '') == 1) ? 'selected' : ''; ?>>Recovered</option>
+                          <option value="0" <?= (isset($_POST) && ($_POST['case_result'] ?? '') == 0) ? 'selected' : ''; ?>>Not Recovered</option>
                         </select>
                       </div>
 
                       <div class="col-2">
                         <select class="form-control" name="customer_city_location" id="customer_city_location" placeholder="Select Location">
-                          <option>Select Location</option>
+                          <option value="">Select Location</option>
                           <?php foreach ($cities as $city) { ?>
-                            <option value="<?= $city['id'] ?>" <?= (($filter['customer_city_location'] ?? '') == $city['id'] ? 'selected' : '') ?>><?= $city['city_name'] ?></option>
+                            <option value="<?= $city['id'] ?>" <?= (isset($_POST) && ($_POST['customer_city_location'] ?? '') == $city['id']) ? 'selected' : ''; ?>><?= $city['city_name'] ?></option>
                           <?php } ?>
                         </select>
                       </div>
@@ -307,7 +316,7 @@ $cities = $model->select('city_location');
 
                     <div class="row mt25px res_mt10">
                       <div class="col-1 max_width100">
-                        <button type="button" class="btn btn-primary wid100" onclick="register_filter_form()">Search </button>
+                        <button type="submit" class="btn btn-primary wid100">Search </button>
                       </div>
                       <div class="col-1 max_width100">
                         <button type="reset" class="btn btn-default wid100">Clear</button>
@@ -340,6 +349,10 @@ $cities = $model->select('city_location');
                       <?php
                       $case_status = [1 => 'Open', 2 => 'In Progress', 3 => 'Processed', 4 => 'Close'];
                       $case_status_color = [1 => 'success', 2 => 'warning', 3 => 'info', 4 => 'danger'];
+                      $estimate_status = [0 => 'Pending', 1 => 'Approved', 2 => 'Reject'];
+                      $estimate_status_color = [0 => 'warning', 1 => 'success', 2 => 'danger'];
+                      $recovery_status = [0 => 'Not Recovered', 1 => 'Recovered'];
+                      $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                       foreach ($case_registers as $case_register) { ?>
                         <tr id="register_tr_no_filter">
                           <td>
@@ -354,10 +367,10 @@ $cities = $model->select('city_location');
                             <!-- <small class="badge badge-<?= $case_status_color[$case_register['case_status']] ?>"><?= $case_status[$case_register['case_status']] ?></small> -->
                           </td>
                           <td>
-                            <small class="badge badge-<?= ($case_register['case_result'] == 0) ? 'secondary' : 'success' ?>"><?= $case_register['case_result'] ?> </small>
+                            <small class="badge badge-<?= ($recovery_status_color[$case_register['case_result']]) ?>"><?= ($recovery_status[$case_register['case_result']]) ?></small>
                           </td>
                           <td>
-                            <small class="badge badge-<?= ($case_register['estimate_approved_by_customer'] == 1) ? 'info' : 'success' ?>"><?= $case_register['estimate_approved_by_customer'] ?> </small>
+                            <small class="badge badge-<?= ($estimate_status_color[$case_register['estimate_approved_by_customer']]) ?>"><?= ($estimate_status[$case_register['estimate_approved_by_customer']]) ?></small>
                           </td>
                           <td>
                             <?= date('d M, Y hh:mm TZD', strtotime($case_register['case_received_date'])) ?>
@@ -370,7 +383,7 @@ $cities = $model->select('city_location');
                                   <a href="see_details.html"><i class='fa fa-search mr5'></i> See Details</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] : '' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
+                                  <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] : '?' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
                                 </li>
                                 <li class="dropdown-divider"></li>
                                 <li class="dropdown-item">
@@ -387,9 +400,9 @@ $cities = $model->select('city_location');
                                   <a href="#"><i class='fa fa-print mr5'></i> Print</a>
                                 </li>
                                 <li class="dropdown-divider"></li>
-                                <li class="dropdown-item">
+                                <!-- <li class="dropdown-item">
                                   <a href="#"><i class='fa fa-inbox mr5'></i> Move to Stock</a>
-                                </li>
+                                </li> -->
                                 <li class="dropdown-item">
                                   <a href="#"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
                                 </li>
@@ -398,34 +411,6 @@ $cities = $model->select('city_location');
                           </td>
                         </tr>
                       <?php } ?>
-                      <!-- <tr id="register_tr_with_filter" style="display: none;">
-                        <td><input type="checkbox" name="terms" class="" id="exampleCheck1"></td>
-                        <td>18943</td>
-                        <td>PNY39200023580104023 <small class="badge badge-success float-right">Inward </small></td>
-                        <td>ABC Infotech</td>
-                        <td><small class="badge badge-success">Open</small></td>
-                        <td><small class="badge badge-secondary">Not Recovered </small></td>
-                        <td><small class="badge badge-info">Pending </small></td>
-                        <td>19 Aug, 2023 11:59 am</td>
-                        <td>
-                          <div class="input-group-prepend">
-                            <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
-                            <ul class="dropdown-menu">
-                              <li class="dropdown-item"><a href="see_details.html"><i class='fa fa-search mr5'></i> See Details</a></li>
-                              <li class="dropdown-item"><a href="#"><i class="fa fa-pencil mr5"></i> Edit</a></li>
-                              <li class="dropdown-divider"></li>
-                              <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal_send_estimate"><i class='fa fa-inr mr5'></i> Send Estimate</a></li>
-                              <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal_add_storage_details"><i class='fa fa-cog mr5'></i> Add Storage Detail</a></li>
-                              <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a></li>
-                              <li class="dropdown-divider"></li>
-                              <li class="dropdown-item"><a href="#"><i class='fa fa-print mr5'></i> Print</a></li>
-                              <li class="dropdown-divider"></li>
-                              <li class="dropdown-item"><a href="#"><i class='fa fa-inbox mr5'></i> Move to Stock</a></li>
-                              <li class="dropdown-item"><a href="#"><i class='fa fa-sign-out mr5'></i> Move to Outward</a></li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr> -->
                     </tbody>
                   </table>
                 </div>
@@ -449,7 +434,6 @@ $cities = $model->select('city_location');
                 <div class="col-md-4 res_mt10 res_padding0 ">
                   <h5 class="mb-3 res_fs22">Register Status :</h5>
                   <p><span class="badge badge-success width65 mr5">Inward</span> Device in Inward Register.</p>
-                  <p><span class="badge badge-danger width65 mr5">Stock</span> Device in Stock Register.</p>
                   <p><span class="badge badge-secondary width65 mr5">Outward </span> Device in Outward Register.</p>
 
                 </div>
@@ -461,11 +445,8 @@ $cities = $model->select('city_location');
       </section>
 
       <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></a>
-
     </div>
-
     <aside class="control-sidebar control-sidebar-dark"></aside>
-
     <!-- /.control-sidebar -->
   </div>
   <!-- ./wrapper -->
@@ -500,24 +481,15 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/dropzone/min/dropzone.min.js"></script>
 
   <script>
-    function register_filter_form() {
-      e.preventDefault();
-      ajaxRequest($('#register_filter_form').serializeArray());
-    };
-
-    function ajaxRequest(formData) {
+    function deleteCustomer(delete_id) {
       $.ajax({
         type: "POST",
         url: "../../controllers/RegisterController.php",
         data: {
-          formData: formData,
-          index: true,
-          type: "<?= $type ?>"
+          delete_id: delete_id,
         },
         success: function(response) {
-          // console.log(response)
-          $('#register_tr_no_filter').hide();
-          $('#register_tr_with_filter').show();
+          location.reload(true);
         }
       });
     }

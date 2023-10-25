@@ -7,15 +7,15 @@ if (!isset($_SESSION['user_id'])) {
 }
 $_SESSION['page'] = 'dashboard.php';
 ?>
-<?php include(__DIR__ . '/template/head.php') ?>
+<?php include('/template/head.php') ?>
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
 
-    <?php include(__DIR__ . '/template/header.php') ?>
+    <?php include('/template/header.php') ?>
 
     <!-- Main Sidebar Container -->
-    <?php include(__DIR__ . '/template/sidebar.php') ?>
+    <?php include('/template/sidebar.php') ?>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">

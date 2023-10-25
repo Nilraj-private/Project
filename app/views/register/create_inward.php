@@ -12,6 +12,10 @@ $model = (new Model());
 $customers = $model->select("customer");
 $manufacturers = $model->select("device_manufacturer");
 $cities = $model->select("city_location");
+
+if (isset($_GET['id'])) {
+  $inward = $model->select('case_register', '*', ' id=' . $_GET['id'])[0];
+}
 ?>
 <?php include('../template/head.php') ?>
 
@@ -55,7 +59,7 @@ $cities = $model->select("city_location");
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid ">
-          <form id="create_inward">
+          <form id="inward_form">
             <div class="row">
               <div class="col-12 ">
                 <div class="card">
@@ -68,7 +72,7 @@ $cities = $model->select("city_location");
                         <select class="form-control" name="customer_id" id="customer_id">
                           <option value="">Select Client</option>
                           <?php foreach ($customers as $customer) { ?>
-                            <option value="<?= $customer['id'] ?>"><?= $customer['customer_name'] ?></option>
+                            <option value="<?= $customer['id'] ?>" <?= (($inward['customer_id'] ?? '') == $customer['id']) ? 'selected' : '' ?>><?= $customer['customer_name'] ?></option>
                           <?php } ?>
                         </select>
                         <!-- <input class="lh30" name="customer_id" id="CaseRegister_customer_id" type="search" /> -->
@@ -86,236 +90,235 @@ $cities = $model->select("city_location");
                 </div>
               </div>
 
-              <div class="modal fade" id="modal-lg">
-                <div class="modal-dialog modal-lg">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h4 class="modal-title">Add New Customer</h4>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <form id="customer_form">
-                      <div class="modal-body res_col_form">
-                        <div class="row">
-                          <div class="col-6">
-                            <div class="form-group">
-                              <label>Company Name *</label>
-                              <input type="text" class="form-control" name="" id="" placeholder="Company Name *" required>
-                            </div>
-                          </div>
-
-                          <div class="col-6">
-                            <div class="form-group">
-                              <label>Customer Name *</label>
-                              <input type="text" class="form-control" name="customer_name" id="customer_name" placeholder="Customer Name *" required>
-                            </div>
-                          </div>
-
-                          <div class="col-6">
-                            <div class="form-group">
-                              <label>Primary Email *</label>
-                              <input type="text" class="form-control" name="customer_primary_email_id" id="customer_primary_email_id" placeholder="Primary Email *" required>
-                            </div>
-                          </div>
-
-                          <div class="col-6">
-                            <div class="form-group">
-                              <label>Primary Mobile No.*</label>
-                              <input type="text" class="form-control" name="customer_mobile_no1" id="customer_mobile_no1" placeholder="Primary Mobile No.*" required>
-                            </div>
-                          </div>
-
-                          <div class="col-6">
-                            <div class="form-group">
-                              <label>Office Phone</label>
-                              <input type="text" class="form-control" name="office_phone" id="office_phone" placeholder="Office Phone">
-                            </div>
-                          </div>
-
-                          <div class="col-6">
-                            <div class="form-group">
-                              <label>Customer Mobile No2</label>
-                              <input type="text" class="form-control" name="customer_mobile_no2" id="customer_mobile_no2" placeholder="Customer Mobile No2">
-                            </div>
-                          </div>
-
-                          <div class="col-6">
-                            <div class="form-group">
-                              <label>Office Address </label>
-                              <textarea class="form-control" name="office_addressline" id="office_addressline" rows="3" placeholder="Office Address "></textarea>
-                            </div>
-                          </div>
-
-                          <div class="col-6">
-                            <div class="form-group">
-                              <label>Location</label>
-                              <select class="form-control" name="customer_city_location" id="customer_city_location" placeholder="Select Location (City)">
-                                <option value="">Select Location (City)</option>
-                                <?php foreach ($cities as $city) { ?>
-                                  <option value="<?= $city['id'] ?>"><?= $city['city_name'] ?></option>
-                                <?php } ?>
-                              </select>
-                            </div>
-                          </div>
-
-                          <div class="col-6 res_mt10">
-                            <div class="form-group">
-                              <!-- <input class="submit btn btn-success" type="submit" name="yt0" value="Add"> -->
-                              <button type="submit" class="btn btn-success">Add</button>
-                              <a class="btn btn-danger" data-dismiss="modal">Cancel</a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </form>
-                    <!-- <div class="modal-footer justify-content-between">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-primary">Save changes</button>
-                    </div> -->
-                  </div>
-                  <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-              </div>
-              <!-- /.modal -->
-
               <div class="col-12 mb-3">
                 <div class="card  mb35">
                   <div class="card-header">
                     <h3 class="float-left">Inward Details :</h3>
                   </div>
                   <div class="card-body res_col_form">
-                    <form id="inward_form">
-                      <div class="row">
-                        <div class="col-3">
-                          <div class="form-group">
-                            <label>Device Serial Number</label>
-                            <input type="text" class="form-control" name="device_serial_number" id="device_serial_number" placeholder="Device Serial Number">
-                          </div>
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label>Device Serial Number</label>
+                          <input type="text" class="form-control" name="device_serial_number" id="device_serial_number" placeholder="Device Serial Number" value="<?= $inward['device_serial_number'] ?? '' ?>">
                         </div>
+                      </div>
 
-                        <div class="col-3">
-                          <div class="form-group">
-                            <label>Device Internal Serial Number</label>
-                            <input type="text" class="form-control" name="device_internal_serial_number" id="device_internal_serial_number" placeholder="Device Internal Serial Number">
-                          </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label>Device Internal Serial Number</label>
+                          <input type="text" class="form-control" name="device_internal_serial_number" id="device_internal_serial_number" placeholder="Device Internal Serial Number" value="<?= $inward['device_internal_serial_number'] ?? '' ?>">
                         </div>
+                      </div>
 
-                        <div class="col-3">
-                          <div class="form-group">
-                            <label>Device Manufacturer</label>
-                            <select class="form-control" name="device_maker_id" id="device_maker_id" placeholder="Device Manufacturer">
-                              <option value="">Select Device Manufacturer</option>
-                              <?php foreach ($manufacturers as $manufacturer) { ?>
-                                <option value="<?= $manufacturer['id'] ?>"><?= $manufacturer['manufacturer_name'] ?></option>
-                              <?php } ?>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label>Device Manufacturer</label>
+                          <select class="form-control" name="device_maker_id" id="device_maker_id" placeholder="Device Manufacturer">
+                            <option value="">Select Device Manufacturer</option>
+                            <?php foreach ($manufacturers as $manufacturer) { ?>
+                              <option value="<?= $manufacturer['id'] ?>" <?= (($inward['device_maker_id'] ?? '') == $manufacturer['id']) ? 'selected' : '' ?>><?= $manufacturer['manufacturer_name'] ?></option>
+                            <?php } ?>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label>Device Model</label>
+                          <input type="text" class="form-control" name="device_model" id="device_model" placeholder="Device Model" value="<?= $inward['device_model'] ?? '' ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt25px res_mt0">
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label>Device Type</label>
+                          <select class="form-control" name="device_type" id="device_type" placeholder="Select Device Type">
+                            <option value="">Device Type</option>
+                            <option value="DESKTOP" <?= (($inward['device_type'] ?? '') == 'DESKTOP') ? 'selected' : '' ?>>DESKTOP</option>
+                            <option value="LAPTOP" <?= (($inward['device_type'] ?? '') == 'LAPTOP') ? 'selected' : '' ?>>LAPTOP</option>
+                            <option value="USB WITH CABLE" <?= (($inward['device_type'] ?? '') == 'USB WITH CABLE') ? 'selected' : '' ?>>USB WITH CABLE</option>
+                            <option value="USB WITHOUT CABLE" <?= (($inward['device_type'] ?? '') == 'USB WITHOUT CABLE') ? 'selected' : '' ?>>USB WITHOUT CABLE</option>
+                            <option value="USB WITH CABLE & ADAPTER" <?= (($inward['device_type'] ?? '') == '"USB WITH CABLE & ADAPTER') ? 'selected' : '' ?>>USB WITH CABLE & ADAPTER</option>
+                            <option value="USB WITHOUT CABLE & WITH ADAPTER" <?= (($inward['device_type'] ?? '') == 'USB WITHOUT CABLE & WITH ADAPTER') ? 'selected' : '' ?>>USB WITHOUT CABLE & WITH ADAPTER
+                            </option>
+                            <option value="USB WITHOUT CABLE & WITHOUT ADAPTER" <?= (($inward['device_type'] ?? '') == 'USB WITHOUT CABLE & WITHOUT ADAPTER') ? 'selected' : '' ?>>USB WITHOUT CABLE & WITHOUT
+                              ADAPTER</option>
+                            <option value="LAPTOP SSD SATA" <?= (($inward['device_type'] ?? '') == 'LAPTOP SSD SATA') ? 'selected' : '' ?>>LAPTOP SSD SATA</option>
+                            <option value="NVME SSD" <?= (($inward['device_type'] ?? '') == 'NVME SSD') ? 'selected' : '' ?>>NVME SSD</option>
+                            <option value="SSD USB WITH CABLE" <?= (($inward['device_type'] ?? '') == 'SSD USB WITH CABLE') ? 'selected' : '' ?>>SSD USB WITH CABLE</option>
+                            <option value="SSD USB WITHOUT CABLE" <?= (($inward['device_type'] ?? '') == 'SSD USB WITHOUT CABLE') ? 'selected' : '' ?>>SSD USB WITHOUT CABLE</option>
+                            <option value="OTHER" <?= (($inward['device_type'] ?? '') == 'OTHER') ? 'selected' : '' ?>>OTHER</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label>Device Size</label>
+                          <div>
+                            <input type="hidden" name="device_size" id="device_size1" value="<?= (substr($inward['device_size'] ?? '', 0, -2)); ?>">
+                            <input type="text" class="form-control width64per float-left" id="device_size2" placeholder="Device Size" value="<?= (substr($inward['device_size'] ?? '', 0, -2)); ?>">
+                            <select class="form-control width-36 float-left" placeholder="Select Device Size" id="device_size_unit">
+                              <option value="TB" <?= (str_contains(($inward['device_size'] ?? ''), 'TB')) ? 'selected' : '' ?>>TB</option>
+                              <option value="GB" <?= (str_contains(($inward['device_size'] ?? ''), 'GB')) ? 'selected' : '' ?>>GB</option>
+                              <option value="MB" <?= (str_contains(($inward['device_size'] ?? ''), 'MB')) ? 'selected' : '' ?>>MB</option>
                             </select>
                           </div>
                         </div>
-
-                        <div class="col-3">
-                          <div class="form-group">
-                            <label>Device Model</label>
-                            <input type="text" class="form-control" name="device_model" id="device_model" placeholder="Device Model">
-                          </div>
-                        </div>
                       </div>
-                      <div class="row mt25px res_mt0">
-                        <div class="col-2">
-                          <div class="form-group">
-                            <label>Device Type</label>
-                            <select class="form-control" name="device_type" id="device_type" placeholder="Select Device Type">
-                              <option value="">Device Type</option>
-                              <option value="DESKTOP">DESKTOP</option>
-                              <option value="LAPTOP">LAPTOP</option>
-                              <option value="USB WITH CABLE">USB WITH CABLE</option>
-                              <option value="USB WITHOUT CABLE">USB WITHOUT CABLE</option>
-                              <option value="USB WITH CABLE &amp; ADAPTER">USB WITH CABLE &amp; ADAPTER</option>
-                              <option value="USB WITHOUT CABLE &amp; WITH ADAPTER">USB WITHOUT CABLE &amp; WITH ADAPTER
-                              </option>
-                              <option value="USB WITHOUT CABLE &amp; WITHOUT ADAPTER">USB WITHOUT CABLE &amp; WITHOUT
-                                ADAPTER</option>
-                              <option value="LAPTOP SSD SATA">LAPTOP SSD SATA</option>
-                              <option value="NVME SSD">NVME SSD</option>
-                              <option value="SSD USB WITH CABLE">SSD USB WITH CABLE</option>
-                              <option value="SSD USB WITHOUT CABLE">SSD USB WITHOUT CABLE</option>
-                              <option value="OTHER">OTHER</option>
-                            </select>
-                          </div>
-                        </div>
 
-                        <div class="col-2">
-                          <div class="form-group">
-                            <label>Device Size</label>
-                            <div>
-                              <input type="hidden" name="device_size" id="device_size1">
-                              <input type="text" class="form-control width64per float-left" id="device_size2" placeholder="Device Size">
-                              <select class="form-control width-36 float-left" placeholder="Select Device Size" id="device_size_unit">
-                                <option value="TB">TB</option>
-                                <option value="GB">GB</option>
-                                <option value="MB">MB</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="col-2">
-                          <div class="form-group">
-                            <label>Crash Type</label>
-                            <select class="form-control" name="crash_type" id="crash_type" placeholder="Crash Type">
-                              <option value="">Crash Type</option>
-                              <option value="PHYSICAL">Physical</option>
-                              <option value="LOGICAL">Logical</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        <div class="col-3">
-                          <div class="form-group">
-                            <label>Device Firmware</label>
-                            <input type="text" class="form-control" name="device_firmware" id="device_firmware" placeholder="Firmware Number">
-                          </div>
-                        </div>
-
-                        <div class="col-3">
-                          <div class="form-group">
-                            <label>Device MLC</label>
-                            <input type="text" class="form-control" name="device_mlc" id="device_mlc" placeholder="Device MLC">
-                          </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label>Crash Type</label>
+                          <select class="form-control" name="crash_type" id="crash_type" placeholder="Crash Type">
+                            <option value="">Crash Type</option>
+                            <option value="PHYSICAL" <?= (($inward['crash_type'] ?? '') == 'PHYSICAL') ? 'selected' : '' ?>>Physical</option>
+                            <option value="LOGICAL" <?= (($inward['crash_type'] ?? '') == 'LOGICAL') ? 'selected' : '' ?>>Logical</option>
+                          </select>
                         </div>
                       </div>
 
-                      <div class="row mt25px res_mt0_991">
-                        <div class="col-6">
-                          <div class="form-group">
-                            <label>Files and Directories to be recovered</label>
-                            <textarea class="form-control" rows="2" name="customer_remarks" id="customer_remarks" placeholder="Enter Files to bis Recovered Details"></textarea>
-                          </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label>Device Firmware</label>
+                          <input type="text" class="form-control" name="device_firmware" id="device_firmware" placeholder="Firmware Number" value="<?= $inward['device_firmware'] ?? '' ?>">
                         </div>
+                      </div>
 
-                        <div class="col-3">
-                          <div class="input-group date " id="case_received_date" data-target-input="nearest">
-                            <label class="width-full">Device Received Date</label>
-                            <input type="text" class="form-control datetimepicker-input" data-target="#case_received_date" name="case_received_date" id="case_received_date" placeholder="Device Received Date">
-                            <div class="input-group-append" data-target="#case_received_date" data-toggle="datetimepicker">
-                              <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                            </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label>Device MLC</label>
+                          <input type="text" class="form-control" name="device_mlc" id="device_mlc" placeholder="Device MLC" value="<?= $inward['device_mlc'] ?? '' ?>">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row mt25px res_mt0_991">
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label>Files and Directories to be recovered</label>
+                          <textarea class="form-control" rows="2" name="customer_remarks" id="customer_remarks" placeholder="Enter Files to bis Recovered Details"><?= $inward['customer_remarks'] ?? '' ?></textarea>
+                        </div>
+                      </div>
+
+                      <div class="col-3">
+                        <div class="input-group date " id="case_received_date" data-target-input="nearest">
+                          <label class="width-full">Device Received Date</label>
+                          <input type="text" class="form-control datetimepicker-input" data-target="#case_received_date" name="case_received_date" id="case_received_date" placeholder="Device Received Date">
+                          <div class="input-group-append" data-target="#case_received_date" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                           </div>
                         </div>
                       </div>
-                      <div class="row mt25px res_auto_btn res_mb12 ">
-                        <button type="button" class="btn btn-success mr10" onClick="addInward(0);">Save & Add New </button>
-                        <button type="button" class="btn btn-success mr10" onClick="addInward(1);">Save & Exit</button>
-                        <a type="button" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?type=<?= $_GET['type'] ?>" class="btn btn-danger">Cancel</a>
-                      </div>
-                    </form>
+                    </div>
+                    <div class="row mt25px res_auto_btn res_mb12 ">
+                      <button type="button" class="btn btn-success mr10" onClick="addInward(0);">Save & Add New </button>
+                      <button type="button" class="btn btn-success mr10" onClick="addInward(1);">Save & Exit</button>
+                      <a type="button" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] : '' ?>" class="btn btn-danger">Cancel</a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </form>
         </div>
+
+        <div class="modal fade" id="modal-lg">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">Add New Customer</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form id="customer_form">
+                <div class="modal-body res_col_form">
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label>Company Name *</label>
+                        <input type="text" class="form-control" name="" id="" placeholder="Company Name *" required>
+                      </div>
+                    </div>
+
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label>Customer Name *</label>
+                        <input type="text" class="form-control" name="customer_name" id="customer_name" placeholder="Customer Name *" required>
+                      </div>
+                    </div>
+
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label>Primary Email *</label>
+                        <input type="text" class="form-control" name="customer_primary_email_id" id="customer_primary_email_id" placeholder="Primary Email *" required>
+                      </div>
+                    </div>
+
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label>Primary Mobile No.*</label>
+                        <input type="text" class="form-control" name="customer_mobile_no1" id="customer_mobile_no1" placeholder="Primary Mobile No.*" required>
+                      </div>
+                    </div>
+
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label>Office Phone</label>
+                        <input type="text" class="form-control" name="office_phone" id="office_phone" placeholder="Office Phone">
+                      </div>
+                    </div>
+
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label>Customer Mobile No2</label>
+                        <input type="text" class="form-control" name="customer_mobile_no2" id="customer_mobile_no2" placeholder="Customer Mobile No2">
+                      </div>
+                    </div>
+
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label>Office Address </label>
+                        <textarea class="form-control" name="office_addressline" id="office_addressline" rows="3" placeholder="Office Address "></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label>Location</label>
+                        <select class="form-control" name="customer_city_location" id="customer_city_location" placeholder="Select Location (City)">
+                          <option value="">Select Location (City)</option>
+                          <?php foreach ($cities as $city) { ?>
+                            <option value="<?= $city['id'] ?>"><?= $city['city_name'] ?></option>
+                          <?php } ?>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col-6 res_mt10">
+                      <div class="form-group">
+                        <!-- <input class="submit btn btn-success" type="submit" name="yt0" value="Add"> -->
+                        <button type="submit" class="btn btn-success">Add</button>
+                        <a class="btn btn-danger" data-dismiss="modal">Cancel</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <!-- <div class="modal-footer justify-content-between">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary">Save changes</button>
+                    </div> -->
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
       </section>
       <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></a>
     </div>
