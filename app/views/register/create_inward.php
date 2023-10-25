@@ -14,7 +14,6 @@ $manufacturers = $model->select("device_manufacturer");
 $cities = $model->select("city_location");
 ?>
 <?php include('../template/head.php') ?>
-<!-- <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/css/test.css"> -->
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
@@ -187,8 +186,7 @@ $cities = $model->select("city_location");
                     <h3 class="float-left">Inward Details :</h3>
                   </div>
                   <div class="card-body res_col_form">
-                    <formk  id="inward_form">
-
+                    <form id="inward_form">
                       <div class="row">
                         <div class="col-3">
                           <div class="form-group">
@@ -207,7 +205,7 @@ $cities = $model->select("city_location");
                         <div class="col-3">
                           <div class="form-group">
                             <label>Device Manufacturer</label>
-                            <select class="form-control" name="manufacture_id" id="manufacture_id" placeholder="Device Manufacturer">
+                            <select class="form-control" name="device_maker_id" id="device_maker_id" placeholder="Device Manufacturer">
                               <option value="">Select Device Manufacturer</option>
                               <?php foreach ($manufacturers as $manufacturer) { ?>
                                 <option value="<?= $manufacturer['id'] ?>"><?= $manufacturer['manufacturer_name'] ?></option>
@@ -223,7 +221,6 @@ $cities = $model->select("city_location");
                           </div>
                         </div>
                       </div>
-
                       <div class="row mt25px res_mt0">
                         <div class="col-2">
                           <div class="form-group">
@@ -252,8 +249,9 @@ $cities = $model->select("city_location");
                           <div class="form-group">
                             <label>Device Size</label>
                             <div>
-                              <input type="text" class="form-control width64per float-left" name="device_size" id="device_size" placeholder="Device Size">
-                              <select class="form-control width-36 float-left" placeholder="Select Device Size" name="device_size_unit" id="device_size_unit">
+                              <input type="hidden" name="device_size" id="device_size1">
+                              <input type="text" class="form-control width64per float-left" id="device_size2" placeholder="Device Size">
+                              <select class="form-control width-36 float-left" placeholder="Select Device Size" id="device_size_unit">
                                 <option value="TB">TB</option>
                                 <option value="GB">GB</option>
                                 <option value="MB">MB</option>
@@ -370,7 +368,9 @@ $cities = $model->select("city_location");
     // });
 
     function addInward(retry) {
-      formData = $('#create_inward').serializeArray();
+      var device_size = $('#device_size2').val() + $('#device_size_unit').val();
+      $('#device_size1').val(device_size)
+      formData = $('#inward_form').serializeArray();
       $.ajax({
         url: '../../controllers/RegisterController.php',
         type: 'POST',
@@ -483,303 +483,303 @@ $cities = $model->select("city_location");
         'format': 'd-m-Y H:i',
         'allowTimes': ['00:00', '00:30', '01:00', '01:30', '02:00', '02:30', '03:00', '03:30', '04:00', '04:30', '05:00', '05:30', '06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30', '23:00', '23:30']
       });
-      jQuery('#customer-form').yiiactiveform({
-        'validateOnSubmit': true,
-        'validateOnChange': true,
-        'inputContainer': 'div.form-group',
-        'errorCssClass': 'has-error',
-        'successCssClass': 'has-success',
-        'attributes': [{
-          'id': 'CaseRegister_customer_id',
-          'inputID': 'CaseRegister_customer_id',
-          'errorID': 'CaseRegister_customer_id_em_',
-          'model': 'CaseRegister',
-          'name': 'customer_id',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
+      // jQuery('#customer-form').yiiactiveform({
+      //   'validateOnSubmit': true,
+      //   'validateOnChange': true,
+      //   'inputContainer': 'div.form-group',
+      //   'errorCssClass': 'has-error',
+      //   'successCssClass': 'has-success',
+      //   'attributes': [{
+      //     'id': 'CaseRegister_customer_id',
+      //     'inputID': 'CaseRegister_customer_id',
+      //     'errorID': 'CaseRegister_customer_id_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'customer_id',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
 
-            if (jQuery.trim(value) == '') {
-              messages.push("Customer Id cannot be blank.");
-            }
-
-
-            if (jQuery.trim(value) != '') {
-
-              if (!value.match(/^\s*[+-]?\d+\s*$/)) {
-                messages.push("Customer Id must be an integer.");
-              }
-
-            }
-
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_device_serial_number',
-          'inputID': 'CaseRegister_device_serial_number',
-          'errorID': 'CaseRegister_device_serial_number_em_',
-          'model': 'CaseRegister',
-          'name': 'device_serial_number',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
-
-            if (jQuery.trim(value) == '') {
-              messages.push("Device Serial Number cannot be blank.");
-            }
+      //       if (jQuery.trim(value) == '') {
+      //         messages.push("Customer Id cannot be blank.");
+      //       }
 
 
-            if (jQuery.trim(value) != '') {
+      //       if (jQuery.trim(value) != '') {
 
-              if (value.length > 30) {
-                messages.push("Device Serial Number is too long (maximum is 30 characters).");
-              }
+      //         if (!value.match(/^\s*[+-]?\d+\s*$/)) {
+      //           messages.push("Customer Id must be an integer.");
+      //         }
 
-            }
+      //       }
 
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_device_internal_serial_number',
-          'inputID': 'CaseRegister_device_internal_serial_number',
-          'errorID': 'CaseRegister_device_internal_serial_number_em_',
-          'model': 'CaseRegister',
-          'name': 'device_internal_serial_number',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_device_serial_number',
+      //     'inputID': 'CaseRegister_device_serial_number',
+      //     'errorID': 'CaseRegister_device_serial_number_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'device_serial_number',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
 
-            if (jQuery.trim(value) != '') {
-
-              if (value.length > 20) {
-                messages.push("Device Internal Serial Number is too long (maximum is 20 characters).");
-              }
-
-            }
-
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_device_maker_id',
-          'inputID': 'CaseRegister_device_maker_id',
-          'errorID': 'CaseRegister_device_maker_id_em_',
-          'model': 'CaseRegister',
-          'name': 'device_maker_id',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
-
-            if (jQuery.trim(value) != '') {
-
-              if (!value.match(/^\s*[+-]?\d+\s*$/)) {
-                messages.push("Device Manufacturer must be an integer.");
-              }
-
-            }
-
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_device_model',
-          'inputID': 'CaseRegister_device_model',
-          'errorID': 'CaseRegister_device_model_em_',
-          'model': 'CaseRegister',
-          'name': 'device_model',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
-
-            if (jQuery.trim(value) != '') {
-
-              if (value.length > 25) {
-                messages.push("Device Model is too long (maximum is 25 characters).");
-              }
-
-            }
-
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_device_type',
-          'inputID': 'CaseRegister_device_type',
-          'errorID': 'CaseRegister_device_type_em_',
-          'model': 'CaseRegister',
-          'name': 'device_type',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
-
-            if (jQuery.trim(value) != '') {
-
-              if (value.length > 50) {
-                messages.push("Device Type is too long (maximum is 50 characters).");
-              }
-
-            }
-
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_device_size',
-          'inputID': 'CaseRegister_device_size',
-          'errorID': 'CaseRegister_device_size_em_',
-          'model': 'CaseRegister',
-          'name': 'device_size',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
-
-            if (jQuery.trim(value) != '') {
-
-              if (value.length > 10) {
-                messages.push("Device Size is too long (maximum is 10 characters).");
-              }
-
-            }
-
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_crash_type',
-          'inputID': 'CaseRegister_crash_type',
-          'errorID': 'CaseRegister_crash_type_em_',
-          'model': 'CaseRegister',
-          'name': 'crash_type',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
-
-            if (jQuery.trim(value) != '') {
-
-              if (value.length > 10) {
-                messages.push("Crash Type is too long (maximum is 10 characters).");
-              }
-
-            }
-
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_device_firmware',
-          'inputID': 'CaseRegister_device_firmware',
-          'errorID': 'CaseRegister_device_firmware_em_',
-          'model': 'CaseRegister',
-          'name': 'device_firmware',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
-
-            if (jQuery.trim(value) != '') {
-
-              if (value.length > 15) {
-                messages.push("Device Firmware is too long (maximum is 15 characters).");
-              }
-
-            }
-
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_device_mlc',
-          'inputID': 'CaseRegister_device_mlc',
-          'errorID': 'CaseRegister_device_mlc_em_',
-          'model': 'CaseRegister',
-          'name': 'device_mlc',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
-
-            if (jQuery.trim(value) != '') {
-
-              if (value.length > 20) {
-                messages.push("Device MLC is too long (maximum is 20 characters).");
-              }
-
-            }
-
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_files_to_recover',
-          'inputID': 'CaseRegister_files_to_recover',
-          'errorID': 'CaseRegister_files_to_recover_em_',
-          'model': 'CaseRegister',
-          'name': 'files_to_recover',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
-
-            if (jQuery.trim(value) != '') {
-
-              if (value.length > 2048) {
-                messages.push("Files To Recover is too long (maximum is 2048 characters).");
-              }
-
-            }
+      //       if (jQuery.trim(value) == '') {
+      //         messages.push("Device Serial Number cannot be blank.");
+      //       }
 
 
-            if (jQuery.trim(value) != '') {
+      //       if (jQuery.trim(value) != '') {
 
-              if (value.length > 512) {
-                messages.push("Files To Recover is too long (maximum is 512 characters).");
-              }
+      //         if (value.length > 30) {
+      //           messages.push("Device Serial Number is too long (maximum is 30 characters).");
+      //         }
 
-            }
+      //       }
 
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_inward_remarks',
-          'inputID': 'CaseRegister_inward_remarks',
-          'errorID': 'CaseRegister_inward_remarks_em_',
-          'model': 'CaseRegister',
-          'name': 'inward_remarks',
-          'enableAjaxValidation': false,
-          'clientValidation': function(value, messages, attribute) {
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_device_internal_serial_number',
+      //     'inputID': 'CaseRegister_device_internal_serial_number',
+      //     'errorID': 'CaseRegister_device_internal_serial_number_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'device_internal_serial_number',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
 
-            if (jQuery.trim(value) != '') {
+      //       if (jQuery.trim(value) != '') {
 
-              if (value.length > 2048) {
-                messages.push("Inward Remarks is too long (maximum is 2048 characters).");
-              }
+      //         if (value.length > 20) {
+      //           messages.push("Device Internal Serial Number is too long (maximum is 20 characters).");
+      //         }
 
-            }
+      //       }
 
-          },
-          'summary': true
-        }, {
-          'id': 'CaseRegister_case_received_date',
-          'inputID': 'CaseRegister_case_received_date',
-          'errorID': 'CaseRegister_case_received_date_em_',
-          'model': 'CaseRegister',
-          'name': 'case_received_date',
-          'enableAjaxValidation': false,
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }, {
-          'summary': true
-        }],
-        'summaryID': 'customer-form_es_',
-        'errorCss': 'error'
-      });
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_device_maker_id',
+      //     'inputID': 'CaseRegister_device_maker_id',
+      //     'errorID': 'CaseRegister_device_maker_id_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'device_maker_id',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (!value.match(/^\s*[+-]?\d+\s*$/)) {
+      //           messages.push("Device Manufacturer must be an integer.");
+      //         }
+
+      //       }
+
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_device_model',
+      //     'inputID': 'CaseRegister_device_model',
+      //     'errorID': 'CaseRegister_device_model_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'device_model',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (value.length > 25) {
+      //           messages.push("Device Model is too long (maximum is 25 characters).");
+      //         }
+
+      //       }
+
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_device_type',
+      //     'inputID': 'CaseRegister_device_type',
+      //     'errorID': 'CaseRegister_device_type_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'device_type',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (value.length > 50) {
+      //           messages.push("Device Type is too long (maximum is 50 characters).");
+      //         }
+
+      //       }
+
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_device_size',
+      //     'inputID': 'CaseRegister_device_size',
+      //     'errorID': 'CaseRegister_device_size_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'device_size',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (value.length > 10) {
+      //           messages.push("Device Size is too long (maximum is 10 characters).");
+      //         }
+
+      //       }
+
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_crash_type',
+      //     'inputID': 'CaseRegister_crash_type',
+      //     'errorID': 'CaseRegister_crash_type_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'crash_type',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (value.length > 10) {
+      //           messages.push("Crash Type is too long (maximum is 10 characters).");
+      //         }
+
+      //       }
+
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_device_firmware',
+      //     'inputID': 'CaseRegister_device_firmware',
+      //     'errorID': 'CaseRegister_device_firmware_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'device_firmware',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (value.length > 15) {
+      //           messages.push("Device Firmware is too long (maximum is 15 characters).");
+      //         }
+
+      //       }
+
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_device_mlc',
+      //     'inputID': 'CaseRegister_device_mlc',
+      //     'errorID': 'CaseRegister_device_mlc_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'device_mlc',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (value.length > 20) {
+      //           messages.push("Device MLC is too long (maximum is 20 characters).");
+      //         }
+
+      //       }
+
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_files_to_recover',
+      //     'inputID': 'CaseRegister_files_to_recover',
+      //     'errorID': 'CaseRegister_files_to_recover_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'files_to_recover',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (value.length > 2048) {
+      //           messages.push("Files To Recover is too long (maximum is 2048 characters).");
+      //         }
+
+      //       }
+
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (value.length > 512) {
+      //           messages.push("Files To Recover is too long (maximum is 512 characters).");
+      //         }
+
+      //       }
+
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_inward_remarks',
+      //     'inputID': 'CaseRegister_inward_remarks',
+      //     'errorID': 'CaseRegister_inward_remarks_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'inward_remarks',
+      //     'enableAjaxValidation': false,
+      //     'clientValidation': function(value, messages, attribute) {
+
+      //       if (jQuery.trim(value) != '') {
+
+      //         if (value.length > 2048) {
+      //           messages.push("Inward Remarks is too long (maximum is 2048 characters).");
+      //         }
+
+      //       }
+
+      //     },
+      //     'summary': true
+      //   }, {
+      //     'id': 'CaseRegister_case_received_date',
+      //     'inputID': 'CaseRegister_case_received_date',
+      //     'errorID': 'CaseRegister_case_received_date_em_',
+      //     'model': 'CaseRegister',
+      //     'name': 'case_received_date',
+      //     'enableAjaxValidation': false,
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }, {
+      //     'summary': true
+      //   }],
+      //   'summaryID': 'customer-form_es_',
+      //   'errorCss': 'error'
+      // });
 
       $('.fancybox-link').fancybox({
         'type': 'ajax',

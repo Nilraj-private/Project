@@ -10,10 +10,9 @@ if (!isset($_SESSION['user_id'])) {
 $_SESSION['page'] = 'register.php?type=' . (isset($_GET['type']) ? $_GET['type'] : '');
 
 $model = (new Model());
-
+$where = '';
 if (isset($_GET["type"]) && ($_GET["type"] == 'inward' || $_GET["type"] == 'outward')) {
   $type = $_GET["type"];
-
   $where = " case_register_state=" . ($_GET['type'] == 'outward' ? 2 : ($_GET['type'] == 'inward' ? 1 : 3));
 } elseif (!isset($_GET["type"])) {
   $type = '';
@@ -352,7 +351,7 @@ $cities = $model->select('city_location');
                           </td>
                           <td><?= $case_register['company_name'] ?></td>
                           <td>
-                            <small class="badge badge-<?= $case_status_color[$case_register['case_status']] ?>"><?= $case_status[$case_register['case_status']] ?></small>
+                            <!-- <small class="badge badge-<?= $case_status_color[$case_register['case_status']] ?>"><?= $case_status[$case_register['case_status']] ?></small> -->
                           </td>
                           <td>
                             <small class="badge badge-<?= ($case_register['case_result'] == 0) ? 'secondary' : 'success' ?>"><?= $case_register['case_result'] ?> </small>
@@ -371,7 +370,7 @@ $cities = $model->select('city_location');
                                   <a href="see_details.html"><i class='fa fa-search mr5'></i> See Details</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a href="create_inward.php?type=<?= $_GET['type'] ?>id=<?= $case_registers['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
+                                  <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] : '' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
                                 </li>
                                 <li class="dropdown-divider"></li>
                                 <li class="dropdown-item">
@@ -399,7 +398,7 @@ $cities = $model->select('city_location');
                           </td>
                         </tr>
                       <?php } ?>
-                      <tr id="register_tr_with_filter" style="display: none;">
+                      <!-- <tr id="register_tr_with_filter" style="display: none;">
                         <td><input type="checkbox" name="terms" class="" id="exampleCheck1"></td>
                         <td>18943</td>
                         <td>PNY39200023580104023 <small class="badge badge-success float-right">Inward </small></td>
@@ -426,7 +425,7 @@ $cities = $model->select('city_location');
                             </ul>
                           </div>
                         </td>
-                      </tr>
+                      </tr> -->
                     </tbody>
                   </table>
                 </div>
