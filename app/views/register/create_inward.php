@@ -214,8 +214,12 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="row mt25px res_auto_btn res_mb12 ">
-                      <button type="button" class="btn btn-success mr10" onClick="addInward(0);">Save & Add New </button>
-                      <button type="button" class="btn btn-success mr10" onClick="addInward(1);">Save & Exit</button>
+                      <?php if (!isset($_GET['id'])) { ?>
+                        <button type="button" class="btn btn-success mr10" onClick="addInward(0);">Save & Add New </button>
+                        <button type="button" class="btn btn-success mr10" onClick="addInward(1);">Save & Exit</button>
+                      <?php } else { ?>
+                        <button type="button" class="btn btn-success mr10" onClick="addInward(1);">Update</button>
+                      <?php } ?>
                       <a type="button" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] : '' ?>" class="btn btn-danger">Cancel</a>
                     </div>
                   </div>
@@ -379,6 +383,7 @@ if (isset($_GET['id'])) {
         type: 'POST',
         data: {
           formData: formData,
+          id: "<?= $_GET['id'] ?? 0 ?>"
         },
         success: function(response) {
           if (retry == 1)

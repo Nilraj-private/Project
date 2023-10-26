@@ -34,12 +34,10 @@ class Model
         $sql .= ' ORDER BY id DESC';
 
         $result = mysqli_query($this->conn, $sql);
-        if ($result) {
+        if ($result->num_rows) {
             $data = [];
-            if ($result) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $data[] = $row;
-                }
+            while ($row = mysqli_fetch_assoc($result)) {
+                $data[] = $row;
             }
             return $data;
         } else {
@@ -101,10 +99,8 @@ class Model
         $result = mysqli_query($this->conn, $sql);
         if ($result->num_rows) {
             $data = [];
-            if ($result) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $data[] = $row;
-                }
+            while ($row = mysqli_fetch_assoc($result)) {
+                $data[] = $row;
             }
             $_SESSION['user_id'] = $data[0]['id'];
             return true;
