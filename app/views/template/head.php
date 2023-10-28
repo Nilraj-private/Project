@@ -1,6 +1,17 @@
-<?php 
+<?php
 
 session_start();
+
+if (isset($is_login_page) && $is_login_page == 1) {
+  if (isset($_SESSION['user_id'])) {
+    header("Location: " . $_SESSION['url_path'] . "/auth/login.php");
+  }
+} else {
+  if (!isset($_SESSION['user_id'])) {
+    header("Location: " . $_SESSION['url_path'] . "/auth/login.php");
+  }
+}
+
 $_SESSION['url_path'] = 'https://recoveryourdata.co.in/module1';
 
 ?>

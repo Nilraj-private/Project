@@ -5,10 +5,6 @@ require("../../models/model.php");
 
 use app\models\Model;
 
-if (!isset($_SESSION['user_id'])) {
-  header("Location: ../auth/login.php");
-}
-
 $_SESSION['page'] = 'register.php' . (isset($_GET['type']) ? '?type=' . $_GET['type'] : '');
 
 $model = (new Model());

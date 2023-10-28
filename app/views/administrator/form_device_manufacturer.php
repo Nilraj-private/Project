@@ -5,10 +5,6 @@ require("../../models/model.php");
 
 use app\models\Model;
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-}
-
 if (isset($_GET['id']) && !empty($_GET['id'])) {
 
     $model = (new Model());

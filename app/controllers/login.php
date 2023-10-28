@@ -4,10 +4,6 @@ require "../models/model.php";
 
 use app\models\Model;
 
-if (isset($_SESSION['user_id'])) {
-    header("Location: ../auth/dashboard.php");
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $model = new Model();
     if (isset($_POST["login_page"])) {

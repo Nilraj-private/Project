@@ -1,10 +1,9 @@
 <?php 
 
+$is_login_page = 1;
+
 include('../template/head.php');
 
-if (isset($_SESSION['user_id'])) {
-    header("Location: app/views/dashboard.php");
-}
 ?>
 <body class="hold-transition login-page">
     <div class="login-box">

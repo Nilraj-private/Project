@@ -2,9 +2,6 @@
 
 include('../../template/head.php');
 
-if (!isset($_SESSION['user_id'])) {
-  header("Location: ../../auth/login.php");
-}
 $_SESSION['page'] = 'problems.php';
 
 ?>
