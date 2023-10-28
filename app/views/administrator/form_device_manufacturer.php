@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 include('../template/head.php');
 require("../../models/model.php");
@@ -120,7 +120,14 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     <script src="<?= $_SESSION['url_path'] ?>/public/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
     <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
-    <script type="text/javascript">
+    <script>
+        $(document).ready(function() {
+            if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
+                toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
+                var unnset = "<?php unset($_SESSION['success_message']); ?>"
+            }
+        })
+
         function addManufacturer() {
             formData = $('#create_device_manufacturer').serializeArray();
             $.ajax({

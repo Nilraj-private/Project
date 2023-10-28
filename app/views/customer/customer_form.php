@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 include('../template/head.php');
 require("../../models/model.php");
@@ -16,6 +16,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 }
 $cities = $model->select('city_location');
 ?>
+
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
     <?php include('../template/header.php') ?>
@@ -134,7 +135,14 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/js/adminlte.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
-  <script type="text/javascript">
+  <script>
+    $(document).ready(function() {
+      if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
+        toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      }
+    })
+
     $(document).ready(function() {
       $("#customer_form").submit(function(e) {
         e.preventDefault();

@@ -109,6 +109,13 @@ if (!isset($_SESSION['user_id'])) {
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    $(document).ready(function() {
+      if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
+        toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      }
+    })
+
     $(function() {
       $("#example1").DataTable({
         "responsive": true,
@@ -126,15 +133,13 @@ if (!isset($_SESSION['user_id'])) {
         "responsive": true,
       });
     });
-  </script>
-  <script>
+
     $(function() {
       $('#reservationdate').datetimepicker({
         format: 'L'
       });
     })
   </script>
-
 </body>
 
 </html>

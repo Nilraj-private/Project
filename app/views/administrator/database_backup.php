@@ -144,6 +144,13 @@ $_SESSION['page'] = 'database_backup.php';
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    $(document).ready(function() {
+      if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
+        toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      }
+    })
+
     $(function() {
       $("#example1").DataTable({
         "responsive": true,
@@ -161,13 +168,7 @@ $_SESSION['page'] = 'database_backup.php';
         "responsive": true,
       });
     });
-  </script>
 
-
-
-
-
-  <script>
     $(function() {
       $('.select2').select2()
       $('.select2bs4').select2({
@@ -280,9 +281,6 @@ $_SESSION['page'] = 'database_backup.php';
       myDropzone.removeAllFiles(true)
     }
   </script>
-
-
-
 </body>
 
 </html>

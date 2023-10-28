@@ -168,7 +168,7 @@ $cities = $model->select('city_location');
                       </tr>
                     </thead>
                     <tbody>
-                      <?php if (isset($customers) && $customers!='') foreach ($customers as $customer) {
+                      <?php if (isset($customers) && $customers != '') foreach ($customers as $customer) {
                         $user = $model->select("user", "*", "id = " . $customer['user_id'])[0] ?? '';
                       ?>
                         <tr id="tr_with_no_filter">
@@ -283,6 +283,13 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    $(document).ready(function() {
+      if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
+        toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      }
+    })
+
     function deleteCustomer(delete_id) {
       $.ajax({
         type: "POST",
@@ -295,9 +302,7 @@ $cities = $model->select('city_location');
         }
       });
     }
-  </script>
 
-  <script>
     $(function() {
       $("#example1").DataTable({
         "responsive": true,

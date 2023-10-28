@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 include('../template/head.php');
 require("../../models/model.php");
@@ -34,6 +34,7 @@ $case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.c
 $manufacturers = $model->select('device_manufacturer');
 $cities = $model->select('city_location');
 ?>
+
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
     <?php include('../template/header.php') ?>

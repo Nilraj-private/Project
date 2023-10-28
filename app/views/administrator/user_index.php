@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 include('../template/head.php');
 require("../../models/model.php");
@@ -15,6 +15,7 @@ $join = " left join city_location as cl on cl.id=e.employee_city_location ";
 $employees = $model->select('employee as e', ' e.*,cl.city_name ', '', $join);
 $cities = $model->select('city_location');
 ?>
+
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
     <?php include('../template/header.php') ?>
@@ -166,6 +167,13 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    $(document).ready(function() {
+      if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
+        toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      }
+    })
+
     function deleteEmployee(delete_id) {
       $.ajax({
         type: "POST",
@@ -178,8 +186,7 @@ $cities = $model->select('city_location');
         }
       });
     }
-  </script>
-  <script>
+
     $(function() {
       $("#example1").DataTable({
         "responsive": true,
@@ -198,8 +205,6 @@ $cities = $model->select('city_location');
       });
     });
   </script>
-
-
 </body>
 
 </html>
