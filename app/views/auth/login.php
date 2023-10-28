@@ -71,7 +71,7 @@ $_SESSION['url_path'] = 'https://recoveryourdata.co.in/module1';
             if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
                 toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
                 var unnset = "<?php unset($_SESSION['success_message']); ?>"
-                window.location.href = 'dashboard.php'
+                window.location.href = 'dashboard.php';
             }
         })
     </script>
