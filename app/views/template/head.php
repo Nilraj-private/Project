@@ -4,11 +4,11 @@ session_start();
 
 if (isset($is_login_page) && $is_login_page == 1) {
   if (isset($_SESSION['user_id'])) {
-    header("Location: " . $_SESSION['url_path'] . "/auth/login.php");
+    header("Location: " . $_SESSION['url_path'] . "/app/views/dashboard.php");
   }
 } else {
   if (!isset($_SESSION['user_id'])) {
-    header("Location: " . $_SESSION['url_path'] . "/auth/login.php");
+    header("Location: " . $_SESSION['url_path'] . "/app/views/auth/login.php");
   }
 }
 

@@ -78,12 +78,13 @@ class Model
         }
     }
 
-    function delete($tableName, $id)
+    function delete($tableName, $id, $title = '')
     {
         $sql = "DELETE FROM $tableName WHERE id = " . $id;
         $result = mysqli_query($this->conn, $sql);
 
         if ($result) {
+            $_SESSION['success_message'] = $title . ' deleted successfully';
             return true;
         } else {
             return false;

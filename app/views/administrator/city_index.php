@@ -69,7 +69,7 @@ $cities = $model->select("city_location");
                       </tr>
                     </thead>
                     <tbody>
-                      <?php foreach ($cities as $city) { ?>
+                      <?php if (isset($cities) && $cities != '') foreach ($cities as $city) { ?>
                         <tr>
                           <td><?= $city['id'] ?></td>
                           <td><?= $city['city_name'] ?></td>

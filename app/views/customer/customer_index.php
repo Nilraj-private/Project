@@ -289,7 +289,7 @@ $cities = $model->select('city_location');
     function deleteCustomer(delete_id) {
       $.ajax({
         type: "POST",
-        url: "../../controllers/AddCustomerController.php",
+        url: "../../controllers/CustomerController.php",
         data: {
           delete_id: delete_id,
         },

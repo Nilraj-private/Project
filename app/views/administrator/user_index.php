@@ -94,7 +94,7 @@ $cities = $model->select('city_location');
                       </tr>
                     </thead>
                     <tbody>
-                      <?php foreach ($employees as $employee) { ?>
+                      <?php if (isset($employees) && $employees != '') foreach ($employees as $employee) { ?>
                         <tr>
                           <td><?= $employee['id'] ?></td>
                           <td><?= $employee['employee_name'] ?>Rajkot-DEALERS</td>

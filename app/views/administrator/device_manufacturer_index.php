@@ -71,7 +71,7 @@ $manufacturers = $model->select("device_manufacturer");
                       </tr>
                     </thead>
                     <tbody>
-                      <?php foreach ($manufacturers as $manufacturer) { ?>
+                      <?php if (isset($manufacturers) && $manufacturers != '') foreach ($manufacturers as $manufacturer) { ?>
                         <tr>
                           <td><?= $manufacturer['id'] ?></td>
                           <td><?= $manufacturer['id'] ?></td>

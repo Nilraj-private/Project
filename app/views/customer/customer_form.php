@@ -146,7 +146,7 @@ $cities = $model->select('city_location');
         var formData = $(this).serializeArray();
         $.ajax({
           type: "POST",
-          url: "../../controllers/AddCustomerController.php",
+          url: "../../controllers/CustomerController.php",
           data: {
             formData: formData,
             id: "<?= $_GET['id'] ?? 0 ?>"

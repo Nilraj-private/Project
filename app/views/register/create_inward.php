@@ -366,7 +366,7 @@ if (isset($_GET['id'])) {
     //     var formData = $(this).serializeArray();
     //     $.ajax({
     //       type: "POST",
-    //       url: "../../controllers/AddCustomerController.php",
+    //       url: "../../controllers/CustomerController.php",
     //       data: {
     //         formData: formData,
     //         id: "<?= $_GET['id'] ?? 0 ?>"
