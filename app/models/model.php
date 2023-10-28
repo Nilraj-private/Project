@@ -5,9 +5,9 @@ namespace app\models;
 class Model
 {
     var $servername = "localhost";
-    var $db_name = "recoveryniki_db";
-    var $username = "root";
-    var $password = "";
+    var $db_name = "recovery_niki_new_db";
+    var $username = "recovery_demo";
+    var $password = "-pW+@vC;soxy";
     var $conn = '';
     function __construct()
     {

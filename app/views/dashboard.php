@@ -1,6 +1,6 @@
 <?php
 
-$_SESSION['url_path'] = '';
+$_SESSION['url_path'] = 'https://recoveryourdata.co.in/module1';
 
 if (!isset($_SESSION['user_id'])) {
   header("Location: auth/login.php");

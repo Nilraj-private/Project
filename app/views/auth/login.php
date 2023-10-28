@@ -3,7 +3,7 @@
 if (isset($_SESSION['user_id'])) {
     header("Location: app/views/dashboard.php");
 }
-$_SESSION['url_path'] = '';
+$_SESSION['url_path'] = 'https://recoveryourdata.co.in/module1';
 
 ?>
 <?php include('../template/head.php') ?>
