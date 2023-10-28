@@ -35,8 +35,6 @@ $_SESSION['page'] = 'change_password.php';
   <link rel="stylesheet" href="plugins/bs-stepper/css/bs-stepper.min.css">
   <link rel="stylesheet" href="plugins/dropzone/min/dropzone.min.css">
 
-  <link rel="stylesheet" href="dist/css/test.css">
-
   <link rel="stylesheet" href="dist/css/main.css">
 
   <script src="https://kit.fontawesome.com/016e38d5fa.js" crossorigin="anonymous"></script>

@@ -1,11 +1,12 @@
 <?php
+
+include('../template/head.php');
+
 if (!isset($_SESSION['user_id'])) {
   header("Location: ../auth/login.php");
 }
 $_SESSION['page'] = 'database_backup.php';
-
 ?>
-<?php include('../template/head.php') ?>
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">

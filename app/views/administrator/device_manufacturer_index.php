@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+include('../template/head.php');
 require("../../models/model.php");
 
 use app\models\Model;
@@ -10,9 +12,7 @@ $_SESSION['page'] = 'device_manufacturer_index.php';
 
 $model = (new Model());
 $manufacturers = $model->select("device_manufacturer");
-
 ?>
-<?php include('../template/head.php') ?>
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">

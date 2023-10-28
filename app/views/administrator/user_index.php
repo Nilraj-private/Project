@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+include('../template/head.php');
 require("../../models/model.php");
 
 use app\models\Model;
@@ -13,8 +15,6 @@ $join = " left join city_location as cl on cl.id=e.employee_city_location ";
 $employees = $model->select('employee as e', ' e.*,cl.city_name ', '', $join);
 $cities = $model->select('city_location');
 ?>
-<?php include('../template/head.php') ?>
-
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
     <?php include('../template/header.php') ?>

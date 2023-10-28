@@ -1,13 +1,12 @@
 <?php
 
-$_SESSION['url_path'] = 'https://recoveryourdata.co.in/module1';
+include('template/head.php');
 
 if (!isset($_SESSION['user_id'])) {
   header("Location: auth/login.php");
 }
 $_SESSION['page'] = 'dashboard.php';
 ?>
-<?php include('template/head.php') ?>
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">

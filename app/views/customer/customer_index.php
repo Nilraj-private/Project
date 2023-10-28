@@ -1,4 +1,6 @@
 <?php
+
+include('../template/head.php');
 require("../../models/model.php");
 
 use app\models\Model;
@@ -24,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 $cities = $model->select('city_location');
 ?>
-<?php include('../template/head.php') ?>
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">

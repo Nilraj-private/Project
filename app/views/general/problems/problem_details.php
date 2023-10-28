@@ -1,9 +1,11 @@
 <?php
+
+include('../../template/head.php');
+
 if (!isset($_SESSION['user_id'])) {
   header("Location: ../../auth/login.php");
 }
 ?>
-<?php include('../../template/head.php') ?>
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">

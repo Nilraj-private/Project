@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+include('../template/head.php');
 require("../../models/model.php");
 
 use app\models\Model;
@@ -13,8 +15,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     $manufacturer = $model->select("device_manufacturer", "*", " id = " . $_GET['id'])[0];
 }
 ?>
-<?php include('../template/head.php') ?>
-<!-- <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/css/test.css"> -->
 
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">

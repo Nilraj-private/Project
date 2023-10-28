@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+include('../template/head.php');
 require("../../models/model.php");
 
 use app\models\Model;
@@ -14,10 +16,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 }
 $cities = $model->select('city_location');
 ?>
-<?php include('../template/head.php') ?>
-
-<!-- <link rel="stylesheet" href="dist/css/test.css"> -->
-
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
     <?php include('../template/header.php') ?>

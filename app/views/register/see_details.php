@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+include('../template/head.php');
 require("../../models/model.php");
 
 use app\models\Model;
@@ -18,8 +20,6 @@ if (isset($_GET['id'])) {
   $inward = $model->select('case_register as cr', 'cr.*', ' cr.id=' . $_GET['id'])[0];
 }
 ?>
-<?php include('../template/head.php') ?>
-
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
     <?php include('../template/header.php') ?>
