@@ -22,15 +22,10 @@
   <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css?v=1.0.1" />
 
   <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-  <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
   <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-  <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/select2/css/select2.min.css">
-  <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-  <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
-  <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/bs-stepper/css/bs-stepper.min.css">
-  <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/dropzone/min/dropzone.min.css">
 
   <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/css/main.css">
+  <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.css">
   <script src="https://kit.fontawesome.com/016e38d5fa.js" crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 </head>

@@ -64,30 +64,17 @@ $_SESSION['url_path'] = '';
     <script src="<?= $_SESSION['url_path'] ?>/public/plugins/jquery/jquery.min.js"></script>
     <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $_SESSION['url_path'] ?>/public/js/adminlte.min.js?v=3.2.0"></script>
-    <!-- 
+    <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
+
     <script>
         $(document).ready(function() {
-            $("#login_form").submit(function(e) {
-                e.preventDefault();
-                var formData = btoa(JSON.stringify($(this).serializeArray()));
-                if ($('#username').val() == '') {
-                    console.log($('#username').val())
-                    return;
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "../../controllers/login.php",
-                    data: {
-                        auth_type: 'login',
-                        formData: formData
-                    },
-                    success: function(response) {
-                        window.location.href = "../dashboard.php";
-                    }
-                });
-            });
-        });
-    </script> -->
+            if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
+                toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
+                var unnset = "<?php unset($_SESSION['success_message']); ?>"
+                window.location.href = 'dashboard.php'
+            }
+        })
+    </script>
 </body>
 
 </html>

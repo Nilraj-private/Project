@@ -167,7 +167,7 @@ $cities = $model->select('city_location');
                       </tr>
                     </thead>
                     <tbody>
-                      <?php foreach ($customers as $customer) {
+                      <?php if (isset($customers) && $customers!='') foreach ($customers as $customer) {
                         $user = $model->select("user", "*", "id = " . $customer['user_id'])[0] ?? '';
                       ?>
                         <tr id="tr_with_no_filter">
@@ -276,16 +276,10 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/js/demo.js"></script>
   <!-- Page specific script -->
 
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/select2/js/select2.full.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/moment/moment.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/inputmask/jquery.inputmask.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/daterangepicker/daterangepicker.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bs-stepper/js/bs-stepper.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/dropzone/min/dropzone.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
     function deleteCustomer(delete_id) {

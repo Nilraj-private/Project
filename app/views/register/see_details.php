@@ -1,16 +1,31 @@
 <?php
+require("../../models/model.php");
+
+use app\models\Model;
+
 if (!isset($_SESSION['user_id'])) {
-  header("Location: ../../auth/login.php");
+  header("Location: ../auth/login.php");
+}
+$_SESSION['page'] = 'create_inward.php';
+
+$model = (new Model());
+$customers = $model->select("customer");
+$manufacturers = $model->select("device_manufacturer");
+$cities = $model->select("city_location");
+
+if (isset($_GET['id'])) {
+  // $join = 
+  $inward = $model->select('case_register as cr', 'cr.*', ' cr.id=' . $_GET['id'])[0];
 }
 ?>
-<?php include('../../template/head.php') ?>
+<?php include('../template/head.php') ?>
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
-    <?php include('../../template/header.php') ?>
+    <?php include('../template/header.php') ?>
 
     <!-- Main Sidebar Container -->
-    <?php include('../../template/sidebar.php') ?>
+    <?php include('../template/sidebar.php') ?>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">

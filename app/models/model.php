@@ -34,6 +34,7 @@ class Model
         $sql .= ' ORDER BY id DESC';
 
         $result = mysqli_query($this->conn, $sql);
+
         if ($result->num_rows) {
             $data = [];
             while ($row = mysqli_fetch_assoc($result)) {
@@ -45,7 +46,7 @@ class Model
         }
     }
 
-    function insert($tableName, $data)
+    function insert($tableName, $data, $title = '')
     {
         $columns = implode(",", array_column($data, 'name'));
         $values = implode("', '", array_column($data, 'value'));
@@ -53,13 +54,14 @@ class Model
 
         $result = mysqli_query($this->conn, $sql);
         if ($result) {
+            $_SESSION['success_message'] = $title . ' created successfully';
             return $result;
         } else {
             return false;
         }
     }
 
-    function update($tableName, $data)
+    function update($tableName, $data, $title = '')
     {
         $update = '';
         for ($i = 0; $i < count(array_column($data['formData'], 'name')); $i++) {
@@ -68,6 +70,7 @@ class Model
         $sql = "UPDATE $tableName SET $update where id = " . $data['id'];
         $result = mysqli_query($this->conn, $sql);
         if ($result) {
+            $_SESSION['success_message'] = $title . ' updated successfully';
             return $result;
         } else {
             return false;
@@ -78,8 +81,9 @@ class Model
     {
         $sql = "DELETE FROM $tableName WHERE id = " . $id;
         $result = mysqli_query($this->conn, $sql);
+
         if ($result) {
-            return $result;
+            return true;
         } else {
             return false;
         }
@@ -102,6 +106,7 @@ class Model
             while ($row = mysqli_fetch_assoc($result)) {
                 $data[] = $row;
             }
+            $_SESSION['success_message'] = 'Login successfully';
             $_SESSION['user_id'] = $data[0]['id'];
             return true;
         } else {

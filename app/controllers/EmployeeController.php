@@ -8,12 +8,14 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: ../views/auth/login.php");
 }
 
+$model = (new Model());
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["id"]) && $_POST["id"] > 0) {
-        return (new Model())->update('employee', $_POST);
+        return $model->update('employee', $_POST);
     } else if (isset($_POST["delete_id"])) {
-        return (new Model())->delete('employee', $_POST['delete_id']);
+        return $model->delete('employee', $_POST['delete_id']);
     } else {
-        return (new Model())->insert('employee', $_POST['formData']);
+        return $model->insert('employee', $_POST['formData']);
     }
 }

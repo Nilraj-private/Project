@@ -53,7 +53,9 @@ $cities = $model->select('city_location');
           </div>
         </div>
       </section>
+      <div id="flash_message">
 
+      </div>
       <!-- Content Header (Page header) -->
       <section class="content-header res_mb5 res_pt2">
         <div class="container-fluid">
@@ -80,47 +82,49 @@ $cities = $model->select('city_location');
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Estimate Amount</label>
-                    <input type="text" class="form-control" placeholder="Enter Amount">
+            <form method="post" action="">
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Estimate Amount</label>
+                      <input type="text" class="form-control" name="estimate_amount" id="estimate_amount" placeholder="Enter Amount">
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Estimation Details</label>
-                    <textarea class="form-control" rows="3" placeholder="Enter Customer Update Details"></textarea>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Estimation Details</label>
+                      <textarea class="form-control" rows="3" placeholder="Enter Customer Update Details"></textarea>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Estimate Approved By Customer</label>
-                    <select class="form-control">
-                      <option value="">Pending</option>
-                      <option value="1">Approved</option>
-                      <option value="2">Rejected</option>
-                    </select>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Estimate Approved By Customer</label>
+                      <select class="form-control">
+                        <option value="">Pending</option>
+                        <option value="1">Approved</option>
+                        <option value="2">Rejected</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12 mb-3">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="SendEmail">
-                    <label class="form-check-label" for="exampleCheck1">Send Email</label>
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="SendEmail">
+                      <label class="form-check-label" for="exampleCheck1">Send Email</label>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-6">
-                  <div class="form-group">
-                    <input class="submit btn btn-success" type="submit" name="yt0" value="Save">
+                  <div class="col-6">
+                    <div class="form-group">
+                      <input class="submit btn btn-success" type="submit" name="yt0" value="Save">
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
@@ -255,9 +259,9 @@ $cities = $model->select('city_location');
                     </div>
                     <div class="row mt25px res_mt0">
                       <div class="col-2">
-                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                          <input type="text" class="form-control datetimepicker-input" name="case_received_date" id="case_received_date" data-target="#reservationdate" placeholder="Start Date">
-                          <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                        <div class="input-group date" id="case_received_date" data-target-input="nearest">
+                          <input type="text" class="form-control datetimepicker-input" name="case_received_date" id="case_received_date" data-target="#case_received_date" placeholder="Start Date">
+                          <div class="input-group-append" data-target="#case_received_date" data-toggle="datetimepicker">
                             <div class="input-group-text">
                               <i class="fa fa-calendar calendar_code"></i>
                             </div>
@@ -353,7 +357,8 @@ $cities = $model->select('city_location');
                       $estimate_status_color = [0 => 'warning', 1 => 'success', 2 => 'danger'];
                       $recovery_status = [0 => 'Not Recovered', 1 => 'Recovered'];
                       $recovery_status_color = [0 => 'secondary', 1 => 'success'];
-                      foreach ($case_registers as $case_register) { ?>
+                      if (isset($case_registers) && $case_registers != '')
+                        foreach ($case_registers as $case_register) { ?>
                         <tr id="register_tr_no_filter">
                           <td>
                             <input type="checkbox" name="terms" class="" id="exampleCheck1">
@@ -373,17 +378,17 @@ $cities = $model->select('city_location');
                             <small class="badge badge-<?= ($estimate_status_color[$case_register['estimate_approved_by_customer']]) ?>"><?= ($estimate_status[$case_register['estimate_approved_by_customer']]) ?></small>
                           </td>
                           <td>
-                            <?= date('d M, Y hh:mm TZD', strtotime($case_register['case_received_date'])) ?>
+                            <?= date('d M, Y h:m a', strtotime($case_register['case_received_date'])) ?>
                           </td>
                           <td>
                             <div class="input-group-prepend">
                               <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                               <ul class="dropdown-menu">
                                 <li class="dropdown-item">
-                                  <a href="see_details.html"><i class='fa fa-search mr5'></i> See Details</a>
+                                  <a href="see_details.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] : '?' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
+                                  <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
                                 </li>
                                 <li class="dropdown-divider"></li>
                                 <li class="dropdown-item">
@@ -469,18 +474,19 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/js/demo.js"></script>
   <!-- Page specific script -->
 
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/select2/js/select2.full.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/moment/moment.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/inputmask/jquery.inputmask.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/daterangepicker/daterangepicker.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bs-stepper/js/bs-stepper.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/dropzone/min/dropzone.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    $(document).ready(function() {
+      if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
+        toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      }
+    })
+
     function deleteCustomer(delete_id) {
       $.ajax({
         type: "POST",
@@ -495,15 +501,11 @@ $cities = $model->select('city_location');
     }
 
     $(function() {
-      $('#reservationdate').datetimepicker({
+      $('#case_received_date').datetimepicker({
         format: 'L'
       });
       $('#case_return_date').datetimepicker({
         format: 'L'
-      });
-
-      $('#timepicker').datetimepicker({
-        format: 'LT'
       });
     })
 

@@ -6,14 +6,13 @@ use app\models\Model;
 if (!isset($_SESSION['user_id'])) {
   header("Location: ../auth/login.php");
 }
-$_SESSION['page'] = 'customer_index.php';
+$_SESSION['page'] = 'customer_form.php';
 
+$model = (new Model());
 if (isset($_GET['id']) && !empty($_GET['id'])) {
-
-  $model = (new Model());
   $customers = $model->select("customer", "*", " id = " . $_GET['id'])[0];
-  $cities = $model->select('city_location');
 }
+$cities = $model->select('city_location');
 ?>
 <?php include('../template/head.php') ?>
 
@@ -135,7 +134,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/jquery/jquery.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/js/adminlte.min.js"></script>
-  <!-- Page specific script -->
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script type="text/javascript">
     $(document).ready(function() {

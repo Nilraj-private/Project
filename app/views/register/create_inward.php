@@ -349,11 +349,10 @@ if (isset($_GET['id'])) {
   <script src="<?= $_SESSION['url_path'] ?>/public/js/demo.js"></script>
   <!-- Page specific script -->
 
-
-  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/select2/js/select2.full.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/moment/moment.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/daterangepicker/daterangepicker.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script type="text/javascript">
     // $(document).ready(function() {
@@ -383,7 +382,8 @@ if (isset($_GET['id'])) {
         type: 'POST',
         data: {
           formData: formData,
-          id: "<?= $_GET['id'] ?? 0 ?>"
+          id: "<?= $_GET['id'] ?? 0 ?>",
+          type: "<?= $_GET['type'] ?? 0 ?>"
         },
         success: function(response) {
           if (retry == 1)
@@ -391,14 +391,6 @@ if (isset($_GET['id'])) {
         },
       });
     }
-  </script>
-
-  <script>
-    $(function() {
-      $('#case_received_date').datetimepicker({
-        format: 'L'
-      });
-    })
   </script>
 
   <!-- <script type="text/javascript">
@@ -802,6 +794,13 @@ if (isset($_GET['id'])) {
     });
   </script> -->
 
+  <script>
+    $(function() {
+      $("#case_received_date").datetimepicker("format", 'Y-M-D h:m:s');
+      if ("<?= isset($inward) ?>" && "<?= $inward['case_received_date'] ?>")
+        $("#case_received_date").datetimepicker("defaultDate", new Date("<?= $inward['case_received_date'] ?? '' ?>"));
+    })
+  </script>
 </body>
 
 </html>
