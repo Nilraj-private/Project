@@ -12,7 +12,9 @@ $where = '';
 
 if (isset($_GET["type"]) && ($_GET["type"] == 'inward' || $_GET["type"] == 'outward')) {
   $type = $_GET["type"];
-  $where .= " case_register_state=" . ($_GET['type'] == 'outward' ? 2 : ($_GET['type'] == 'inward' ? 1 : 3));
+  if ($_SERVER["REQUEST_METHOD"] != "POST") {
+    $where .= " case_register_state=" . ($_GET['type'] == 'outward' ? 2 : ($_GET['type'] == 'inward' ? 1 : 3));
+  }
 } elseif (!isset($_GET["type"])) {
   $type = '';
 }
@@ -483,19 +485,6 @@ $cities = $model->select('city_location');
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
       }
     })
-
-    function deleteCustomer(delete_id) {
-      $.ajax({
-        type: "POST",
-        url: "../../controllers/RegisterController.php",
-        data: {
-          delete_id: delete_id,
-        },
-        success: function(response) {
-          location.reload(true);
-        }
-      });
-    }
 
     $(function() {
       $('#case_received_date').datetimepicker({

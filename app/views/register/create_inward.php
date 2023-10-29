@@ -391,8 +391,11 @@ if (isset($_GET['id'])) {
           type: "<?= $_GET['type'] ?? 0 ?>"
         },
         success: function(response) {
-          if (retry == 1)
+          if (retry == 1) {
             window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
+          } else {
+            location.reload(true);
+          }
         },
       });
     }

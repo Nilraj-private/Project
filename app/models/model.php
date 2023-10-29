@@ -9,6 +9,7 @@ class Model
     var $username = "recovery_demo";
     var $password = "-pW+@vC;soxy";
     var $conn = '';
+    
     function __construct()
     {
         session_start();
@@ -49,8 +50,11 @@ class Model
 
     function insert($tableName, $data, $title = '')
     {
-        $columns = implode(",", array_column($data, 'name'));
-        $values = implode("', '", array_column($data, 'value'));
+        $columnArray = array_column($data, 'name');
+        $valueArray = array_column($data, 'value');
+
+        $columns = implode(",", $columnArray);
+        $values = implode("', '", $valueArray);
         $sql = "INSERT INTO $tableName ($columns) VALUES ('$values');";
 
         $result = mysqli_query($this->conn, $sql);
