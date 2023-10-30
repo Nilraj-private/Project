@@ -159,9 +159,9 @@ if (isset($_GET['id'])) {
                             <input type="hidden" name="device_size" id="device_size1" value="<?= (substr($inward['device_size'] ?? '', 0, -2)); ?>">
                             <input type="text" class="form-control width64per float-left" id="device_size2" placeholder="Device Size" value="<?= (substr($inward['device_size'] ?? '', 0, -2)); ?>">
                             <select class="form-control width-36 float-left" placeholder="Select Device Size" id="device_size_unit">
-                              <option value="TB" <?= (str_contains(($inward['device_size'] ?? ''), 'TB')) ? 'selected' : '' ?>>TB</option>
-                              <option value="GB" <?= (str_contains(($inward['device_size'] ?? ''), 'GB')) ? 'selected' : '' ?>>GB</option>
-                              <option value="MB" <?= (str_contains(($inward['device_size'] ?? ''), 'MB')) ? 'selected' : '' ?>>MB</option>
+                              <option value="TB" <?= (strpos(($inward['device_size'] ?? ''), 'TB')) ? 'selected' : '' ?>>TB</option>
+                              <option value="GB" <?= (strpos(($inward['device_size'] ?? ''), 'GB')) ? 'selected' : '' ?>>GB</option>
+                              <option value="MB" <?= (strpos(($inward['device_size'] ?? ''), 'MB')) ? 'selected' : '' ?>>MB</option>
                             </select>
                           </div>
                         </div>
@@ -210,6 +210,8 @@ if (isset($_GET['id'])) {
                           </div>
                         </div>
                       </div>
+                      <input type="hidden" name="case_status" value="1">
+                      <input type="hidden" name="estimate_approved_by_customer" value="0">
                     </div>
                     <div class="row mt25px res_auto_btn res_mb12 ">
                       <?php if (!isset($_GET['id'])) { ?>

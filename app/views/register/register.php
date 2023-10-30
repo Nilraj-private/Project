@@ -368,7 +368,7 @@ $cities = $model->select('city_location');
                           </td>
                           <td><?= $case_register['company_name'] ?></td>
                           <td>
-                            <!-- <small class="badge badge-<?= $case_status_color[$case_register['case_status']] ?>"><?= $case_status[$case_register['case_status']] ?></small> -->
+                            <small class="badge badge-<?= $case_status_color[$case_register['case_status']] ?>"><?= $case_status[$case_register['case_status']] ?></small>
                           </td>
                           <td>
                             <small class="badge badge-<?= ($recovery_status_color[$case_register['case_result']]) ?>"><?= ($recovery_status[$case_register['case_result']]) ?></small>
@@ -377,7 +377,7 @@ $cities = $model->select('city_location');
                             <small class="badge badge-<?= ($estimate_status_color[$case_register['estimate_approved_by_customer']]) ?>"><?= ($estimate_status[$case_register['estimate_approved_by_customer']]) ?></small>
                           </td>
                           <td>
-                            <?= date('d M, Y h:m a', strtotime($case_register['case_received_date'])) ?>
+                            <?= date('d M, Y h:m a', strtotime(($case_register['case_received_date'] == '0000-00-00 00:00:00' ? time() : ''))) ?>
                           </td>
                           <td>
                             <div class="input-group-prepend">
