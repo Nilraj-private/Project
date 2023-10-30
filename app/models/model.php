@@ -69,11 +69,22 @@ class Model
     function update($tableName, $data, $title = '')
     {
         $update = '';
-        for ($i = 0; $i < count(array_column($data['formData'], 'name')); $i++) {
-            $update .= ' ' . array_column($data['formData'], 'name')[$i] . '="' . array_column($data['formData'], 'value')[$i] . '"' . ((count(array_column($data['formData'], 'name')) - 1 != $i) ? ',' : '');
+        if (isset($data['event_name'])) {
+            if ($data['event_name'] == 'send_estimate')
+                $update .= ' estimate_amount=' . $data['estimate_amount'] . ', estimate_approved_by_customer=' . $data['customer_estimate_status'] . ' WHERE id=' . $data['inward_register_id'];
+            else if ($data['event_name'] == 'moveToOwtward')
+                $update .= ' case_status=4 WHERE id=' . $data['inward_register_id'];
+        } else {
+            for ($i = 0; $i < count(array_column($data['formData'], 'name')); $i++) {
+                if (array_column($data['formData'], 'name')[$i] != 'case_status' || array_column($data['formData'], 'name')[$i] != 'estimate_approved_by_customer')
+                    $update .= ' ' . array_column($data['formData'], 'name')[$i] . '="' . array_column($data['formData'], 'value')[$i] . '"' . ((count(array_column($data['formData'], 'name')) - 1 != $i) ? ',' : '');
+            }
+            $update .= " WHERE id = " . $data['id'];
         }
-        $sql = "UPDATE $tableName SET $update where id = " . $data['id'];
+        $sql = "UPDATE $tableName SET $update";
+
         $result = mysqli_query($this->conn, $sql);
+
         if ($result) {
             $_SESSION['success_message'] = $title . ' updated successfully';
             return $result;

@@ -81,9 +81,13 @@ $cities = $model->select('city_location');
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <form method="post" action="">
+            <form method="post" action="../../controllers/EmailController.php">
               <div class="modal-body">
                 <div class="row">
+                  <input type="hidden" name="event_name" id="event_name" value="send_estimate">
+                  <input type="hidden" name="inward_register_id" id="inward_register_id" value="">
+                  <input type="hidden" name="customer_id" id="customer_id" value="">
+                  <input type="hidden" name="type" id="type" value="<?= (isset($_GET['type']) ? $_GET['type'] : '') ?>">
                   <div class="col-12">
                     <div class="form-group">
                       <label>Estimate Amount</label>
@@ -94,15 +98,15 @@ $cities = $model->select('city_location');
                   <div class="col-12">
                     <div class="form-group">
                       <label>Estimation Details</label>
-                      <textarea class="form-control" rows="3" placeholder="Enter Customer Update Details"></textarea>
+                      <textarea class="form-control" rows="3" name="customer_details" id="customer_details" placeholder="Enter Customer Update Details"></textarea>
                     </div>
                   </div>
 
                   <div class="col-12">
                     <div class="form-group">
                       <label>Estimate Approved By Customer</label>
-                      <select class="form-control">
-                        <option value="">Pending</option>
+                      <select class="form-control" name="customer_estimate_status" id="customer_estimate_status">
+                        <option value="0">Pending</option>
                         <option value="1">Approved</option>
                         <option value="2">Rejected</option>
                       </select>
@@ -111,15 +115,13 @@ $cities = $model->select('city_location');
 
                   <div class="col-12 mb-3">
                     <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="SendEmail">
+                      <input type="checkbox" class="form-check-input" name="send_email" id="send_email">
                       <label class="form-check-label" for="exampleCheck1">Send Email</label>
                     </div>
                   </div>
 
                   <div class="col-6">
-                    <div class="form-group">
-                      <input class="submit btn btn-success" type="submit" name="yt0" value="Save">
-                    </div>
+                    <button class="btn btn-success" type="submit">Save</button>
                   </div>
                 </div>
               </div>
@@ -350,8 +352,8 @@ $cities = $model->select('city_location');
                     </thead>
                     <tbody>
                       <?php
-                      $case_status = [1 => 'Open', 2 => 'In Progress', 3 => 'Processed', 4 => 'Close'];
-                      $case_status_color = [1 => 'success', 2 => 'warning', 3 => 'info', 4 => 'danger'];
+                      $case_status = [0 => '', 1 => 'Open', 2 => 'In Progress', 3 => 'Processed', 4 => 'Close'];
+                      $case_status_color = [0 => '', 1 => 'success', 2 => 'warning', 3 => 'info', 4 => 'danger'];
                       $estimate_status = [0 => 'Pending', 1 => 'Approved', 2 => 'Reject'];
                       $estimate_status_color = [0 => 'warning', 1 => 'success', 2 => 'danger'];
                       $recovery_status = [0 => 'Not Recovered', 1 => 'Recovered'];
@@ -383,32 +385,32 @@ $cities = $model->select('city_location');
                             <div class="input-group-prepend">
                               <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                               <ul class="dropdown-menu">
-                                <li class="dropdown-item">
+                                <!-- <li class="dropdown-item">
                                   <a href="see_details.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
-                                </li>
+                                </li> -->
                                 <li class="dropdown-item">
                                   <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
                                 </li>
                                 <li class="dropdown-divider"></li>
                                 <li class="dropdown-item">
-                                  <a href="#" data-toggle="modal" data-target="#modal_send_estimate"><i class='fa fa-inr mr5'></i> Send Estimate</a>
+                                  <a href="#" onclick="sendEstimate(<?= $case_register['id'] ?>,<?= $case_register['customer_id'] ?>,<?= $case_register['estimate_approved_by_customer'] ?>)" style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
                                 </li>
-                                <li class="dropdown-item">
+                                <!-- <li class="dropdown-item">
                                   <a href="#" data-toggle="modal" data-target="#modal_add_storage_details"><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
-                                </li>
-                                <li class="dropdown-item">
+                                </li> -->
+                                <!-- <li class="dropdown-item">
                                   <a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a>
-                                </li>
-                                <li class="dropdown-divider"></li>
+                                </li> -->
+                                <!-- <li class="dropdown-divider"></li>
                                 <li class="dropdown-item">
                                   <a href="#"><i class='fa fa-print mr5'></i> Print</a>
-                                </li>
-                                <li class="dropdown-divider"></li>
+                                </li> -->
+                                <!-- <li class="dropdown-divider"></li> -->
                                 <!-- <li class="dropdown-item">
                                   <a href="#"><i class='fa fa-inbox mr5'></i> Move to Stock</a>
                                 </li> -->
                                 <li class="dropdown-item">
-                                  <a href="#"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
+                                  <a href="#" onclick="moveToOwtward(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
                                 </li>
                               </ul>
                             </div>
@@ -479,10 +481,33 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    function sendEstimate(inward_register_id, customer_id, approval_status) {
+      $('#customer_id').val(customer_id);
+      $('#inward_register_id').val(inward_register_id);
+      $('#customer_estimate_status option[value="' + approval_status + '"]').prop('selected', true);
+      $('#modal_send_estimate').modal();
+    }
+
+    function moveToOwtward(inward_register_id) {
+      $.ajax({
+        url: '../../controllers/RegisterController.php',
+        type: 'POST',
+        data: {
+          inward_register_id: inward_register_id,
+          event_name: 'moveToOwtward'
+        },
+        success: function(response) {
+          location.reload(true);
+        },
+      });
+    }
     $(document).ready(function() {
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      } else if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+        toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['error_message']); ?>"
       }
     })
 
