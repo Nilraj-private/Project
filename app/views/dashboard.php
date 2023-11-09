@@ -1,6 +1,7 @@
 <?php
 
 include('template/head.php');
+require_once "../../vendor/autoload.php";
 
 $_SESSION['page'] = 'dashboard.php';
 ?>

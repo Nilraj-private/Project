@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $where = '';
   foreach ($_POST as $key => $value) {
     if ($value != '')
-      $where .= (($where == '') ? '' : ' AND ') . " $key = '" . $value . "' ";
+      $where .= (($where == '') ? '' : ' AND ') . " $key LIKE '%" . $value . "%' ";
   }
   $customers = $model->select('customer as c', ' c.*,cl.city_name ', $where, $join);
 } else {
@@ -74,22 +74,19 @@ $cities = $model->select('city_location');
             <div class="modal-body">
               <div class="row">
                 <div class="col-12">
-                  <div class="form-group">
-                    <label>No of Selected Recoard: 1</label>
-
-                  </div>
+                  <label>No of Selected Record: <span id="selected-record-no"></span></label>
                 </div>
 
                 <div class="col-12">
                   <div class="form-group">
                     <label>Your Message</label>
-                    <textarea class="form-control" rows="3" placeholder="Enter Your Message"></textarea>
+                    <textarea class="form-control" id="sms_message_text" name="message" rows="3" placeholder="Enter Your Message"></textarea>
                   </div>
                 </div>
 
                 <div class="col-6">
                   <div class="form-group">
-                    <input class="submit btn btn-success" type="submit" name="yt0" value="Send Message">
+                    <button id="submitBulkSms" type="button" class="btn btn-primary"><i class="fa fa-envelope"></i> Send message</button>
                   </div>
                 </div>
               </div>
@@ -137,7 +134,7 @@ $cities = $model->select('city_location');
                         <button type="submit" class="btn btn-primary wid100">Search </button>
                       </div>
                       <div class="col-1 max_width100 res_mt10">
-                        <button type="reset" class="btn btn-default wid100">Clear</button>
+                        <a class="btn btn-default wid100" href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_index.php">Clear</a>
                       </div>
                     </div>
                   </div>
@@ -151,7 +148,7 @@ $cities = $model->select('city_location');
                   <table id="example1" class="table table-bordered table-striped">
                     <thead>
                       <tr class="color_blue_bg">
-                        <th> <input type="checkbox" name="terms" class="" id="exampleCheck1"></th>
+                        <th> <input type="checkbox" class="select-all"></th>
                         <th>SI No</th>
                         <th>Company Name</th>
                         <th>Customer Name</th>
@@ -164,12 +161,13 @@ $cities = $model->select('city_location');
                       </tr>
                     </thead>
                     <tbody>
-                      <?php if (isset($customers) && $customers != '') foreach ($customers as $customer) {
+                      <?php $counter = 0;
+                      if (isset($customers) && $customers != '') foreach ($customers as $customer) {
                         $user = $model->select("user", "*", "id = " . $customer['user_id'])[0] ?? '';
                       ?>
                         <tr id="tr_with_no_filter">
                           <td>
-                            <input type="checkbox" name="terms" class="" id="exampleCheck1">
+                            <input type="checkbox" name="id[]" id="id_<?= $counter++; ?>" value="<?= $customer['id'] ?>">
                           </td>
                           <td><?= $customer['id'] ?></td>
                           <td><?= $customer['company_name'] ?></td>
@@ -187,53 +185,20 @@ $cities = $model->select('city_location');
                                   <a href="customer_form.php?id=<?= $customer['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Customer</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a href="#"><i class='fa fa-inbox mr5'></i> View Inward</a>
+                                  <a onclick="viewCustomerInward(<?= $customer['id'] ?>)" style="cursor: pointer;color: #007bff;"><i class='fa fa-inbox mr5'></i> View Inward</a>
                                 </li>
                                 <li class="dropdown-divider"></li>
                                 <li class="dropdown-item">
                                   <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a type="button" onclick="deleteCustomer(<?= $customer['id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete Customer</a>
+                                  <a type="button" onclick="deleteCustomer(<?= $customer['id'] ?>)" style="cursor: pointer;color: #007bff;"><i class='fa fa-trash-o mr5'></i> Delete Customer</a>
                                 </li>
                               </ul>
                             </div>
                           </td>
                         </tr>
                       <?php } ?>
-                      <tr id="tr_with_filter" style="display: none;">
-                        <td>
-                          <input type="checkbox" name="terms" class="" id="exampleCheck1">
-                        </td>
-                        <td><?= $customer['id'] ?></td>
-                        <td><?= $customer['company_name'] ?></td>
-                        <td><?= $customer['customer_name'] ?></td>
-                        <td><?= $customer['customer_primary_email_id'] ?></td>
-                        <td><?= $customer['customer_mobile_no1']   ?></td>
-                        <td><?= $customer['office_addressline'] ?></td>
-                        <td><?= $customer['city_name'] ?></td>
-                        <td><small class="badge badge-<?= ($user['is_active'] ?? 0 == 0) ? 'danger' : 'success' ?>"><?= ($user['is_active'] ?? 0 == 0) ? 'Block' : 'Active' ?></small></td>
-                        <td>
-                          <div class="input-group-prepend">
-                            <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
-                            <ul class="dropdown-menu">
-                              <li class="dropdown-item">
-                                <a href="customer_form.php?id=<?= $customer['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Customer</a>
-                              </li>
-                              <li class="dropdown-item">
-                                <a href="#"><i class='fa fa-inbox mr5'></i> View Inward</a>
-                              </li>
-                              <li class="dropdown-divider"></li>
-                              <li class="dropdown-item">
-                                <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a>
-                              </li>
-                              <li class="dropdown-item">
-                                <a type="button" onclick="deleteCustomer(<?= $customer['id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete Customer</a>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -241,12 +206,14 @@ $cities = $model->select('city_location');
             </div>
 
             <div class="container-fluid mb35">
-              <button type="submit" class="btn btn-primary float-left mb35 res_mb25" data-toggle="modal" data-target="#modal_sms"><i class="fa fa-envelope"></i> Send SMS</button>
+              <button type="button" id="send_sms" class="btn btn-primary float-left mb35 res_mb25"><i class="fa fa-envelope"></i> Send SMS</button>
             </div>
           </div>
         </div>
       </section>
-
+      <!-- <form method="POST" id="view_inward_form" action="../register/register.php">
+        <input type="hidden" name=""
+      </form> -->
       <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></a>
 
     </div>
@@ -279,12 +246,59 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    $('.select-all').click(function() {
+      if ($('.select-all:checked')[0]) {
+        $('input[name="id[]"]').attr('checked', true);
+      } else {
+        $('input[name="id[]"]').attr('checked', false);
+      }
+    });
+
+    $('#send_sms').click(function(e) {
+      var total = $('input[name="id[]"]:checked').length;
+      var atLeastOneIsChecked = total > 0;
+
+      if (!atLeastOneIsChecked) {
+        alert('Please select atleast one customer');
+      } else {
+        $("#selected-record-no").html(total);
+        $('#modal_sms').modal();
+      }
+    });
+    $("#submitBulkSms").click(function() {
+      var text_message = $("#sms_message_text").val();
+      if (text_message != "") {
+
+        var checkedValues = $('input[name="id[]"]:checked').map(function() {
+          return this.value;
+        }).get();
+
+        $.ajax({
+          url: "SendBulkSMS",
+          data: {
+            userid: checkedValues,
+            message: text_message
+          },
+          method: 'POST',
+        }).done(function() {
+          $(this).addClass("done");
+          alert('Message Successfully Send');
+          $('#SendSmsModal').modal('hide');
+        });
+      } else {
+        alert("Plz... Enter Message.");
+      }
+    });
     $(document).ready(function() {
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
       }
     })
+
+    function viewCustomerInward(customer_id) {
+
+    }
 
     function deleteCustomer(delete_id) {
       $.ajax({

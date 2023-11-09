@@ -67,7 +67,7 @@ if (isset($_GET['id'])) {
                         <h4 class="float-left">Select Client :</h4>
                       </div>
                       <div class="col-6">
-                        <select class="form-control" name="customer_id" id="customer_id">
+                        <select class="form-control" name="customer_id" id="customer_id" required>
                           <option value="">Select Client</option>
                           <?php foreach ($customers as $customer) { ?>
                             <option value="<?= $customer['id'] ?>" <?= (($inward['customer_id'] ?? '') == $customer['id']) ? 'selected' : '' ?>><?= $customer['customer_name'] ?></option>
@@ -81,7 +81,7 @@ if (isset($_GET['id'])) {
                         <button type="button" class="btn btn-primary wid100" data-toggle="modal" data-target="#modal-lg"><i class="fa fa-plus"></i> Add Customer </button>
                       </div>
                       <div class="col-2 res_mt10 new_col">
-                        <button type="submit" class="btn btn-default wid100"><i class="fa fa-inbox"></i> Inward List</button>
+                        <a type="button" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] : '' ?>" class="btn btn-default wid100"><i class="fa fa-inbox"></i> Inward List</a>
                       </div>
                     </div>
                   </div>
@@ -197,7 +197,7 @@ if (isset($_GET['id'])) {
                       <div class="col-6">
                         <div class="form-group">
                           <label>Files and Directories to be recovered</label>
-                          <textarea class="form-control" rows="2" name="customer_remarks" id="customer_remarks" placeholder="Enter Files to bis Recovered Details"><?= $inward['customer_remarks'] ?? '' ?></textarea>
+                          <textarea class="form-control" rows="2" name="files_to_recover" id="files_to_recover" placeholder="Enter Files to bis Recovered Details"><?= $inward['files_to_recover'] ?? '' ?></textarea>
                         </div>
                       </div>
 
@@ -210,6 +210,7 @@ if (isset($_GET['id'])) {
                           </div>
                         </div>
                       </div>
+                      <input type="hidden" name="case_register_state" value="1">
                       <input type="hidden" name="case_status" value="1">
                       <input type="hidden" name="estimate_approved_by_customer" value="0">
                     </div>
@@ -238,13 +239,15 @@ if (isset($_GET['id'])) {
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <form id="customer_form">
+              <form id="customer_form" method="POST" action="../../controllers/CustomerController.php">
+                <!-- <form id="customer_form" method="POST" action="../../controllers/CustomerController.php"> -->
                 <div class="modal-body res_col_form">
                   <div class="row">
                     <div class="col-6">
                       <div class="form-group">
                         <label>Company Name *</label>
-                        <input type="text" class="form-control" name="" id="" placeholder="Company Name *" required>
+                        <input type="text" class="form-control" name="company_name" id="company_name" placeholder="Company Name *" required>
+                        <div id="company_name_error" style="display:none;">Company Name cannot be blank.</div>
                       </div>
                     </div>
 
@@ -252,6 +255,7 @@ if (isset($_GET['id'])) {
                       <div class="form-group">
                         <label>Customer Name *</label>
                         <input type="text" class="form-control" name="customer_name" id="customer_name" placeholder="Customer Name *" required>
+                        <div id="customer_name_error" style="display:none;">Customer Name cannot be blank.</div>
                       </div>
                     </div>
 
@@ -259,6 +263,7 @@ if (isset($_GET['id'])) {
                       <div class="form-group">
                         <label>Primary Email *</label>
                         <input type="text" class="form-control" name="customer_primary_email_id" id="customer_primary_email_id" placeholder="Primary Email *" required>
+                        <div id="customer_primary_email_id_error" style="display:none;">Primary Email cannot be blank.</div>
                       </div>
                     </div>
 
@@ -266,6 +271,7 @@ if (isset($_GET['id'])) {
                       <div class="form-group">
                         <label>Primary Mobile No.*</label>
                         <input type="text" class="form-control" name="customer_mobile_no1" id="customer_mobile_no1" placeholder="Primary Mobile No.*" required>
+                        <div id="customer_mobile_no1_error" style="display:none;">Primary Mobile No. cannot be blank.</div>
                       </div>
                     </div>
 
@@ -301,11 +307,11 @@ if (isset($_GET['id'])) {
                         </select>
                       </div>
                     </div>
+                    <input type="hidden" name="user_id" value="<?= $user->id ?? 0 ?>">
 
                     <div class="col-6 res_mt10">
                       <div class="form-group">
-                        <!-- <input class="submit btn btn-success" type="submit" name="yt0" value="Add"> -->
-                        <button type="submit" class="btn btn-success">Add</button>
+                        <button type="submit" class="btn btn-success mr10">Add </button>
                         <a class="btn btn-danger" data-dismiss="modal">Cancel</a>
                       </div>
                     </div>
@@ -362,27 +368,28 @@ if (isset($_GET['id'])) {
       }
     })
 
-    // $(document).ready(function() {
-    //   $("#customer_form").submit(function(e) {
-    //     e.preventDefault();
-    //     var formData = $(this).serializeArray();
-    //     $.ajax({
-    //       type: "POST",
-    //       url: "../../controllers/CustomerController.php",
-    //       data: {
-    //         formData: formData,
-    //         id: "<?= $_GET['id'] ?? 0 ?>"
-    //       },
-    //       success: function(response) {
-    //         window.location.href = "customer_index.php";
-    //       }
-    //     });
-    //   });
-    // });
+    $("#customer_form").submit(function(e) {
+      e.preventDefault();
+      var formData = $(this).serializeArray();
+      $.ajax({
+        type: "POST",
+        url: "../../controllers/CustomerController.php",
+        data: {
+          formData: formData,
+        },
+        success: function(response) {
+          location.reload(true);
+        }
+      });
+    });
 
     function addInward(retry) {
       var device_size = $('#device_size2').val() + $('#device_size_unit').val();
       $('#device_size1').val(device_size)
+      if ($('#customer_id').val() == "") {
+        $('#CaseRegister_customer_id_em_').removeAttr('style').html('Customer is required.');
+        return false;
+      }
       formData = $('#inward_form').serializeArray();
       $.ajax({
         url: '../../controllers/RegisterController.php',
@@ -807,7 +814,7 @@ if (isset($_GET['id'])) {
   <script>
     $(function() {
       $("#case_received_date").datetimepicker("format", 'Y-M-D h:m:s');
-      if ("<?= isset($inward) ?>" && "<?= $inward['case_received_date'] ?>")
+      if ("<?= isset($inward) && $inward['case_received_date'] ?>")
         $("#case_received_date").datetimepicker("defaultDate", new Date("<?= $inward['case_received_date'] ?? '' ?>"));
     })
   </script>

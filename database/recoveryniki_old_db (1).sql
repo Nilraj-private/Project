@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 24, 2023 at 08:15 PM
+-- Generation Time: Nov 09, 2023 at 03:22 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -11,14 +11,8 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
--- Database: `recoveryniki_old_db`
+-- Database: `recoveryniki_new_db`
 --
 
 -- --------------------------------------------------------
@@ -96,11 +90,11 @@ CREATE TABLE `case_register` (
   `customer_remarks` varchar(512) DEFAULT NULL,
   `files_to_recover` varchar(512) DEFAULT NULL,
   `service_options` varchar(10) DEFAULT NULL,
-  `case_register_state` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'will store only (in, out, register) ',
-  `case_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'case status (OPEN,INPROCESS,PROCESSED<CLOSED)',
+  `case_register_state` tinyint(4) NOT NULL DEFAULT 1 COMMENT 'will store only (in, out, register) ',
+  `case_status` tinyint(4) NOT NULL DEFAULT 1 COMMENT 'case status (OPEN,INPROCESS,PROCESSED<CLOSED)',
   `case_result` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'value should be(WIN,LOSS)',
   `estimate_amount` float DEFAULT NULL,
-  `estimate_approved_by_customer` tinyint(4) DEFAULT NULL,
+  `estimate_approved_by_customer` tinyint(4) NOT NULL DEFAULT 0,
   `case_received_date` datetime DEFAULT NULL,
   `case_return_date` datetime DEFAULT NULL,
   `sd_hddno` varchar(20) DEFAULT NULL,
@@ -378,7 +372,3 @@ ALTER TABLE `auth_itemchild`
 ALTER TABLE `rights`
   ADD CONSTRAINT `rights_ibfk_1` FOREIGN KEY (`itemname`) REFERENCES `auth_item` (`name`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

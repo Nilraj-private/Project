@@ -20,9 +20,20 @@ if (isset($_GET["type"]) && ($_GET["type"] == 'inward' || $_GET["type"] == 'outw
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $flag = 1;
   foreach ($_POST as $key => $value) {
     if ($value != '') {
-      $where .= (($where == '') ? '' : ' AND ') . " $key = '" . $value . "' ";
+      if ($flag && (isset($_POST['case_received_date']) && $_POST['case_received_date'] != '') && (isset($_POST['case_return_date']) && $_POST['case_return_date'] != '')) {
+        $flag = 0;
+        $where .= (($where == '') ? '' : ' AND ') . " case_received_date BETWEEN  '" . $_POST['case_received_date'] . "' AND '" . $_POST['case_return_date'] . "' ";
+      } else
+       if ($flag && $key == 'case_received_date') {
+        $where .= (($where == '') ? '' : ' AND ') . " $key > '" . $value . " 00:00:00' ";
+      } else if ($flag && $key == 'case_return_date') {
+        $where .= (($where == '') ? '' : ' AND ') . " $key < '" . $value . " 00:00:00' ";
+      } else if ($key != 'case_received_date' && $key != 'case_return_date') {
+        $where .= (($where == '') ? '' : ' AND ') . " $key = '" . $value . "' ";
+      }
     }
   }
 }
@@ -81,10 +92,9 @@ $cities = $model->select('city_location');
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <form method="post" action="../../controllers/EmailController.php">
+            <form id="send_estimate_form">
               <div class="modal-body">
                 <div class="row">
-                  <input type="hidden" name="event_name" id="event_name" value="send_estimate">
                   <input type="hidden" name="inward_register_id" id="inward_register_id" value="">
                   <input type="hidden" name="customer_id" id="customer_id" value="">
                   <input type="hidden" name="type" id="type" value="<?= (isset($_GET['type']) ? $_GET['type'] : '') ?>">
@@ -121,7 +131,7 @@ $cities = $model->select('city_location');
                   </div>
 
                   <div class="col-6">
-                    <button class="btn btn-success" type="submit">Save</button>
+                    <button type="button" class="btn btn-success mr10" onclick="sendEstimate();">Save</button>
                   </div>
                 </div>
               </div>
@@ -232,7 +242,7 @@ $cities = $model->select('city_location');
                   <h3 class="float-left res_mt5 res_fs22">Search Device</h3>
                   <a type="button" class="btn btn-primary float-right" href="<?= $_SESSION['url_path'] ?>/app/views/register/create_inward.php<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>">Create Inward</a>
                 </div>
-                <form method="post" action="register.php<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>">
+                <form id="register_filter_form" method="post" action="register.php<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>">
                   <div class="card-body res_col_form">
                     <div class="row">
                       <div class="col-2">
@@ -261,7 +271,7 @@ $cities = $model->select('city_location');
                     <div class="row mt25px res_mt0">
                       <div class="col-2">
                         <div class="input-group date" id="case_received_date" data-target-input="nearest">
-                          <input type="text" class="form-control datetimepicker-input" name="case_received_date" id="case_received_date" data-target="#case_received_date" placeholder="Start Date">
+                          <input type="text" class="form-control datetimepicker-input" name="case_received_date" id="case_received_date_input" data-target="#case_received_date" placeholder="Start Date">
                           <div class="input-group-append" data-target="#case_received_date" data-toggle="datetimepicker">
                             <div class="input-group-text">
                               <i class="fa fa-calendar calendar_code"></i>
@@ -272,7 +282,7 @@ $cities = $model->select('city_location');
 
                       <div class="col-2">
                         <div class="input-group date" id="case_return_date" data-target-input="nearest">
-                          <input type="text" class="form-control datetimepicker-input" name="case_return_date" id="case_return_date" data-target="#case_return_date" placeholder="End Date">
+                          <input type="text" class="form-control datetimepicker-input" name="case_return_date" id="case_return_date_input" data-target="#case_return_date" placeholder="End Date">
                           <div class="input-group-append" data-target="#case_return_date" data-toggle="datetimepicker">
                             <div class="input-group-text">
                               <i class="fa fa-calendar calendar_code"></i>
@@ -324,7 +334,7 @@ $cities = $model->select('city_location');
                         <button type="submit" class="btn btn-primary wid100">Search </button>
                       </div>
                       <div class="col-1 max_width100">
-                        <button type="reset" class="btn btn-default wid100">Clear</button>
+                        <a class="btn btn-default wid100" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_GET['type']) ? '?type=' . $_GET['type'] : '') ?>">Clear</a>
                       </div>
                     </div>
                   </div>
@@ -339,7 +349,7 @@ $cities = $model->select('city_location');
                   <table id="example1" class="table table-bordered table-striped">
                     <thead>
                       <tr class="color_blue_bg">
-                        <th> <input type="checkbox" name="terms" class="" id="exampleCheck1"></th>
+                        <th> <input type="checkbox" class="select-all"></th>
                         <th>Id</th>
                         <th>Serial #</th>
                         <th>Company Name</th>
@@ -352,6 +362,9 @@ $cities = $model->select('city_location');
                     </thead>
                     <tbody>
                       <?php
+                      $counter = 0;
+                      $case_register_state = [1 => 'Inward', 2 => 'Outward', 3 => 'Register'];
+                      $case_register_state_color = [1 => 'success', 2 => 'danger', 3 => 'warning'];
                       $case_status = [0 => '', 1 => 'Open', 2 => 'In Progress', 3 => 'Processed', 4 => 'Close'];
                       $case_status_color = [0 => '', 1 => 'success', 2 => 'warning', 3 => 'info', 4 => 'danger'];
                       $estimate_status = [0 => 'Pending', 1 => 'Approved', 2 => 'Reject'];
@@ -362,11 +375,11 @@ $cities = $model->select('city_location');
                         foreach ($case_registers as $case_register) { ?>
                         <tr id="register_tr_no_filter">
                           <td>
-                            <input type="checkbox" name="terms" class="" id="exampleCheck1">
+                            <input type="checkbox" name="id[]" id="id_<?= $counter++; ?>" value="<?= $case_register['id'] ?>">
                           </td>
                           <td><?= $case_register['id'] ?></td>
                           <td>
-                            <?= $case_register['device_serial_number'] ?><small class="badge badge-success float-right">Inward </small>
+                            <?= $case_register['device_serial_number'] ?><small class="badge badge-<?= $case_register_state_color[$case_register['case_register_state']] ?> float-right"><?= $case_register_state[$case_register['case_register_state']] ?></small>
                           </td>
                           <td><?= $case_register['company_name'] ?></td>
                           <td>
@@ -379,39 +392,41 @@ $cities = $model->select('city_location');
                             <small class="badge badge-<?= ($estimate_status_color[$case_register['estimate_approved_by_customer']]) ?>"><?= ($estimate_status[$case_register['estimate_approved_by_customer']]) ?></small>
                           </td>
                           <td>
-                            <?= date('d M, Y h:m a', strtotime(($case_register['case_received_date'] == '0000-00-00 00:00:00' ? time() : ''))) ?>
+                            <?= date('d M, Y h:m a', strtotime(($case_register['case_received_date'] != '0000-00-00 00:00:00' ? $case_register['case_received_date'] : ''))) ?>
                           </td>
                           <td>
                             <div class="input-group-prepend">
                               <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                               <ul class="dropdown-menu">
-                                <!-- <li class="dropdown-item">
+                                <?php if ($case_register_state[$case_register['case_register_state']] !== 'Outward') { ?>
+                                  <!-- <li class="dropdown-item">
                                   <a href="see_details.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
                                 </li> -->
-                                <li class="dropdown-item">
-                                  <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
-                                </li>
-                                <li class="dropdown-divider"></li>
-                                <li class="dropdown-item">
-                                  <a href="#" onclick="sendEstimate(<?= $case_register['id'] ?>,<?= $case_register['customer_id'] ?>,<?= $case_register['estimate_approved_by_customer'] ?>)" style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
-                                </li>
-                                <!-- <li class="dropdown-item">
+                                  <li class="dropdown-item">
+                                    <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
+                                  </li>
+                                  <li class="dropdown-divider"></li>
+                                  <li class="dropdown-item">
+                                    <a href="#" onclick="sendEstimateModal(<?= $case_register['id'] ?>,<?= $case_register['customer_id'] ?>,<?= $case_register['estimate_approved_by_customer'] ?>)" style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
+                                  </li>
+                                  <!-- <li class="dropdown-item">
                                   <a href="#" data-toggle="modal" data-target="#modal_add_storage_details"><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
                                 </li> -->
-                                <!-- <li class="dropdown-item">
+                                  <!-- <li class="dropdown-item">
                                   <a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a>
                                 </li> -->
-                                <!-- <li class="dropdown-divider"></li>
+                                  <!-- <li class="dropdown-divider"></li>
                                 <li class="dropdown-item">
                                   <a href="#"><i class='fa fa-print mr5'></i> Print</a>
                                 </li> -->
-                                <!-- <li class="dropdown-divider"></li> -->
-                                <!-- <li class="dropdown-item">
+                                  <!-- <li class="dropdown-divider"></li> -->
+                                  <!-- <li class="dropdown-item">
                                   <a href="#"><i class='fa fa-inbox mr5'></i> Move to Stock</a>
                                 </li> -->
-                                <li class="dropdown-item">
-                                  <a href="#" onclick="moveToOwtward(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
-                                </li>
+                                  <li class="dropdown-item">
+                                    <a href="#" onclick="moveToOwtward(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
+                                  </li>
+                                <?php } ?>
                               </ul>
                             </div>
                           </td>
@@ -425,7 +440,7 @@ $cities = $model->select('city_location');
 
             <div class="col-12">
               <div class="col-12">
-                <button type="submit" class="btn btn-primary float-left mb35 res_mb25">Delete All</button>
+                <button id="delete_button" class="btn btn-danger float-left mb35 res_mb25">Delete All</button>
               </div>
 
               <div class="col-md-12 pt30 bdr_top mb35 res_pt20 flex_row res_flex_column_new">
@@ -481,11 +496,59 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
-    function sendEstimate(inward_register_id, customer_id, approval_status) {
+    function sendEstimateModal(inward_register_id, customer_id, approval_status) {
       $('#customer_id').val(customer_id);
       $('#inward_register_id').val(inward_register_id);
       $('#customer_estimate_status option[value="' + approval_status + '"]').prop('selected', true);
       $('#modal_send_estimate').modal();
+    }
+    $('.select-all').click(function() {
+      if ($('.select-all:checked')[0]) {
+        $('input[name="id[]"]').attr('checked', true);
+      } else {
+        $('input[name="id[]"]').attr('checked', false);
+      }
+    });
+    $('#delete_button').click(function(e) {
+      var total = $('input[name="id[]"]:checked').length;
+      var delete_ids = $("input[name='id[]:checked:checked']").map(function() {
+        return $(this).val();
+      }).get();
+      console.log(delete_ids)
+
+      var atLeastOneIsChecked = total > 0;
+      if (!atLeastOneIsChecked) {
+        alert('Please select atleast one case.');
+      } else {
+        // $.ajax({
+        //   type: "POST",
+        //   url: "../../controllers/RegisterController.php",
+        //   data: {
+        //     delete_id: delete_id,
+        //   },
+        //   success: function(response) {
+        //     location.reload(true);
+        //   }
+        // });
+      }
+    });
+
+    function sendEstimate() {
+      formData = $('#send_estimate_form').serializeArray();
+      $.ajax({
+        url: '../../controllers/EmailController.php',
+        type: 'POST',
+        data: {
+          formData: formData,
+          event_name: 'send_estimate',
+          send_email: $('input[name="send_email"]:checked').val(),
+          customer_id: $('#customer_id').val(),
+          inward_register_id: $('#inward_register_id').val()
+        },
+        success: function(response) {
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
+        },
+      });
     }
 
     function moveToOwtward(inward_register_id) {
@@ -512,15 +575,6 @@ $cities = $model->select('city_location');
     })
 
     $(function() {
-      $('#case_received_date').datetimepicker({
-        format: 'L'
-      });
-      $('#case_return_date').datetimepicker({
-        format: 'L'
-      });
-    })
-
-    $(function() {
       $("#example1").DataTable({
         "responsive": true,
         "lengthChange": false,
@@ -536,6 +590,17 @@ $cities = $model->select('city_location');
         "autoWidth": false,
         "responsive": true,
       });
+    });
+
+    $(function() {
+      $("#case_received_date").datetimepicker("format", 'Y-MM-DD');
+      $("#case_return_date").datetimepicker("format", 'Y-MM-DD');
+      if ("<?= isset($_POST) && ($_POST['case_received_date'] ?? '') ?>") {
+        $("#case_received_date").datetimepicker("defaultDate", new Date("<?= $_POST['case_received_date'] ?? '' ?>"));
+      }
+      if ("<?= isset($_POST) && ($_POST['case_return_date'] ?? '') ?>") {
+        $("#case_return_date").datetimepicker("defaultDate", new Date("<?= $_POST['case_return_date'] ?? '' ?>"));
+      }
     });
   </script>
 </body>
