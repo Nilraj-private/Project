@@ -74,7 +74,7 @@ if (isset($_GET['id'])) {
                           <?php } ?>
                         </select>
                         <!-- <input class="lh30" name="customer_id" id="CaseRegister_customer_id" type="search" /> -->
-                        <div class="errorMessage" id="CaseRegister_customer_id_em_" style="display:none"></div>
+                        <div class="errorMessage" id="customer_id_error" style="display:none"></div>
                       </div>
 
                       <div class="col-2 res_mt10 new_col">
@@ -99,6 +99,7 @@ if (isset($_GET['id'])) {
                         <div class="form-group">
                           <label>Device Serial Number</label>
                           <input type="text" class="form-control" name="device_serial_number" id="device_serial_number" placeholder="Device Serial Number" value="<?= $inward['device_serial_number'] ?? '' ?>">
+                          <div class="errorMessage" id="device_serial_number_error" style="display:none"></div>
                         </div>
                       </div>
 
@@ -386,8 +387,21 @@ if (isset($_GET['id'])) {
     function addInward(retry) {
       var device_size = $('#device_size2').val() + $('#device_size_unit').val();
       $('#device_size1').val(device_size)
+      var validation = true;
       if ($('#customer_id').val() == "") {
-        $('#CaseRegister_customer_id_em_').removeAttr('style').html('Customer is required.');
+        $('#customer_id_error').removeAttr('style').attr('style', "color:red;").html('Customer is required.');
+        validation = false;
+      } else {
+        $('#customer_id_error').hide();
+      }
+      
+      if ($.trim($('#device_serial_number').val()) =='') {
+        $('#device_serial_number_error').removeAttr('style').attr('style', "color:red;").html('Device serial number is required.');
+        validation = false;
+      } else {
+        $('#device_serial_number_error').hide();
+      }
+      if(!validation){
         return false;
       }
       formData = $('#inward_form').serializeArray();
@@ -509,7 +523,7 @@ if (isset($_GET['id'])) {
       //   'attributes': [{
       //     'id': 'CaseRegister_customer_id',
       //     'inputID': 'CaseRegister_customer_id',
-      //     'errorID': 'CaseRegister_customer_id_em_',
+      //     'errorID': 'customer_id_error',
       //     'model': 'CaseRegister',
       //     'name': 'customer_id',
       //     'enableAjaxValidation': false,

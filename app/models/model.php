@@ -61,23 +61,36 @@ class Model
         $columnArray = array_column($data, 'name');
         $valueArray = array_column($data, 'value');
 
-        $columns = implode(",", $columnArray);
-        $values = implode("', '", $valueArray);
+        foreach ($columnArray as $key => $each) {
+            $dataArray[$each] = $valueArray[$key];
+        }
 
-        $sql = "INSERT INTO $tableName ($columns) VALUES ('$values');";
+        if ($tableName == 'customer') {
+            $sql = "INSERT INTO user (username,password,user_type) VALUES ('" . $dataArray['customer_primary_email_id'] . "','" . md5($dataArray['customer_mobile_no1']) . "','Customer');";
+            $result = mysqli_query($this->conn, $sql);
+            if (!$result) {
+                return false;
+            }
+            $user_id = $this->select("user", 'id', "username = '" . $dataArray['customer_primary_email_id'] . "'")[0]['id'];
+            $dataArray['user_id'] = $user_id;
+        }
+
+        $sql = "INSERT INTO $tableName (" . implode(",", array_keys($dataArray)) . ") VALUES ('" . implode("', '", array_values($dataArray)) . "');";
 
         $result = mysqli_query($this->conn, $sql);
         if ($result) {
 
             if ($tableName == 'case_register') {
                 $modelArray = $this->select($tableName, '*', '', '', '', 1)[0];
-                $manufacturer = $this->select('device_manufacturer', 'manufacturer_name', 'id = ' . $modelArray['device_maker_id'] ?? 0, '', '', 1)[0];
-
                 $customer = $this->select('customer', '*', "id = " . $valueArray[0] ?? 0)[0];
                 $modelArray = array_merge($customer, $modelArray);
 
-                $modelArray = array_merge($manufacturer, $modelArray);
-                $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray->id, 'register/inward_submit_email.php', $modelArray);
+                if (!empty($modelArray['device_maker_id'])) {
+                    $manufacturer = $this->select('device_manufacturer', 'manufacturer_name', 'id = ' . $modelArray['device_maker_id'] ?? 0, '', '', 1)[0];
+                    $modelArray = array_merge($manufacturer, $modelArray);
+                }
+
+                $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray['id'], 'register/inward_submit_email.php', $modelArray);
             }
             $_SESSION['success_message'] = $title . ' created successfully';
             return $result;
@@ -188,7 +201,6 @@ class Model
         }
 
         $body = $this->render($modelArray, $view);
-        print_r($body);
         $mail->Body = $body;
         $mail->IsHTML(true); // send as HTML 
         $mail->AddAddress(trim($to));
