@@ -8,9 +8,9 @@ $model = (new Model());
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["id"]) && $_POST["id"] > 0) {
-        return $model->update('customer', $_POST, 'Customer');
+        return $model->update('customer', $_POST, 'Customer updated');
     } else if (isset($_POST["delete_id"])) {
-        return $model->delete('customer', $_POST['delete_id'], 'Customer');
+        return $model->delete('customer', $_POST, 'Customer');
     } else {
         $model->insert('customer', $_POST['formData'], 'Customer');
         $user['formData'][0]['name'] = 'username';

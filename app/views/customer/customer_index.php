@@ -192,7 +192,7 @@ $cities = $model->select('city_location');
                                   <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a type="button" onclick="deleteCustomer(<?= $customer['id'] ?>)" style="cursor: pointer;color: #007bff;"><i class='fa fa-trash-o mr5'></i> Delete Customer</a>
+                                  <a type="button" onclick="deleteCustomer(<?= $customer['id'] ?>,'<?= $customer['customer_primary_email_id'] ?>')" style="cursor: pointer;color: #007bff;"><i class='fa fa-trash-o mr5'></i> Delete Customer</a>
                                 </li>
                               </ul>
                             </div>
@@ -300,12 +300,13 @@ $cities = $model->select('city_location');
 
     }
 
-    function deleteCustomer(delete_id) {
+    function deleteCustomer(delete_id, customer_primary_email_id) {
       $.ajax({
         type: "POST",
         url: "../../controllers/CustomerController.php",
         data: {
           delete_id: delete_id,
+          customer_primary_email_id: customer_primary_email_id
         },
         success: function(response) {
           location.reload(true);

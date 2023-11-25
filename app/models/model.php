@@ -101,13 +101,38 @@ class Model
 
     function update($tableName, $data, $title = '')
     {
-        $update = '';
+        $update = $where = '';
         if (isset($data['event_name'])) {
-            if ($data['event_name'] == 'send_estimate')
-                $update .= ' estimate_amount="' . $data['estimate_amount'] . '", estimate_approved_by_customer="' . $data['customer_estimate_status'] . '" WHERE id=' . $data['inward_register_id'];
-            else if ($data['event_name'] == 'moveToOwtward')
+            if ($data['event_name'] == 'send_estimate') {
+                if (isset($data['send_email'])) {
+                    $update .= '  case_status=2, ';
+                }
+                $update .= ' estimate_amount="' . $data['formData'][3]['value'] . '", customer_remarks="' . $data['formData'][4]['value'] . '", estimate_approved_by_customer="' . $data['formData'][5]['value'] . '" WHERE id=' . $data['inward_register_id'];
+            } else if ($data['event_name'] == 'moveToOwtward') {
                 $update .= ' case_status=4, case_register_state=2 WHERE id=' . $data['inward_register_id'];
-        } else {
+            } else if ($data['event_name'] == 'add_storage_detail') {
+                $name = array_column($data['formData'], 'name');
+                $value = array_column($data['formData'], 'value');
+                for ($i = 0; $i < count($name); $i++) {
+                    if ($name[$i] != 'inward_register_id_storage' && $name[$i] != 'type') {
+                        if ($name[$i] == 'case_result' && $value[$i] == 'on') {
+                            $value[$i] = 1;
+                        } else {
+                            $value[$i] = '"' . $value[$i] . '"';
+                        }
+                        $update .= ' ' . $name[$i] . '= ' . $value[$i] . '' . ((count($name) - 1 != $i) ? ',' : '');
+                    } else {
+                        if ($name[$i] == 'inward_register_id_storage') {
+                            $where = " WHERE id = " . $value[$i];
+                        }
+                    }
+                }
+                if (!in_array("case_result", array_column($data['formData'], 'name'))) {
+                    $update .= ' ,case_result = 0';
+                }
+                $update .= $where;
+            }
+        } elseif (isset($data['formData'])) {
             for ($i = 0; $i < count(array_column($data['formData'], 'name')); $i++) {
                 if (array_column($data['formData'], 'name')[$i] != 'case_status' || array_column($data['formData'], 'name')[$i] != 'estimate_approved_by_customer')
                     $update .= ' ' . array_column($data['formData'], 'name')[$i] . '="' . array_column($data['formData'], 'value')[$i] . '"' . ((count(array_column($data['formData'], 'name')) - 1 != $i) ? ',' : '');
@@ -119,16 +144,25 @@ class Model
         $result = mysqli_query($this->conn, $sql);
 
         if ($result) {
-            $_SESSION['success_message'] = $title . ' updated successfully';
+            $_SESSION['success_message'] = $title . ' successfully';
             return $result;
         } else {
             return false;
         }
     }
 
-    function delete($tableName, $id, $title = '')
+    function delete($tableName, $data, $title = '')
     {
-        $sql = "DELETE FROM $tableName WHERE id = " . $id;
+        if ($tableName == 'customer') {
+            $sql = "DELETE FROM user WHERE username = '" . $data['customer_primary_email_id'] . "' AND user_type='Customer'";
+            $resultSubQuery = mysqli_query($this->conn, $sql);
+            if (!$resultSubQuery) {
+                $_SESSION['error_message'] = 'User not Found';
+                return false;
+            }
+        }
+
+        $sql = "DELETE FROM $tableName WHERE id = " . $data['delete_id'];
         $result = mysqli_query($this->conn, $sql);
 
         if ($result) {
@@ -141,7 +175,7 @@ class Model
 
     function user_authentication($data)
     {
-        $sql = "SELECT id FROM user Where";
+        $sql = "SELECT id,user_type FROM user Where";
         for ($i = 0; $i < count($data); $i++) {
             if ($i != 0) {
                 $sql .= " AND ";
@@ -156,12 +190,34 @@ class Model
             while ($row = mysqli_fetch_assoc($result)) {
                 $data[] = $row;
             }
+            $customer = "SELECT company_name FROM customer Where user_id= '" . $data[0]['id'] . "'";
+
+            $customerResult = mysqli_query($this->conn, $customer);
+            $customerData = mysqli_fetch_assoc($customerResult);
+
             $_SESSION['success_message'] = 'Login successfully';
             $_SESSION['user_id'] = $data[0]['id'];
+            $_SESSION['user_type'] = $data[0]['user_type'];
+            $_SESSION['company_name'] = $customerData['company_name'];
             return true;
         } else {
             return false;
         }
+    }
+
+    function print($data)
+    {
+        $customer = $this->select('customer', 'company_name,customer_name,customer_mobile_no1,customer_primary_email_id,office_addressline', ' id=' . $data['customer_id'])[0];
+        $city_location = $this->select('city_location', 'city_name', ' id=' . $data['city_id'])[0];
+        $inward = $this->select('case_register', '*', ' id=' . $data['inward_register_id'])[0];
+
+        $modelArray = array_merge($inward, $city_location);
+        $modelArray = array_merge($modelArray, $customer);
+
+        if (isset($data['user_type'])) {
+            $_SESSION['user_type'] = 'admin';
+        }
+        return $this->render($modelArray, '../views/register/print_inward.php');
     }
 
     function sendMail($to, $subject, $view, $modelArray, $redirect = '', $html = true, $attachment = "")

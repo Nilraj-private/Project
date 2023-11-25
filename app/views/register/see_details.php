@@ -1,22 +1,33 @@
-<?php 
+<?php
 
 include('../template/head.php');
 require("../../models/model.php");
 
 use app\models\Model;
 
-$_SESSION['page'] = 'create_inward.php';
+$_SESSION['page'] = 'register.php' . (isset($_GET['type']) ? '?type=' . $_GET['type'] : '');
 
 $model = (new Model());
 $customers = $model->select("customer");
 $manufacturers = $model->select("device_manufacturer");
 $cities = $model->select("city_location");
+$action_history = $model->select("action_history", '*', ' case_register_id=' . $_GET['id']);
 
 if (isset($_GET['id'])) {
-  // $join = 
-  $inward = $model->select('case_register as cr', 'cr.*', ' cr.id=' . $_GET['id'])[0];
+  $join = ' LEFT JOIN customer as c on c.id=cr.customer_id LEFT JOIN device_manufacturer as m on m.id=cr.device_maker_id LEFT JOIN city_location cl on cl.id=c.customer_city_location ';
+  $register = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name,c.customer_primary_email_id,c.customer_mobile_no1,c.customer_mobile_no2,c.office_phone, c.office_addressline, m.manufacturer_name, cl.city_name', ' cr.id=' . $_GET['id'], $join)[0];
 }
+
+$case_register_state = [1 => 'Inward', 2 => 'Outward', 3 => 'Register'];
+$case_register_state_color = [1 => 'success', 2 => 'danger', 3 => 'warning'];
+$case_status = [0 => '', 1 => 'Open', 2 => 'In Progress', 3 => 'Processed', 4 => 'Close'];
+$case_status_color = [0 => '', 1 => 'success', 2 => 'warning', 3 => 'info', 4 => 'danger'];
+$estimate_status = [0 => 'Pending', 1 => 'Approved', 2 => 'Reject'];
+$estimate_status_color = [0 => 'warning', 1 => 'success', 2 => 'danger'];
+$recovery_status = [0 => 'Not Recovered', 1 => 'Recovered'];
+$recovery_status_color = [0 => 'secondary', 1 => 'success'];
 ?>
+
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
     <?php include('../template/header.php') ?>
@@ -51,9 +62,9 @@ if (isset($_GET['id'])) {
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="<?= $_SESSION['url_path'] ?>/app/views/dashboard.php">Home</a></li>
-                <li class="breadcrumb-item "><a href="create_inward.html"> Register</a> </li>
+                <li class="breadcrumb-item "><a href="register.php?type=inward"> Register</a> </li>
                 <li class="breadcrumb-item active"> Inward</li>
-                <li class="breadcrumb-item active"> Details #19190</li>
+                <li class="breadcrumb-item active"> Details #<?= $register['id'] ?></li>
               </ol>
             </div>
           </div>
@@ -112,52 +123,51 @@ if (isset($_GET['id'])) {
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Estimate Amount</label>
-                    <input type="text" class="form-control" placeholder="Enter Amount">
+            <form id="send_estimate_form">
+              <div class="modal-body">
+                <div class="row">
+                  <input type="hidden" name="inward_register_id" id="inward_register_id" value="">
+                  <input type="hidden" name="customer_id" id="customer_id" value="">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Estimate Amount</label>
+                      <input type="text" class="form-control" name="estimate_amount" id="estimate_amount" placeholder="Enter Amount">
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Estimation Details</label>
-                    <textarea class="form-control" rows="3" placeholder="Enter Customer Update Details"></textarea>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Estimation Details</label>
+                      <textarea class="form-control" rows="3" name="customer_details" id="customer_details" placeholder="Enter Customer Update Details"></textarea>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Estimate Approved By Customer</label>
-                    <select class="form-control">
-                      <option value="">Pending</option>
-                      <option value="1">Approved</option>
-                      <option value="2">Rejected</option>
-                    </select>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Estimate Approved By Customer</label>
+                      <select class="form-control" name="customer_estimate_status" id="customer_estimate_status">
+                        <option value="0">Pending</option>
+                        <option value="1">Approved</option>
+                        <option value="2">Rejected</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12 mb-3">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="SendEmail">
-                    <label class="form-check-label" for="exampleCheck1">Send Email</label>
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" name="send_email" id="send_email">
+                      <label class="form-check-label" for="exampleCheck1">Send Email</label>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-6">
-                  <div class="form-group">
-                    <input class="submit btn btn-success" type="submit" name="yt0" value="Save">
+                  <div class="col-6">
+                    <button type="button" class="btn btn-success mr10" onclick="sendEstimate();">Save</button>
                   </div>
                 </div>
               </div>
-            </div>
-
+            </form>
           </div>
-
         </div>
-
       </div>
 
       <div class="modal fade" id="modal_add_storage_details">
@@ -169,48 +179,48 @@ if (isset($_GET['id'])) {
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>HDD Numer</label>
-                    <input type="text" class="form-control" placeholder="Enter Storage HDD Number">
+            <form id="add_storage_detail_form">
+              <div class="modal-body">
+                <input type="hidden" name="inward_register_id_storage" id="inward_register_id_storage" value="">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>HDD Numer</label>
+                      <input type="text" name="sd_hddno" id="sd_hddno" class="form-control" placeholder="Enter Storage HDD Number">
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Storage Size</label>
-                    <input type="text" class="form-control" placeholder="Enter Storage Data Size. i.e. 205GB">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Storage Size</label>
+                      <input type="text" name="sd_size" id="sd_size" class="form-control" placeholder="Enter Storage Data Size. i.e. 205GB">
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Storage Remarks</label>
-                    <textarea class="form-control" rows="3" placeholder="Enter Remarks"></textarea>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Storage Remarks</label>
+                      <textarea class="form-control" name="sd_remarks" id="sd_remarks" rows="3" placeholder="Enter Remarks"></textarea>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12 mb-3">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="DataRecovered">
-                    <label class="form-check-label" for="exampleCheck1">Is Data Recovered</label>
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" name="case_result" id="case_result" class="form-check-input" id="DataRecovered">
+                      <label class="form-check-label" for="exampleCheck1">Is Data Recovered</label>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-6">
-                  <div class="form-group">
-                    <input class="submit btn btn-success" type="submit" name="yt0" value="Save">
+                  <div class="col-6">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-success mr10" onclick="addStorageDetail();">Save</button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-
+            </form>
           </div>
-
         </div>
-
       </div>
       <!-- modal -->
 
@@ -223,35 +233,42 @@ if (isset($_GET['id'])) {
                 <div class="col-md-8 max_width100">
                   <div class="card">
                     <div class="card-header">
-                      <h4 class="float-left">Inward Details (#19190)</h4>
+                      <h4 class="float-left">Inward Details (#<?= $register['id'] ?>)</h4>
                       <div class="float-right">
-                        <button type="submit" class="btn btn-primary "><i class="fa fa-angle-left"></i> Back</button>
+                        <a type="button" href="register.php?type=inward" class="btn btn-primary "><i class="fa fa-angle-left"></i> Back</a>
                         <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                         <ul class="dropdown-menu">
-                          <li class="dropdown-item"><a href="#"><i class="fa fa-pencil mr5"></i> Edit</a></li>
+                          <li class="dropdown-item">
+                            <a href="create_inward.php?id=<?= $register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
+                          </li>
                           <li class="dropdown-divider"></li>
-                          <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal_send_estimate"><i class='fa fa-inr mr5'></i> Send Estimate</a></li>
-                          <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal_add_storage_details"><i class='fa fa-cog mr5'></i> Add Storage Detail</a></li>
-                          <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a></li>
+                          <li class="dropdown-item">
+                            <a href="#" onclick="sendEstimateModal('<?= $register['id'] ?>','<?= $register['customer_id'] ?>','<?= $register['estimate_amount'] ?>','<?= $register['customer_remarks'] ?>','<?= $register['estimate_approved_by_customer'] ?>')" style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
+                          </li>
+                          <li class="dropdown-item">
+                            <a href="#" onclick="addStorageDetailModal('<?= $register['id'] ?>','<?= $register['sd_hddno'] ?>','<?= $register['sd_size'] ?>','<?= $register['sd_remarks'] ?>','<?= $register['case_result'] ?>')"><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
+                          </li>
+                          <!-- <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a></li> -->
                           <li class="dropdown-divider"></li>
-                          <li class="dropdown-item"><a href="#"><i class='fa fa-sign-out mr5'></i> Move to Outward</a></li>
-                          <li class="dropdown-item"><a href="#"><i class='fa fa-inbox mr5'></i> Move to Stock</a></li>
-                          <li class="dropdown-divider"></li>
-                          <li class="dropdown-item"><a href="#"><i class='fa fa-print mr5'></i> Print</a></li>
+                          <li class="dropdown-item">
+                            <a href="#" onclick="moveToOwtward(<?= $register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
+                          </li>
+                          <!-- <li class="dropdown-divider"></li> -->
+                          <!-- <li class="dropdown-item"><a href="#"><i class='fa fa-print mr5'></i> Print</a></li> -->
                         </ul>
                       </div>
                     </div>
 
-                    <div class="card-body per_details">
-                      <p><span>Serial No</span> <span class="span_dot">:</span> WDEE0Q8Y</p>
-                      <p><span>Internal SR#</span> <span class="span_dot">:</span> N/A</p>
-                      <p><span>Device Mfg</span> <span class="span_dot">:</span> Seagate</p>
-                      <p><span>Device Model</span> <span class="span_dot">:</span> ST1000LX015</p>
-                      <p><span>Device Type</span> <span class="span_dot">:</span> LAPTOP</p>
-                      <p><span>Device Size</span> <span class="span_dot">:</span> 1TB</p>
-                      <p><span>Device Firmware</span> <span class="span_dot">:</span> SHM2</p>
-                      <p><span>Device MLC</span> <span class="span_dot">:</span> N/A</p>
-                      <p><span class="res_tl">Files and Directories to be Recovered </span> <span class="span_dot">:</span> <b class="res_width50 res_tl"> Hang Problem, 2 partition, Photos (IMP) & documents data recover</b></p>
+                    <div class="card-body per_details" style="margin:2px">
+                      <p><span>Serial No</span> <span class="span_dot">:</span> <?= $register['device_serial_number'] ?></p>
+                      <p><span>Internal SR#</span> <span class="span_dot">:</span><?= $register['device_internal_serial_number'] ?></p>
+                      <p><span>Device Mfg</span> <span class="span_dot">:</span> <?= $register['manufacturer_name'] ?></p>
+                      <p><span>Device Model</span> <span class="span_dot">:</span><?= $register['device_model'] ?></p>
+                      <p><span>Device Type</span> <span class="span_dot">:</span><?= $register['device_type'] ?></p>
+                      <p><span>Device Size</span> <span class="span_dot">:</span><?= $register['device_size'] ?></p>
+                      <p><span>Device Firmware</span> <span class="span_dot">:</span><?= $register['device_firmware'] ?></p>
+                      <p><span>Device MLC</span> <span class="span_dot">:</span><?= $register['device_mlc'] ?></p>
+                      <p><span class="res_tl">Files and Directories to be Recovered </span> <span class="span_dot">:</span> <b class="res_width50 res_tl"><?= $register['files_to_recover'] ?></b></p>
                     </div>
                   </div>
 
@@ -267,14 +284,21 @@ if (isset($_GET['id'])) {
                         </div>
 
                         <div class="card-body">
-                          <div class="card card-outline card-danger">
-                            <div class="card-header">
-                              <p class="box_txt">Data Storage Details not found!</p>
+                          <?php if ($register['sd_hddno'] == NULL) { ?>
+                            <div class="card card-outline card-danger">
+                              <div class="card-header">
+                                <p class="box_txt">Data Storage Details not found!</p>
+                              </div>
                             </div>
-                          </div>
+                          <?php } else { ?>
+                            <p><span><b>HDD Number</b></span> <span class="span_dot">:</span> <?= $register['sd_hddno'] ?>
+                              <br><span><b>Storage Size</b></span> <span class="span_dot">:</span> <?= $register['sd_size'] ?>
+                              <br><span><b>Storage Remarks</b></span> <span class="span_dot">:</span> <?= $register['sd_remarks'] ?>
+                            </p>
+                          <?php } ?>
 
                           <div class="flex_center">
-                            <button type="submit" class="btn btn-primary mr10" title="Update Storage Details"><i class='fa fa-inr'></i> Update Storage Details</button>
+                            <button type="button" class="btn btn-primary mr10" onclick="addStorageDetailModal('<?= $register['id'] ?>','<?= $register['sd_hddno'] ?>','<?= $register['sd_size'] ?>','<?= $register['sd_remarks'] ?>','<?= $register['case_result'] ?>')" title="Update Storage Details"> Update Storage Details</button>
                           </div>
                         </div>
                       </div>
@@ -293,19 +317,19 @@ if (isset($_GET['id'])) {
                         </div>
 
                         <div class="card-body">
-                          <p><b class="mr10">Information</b><span class="badge badge-secondary width65 mr5">Private </span></p>
-
-                          <p class="mb-2 res_txt_justify res_ls02"> 1) Text will come here Text will come hereText will come hereText will come hereText will come hereText will come hereText will come hereText will come hereText will come here </p>
-
-                          <p class="mb-2 res_txt_justify res_ls02"> 2) Text will come hereText will come hereText will come hereText will come hereText will come hereText will come hereText will come hereText will come hereText will come here</p>
-
-                          <p class="mb-2 res_txt_justify res_ls02"> 3) Text will come hereText will come hereText will come hereText will come hereText will come hereText will come hereText will come hereText will come hereText will come here</p>
-
-                          <div class="space_betwwen">
-                            <span class="gray_color "><i class="fa fa-clock-o"></i> 04 Oct, 2023 01:25 pm</span>
-                            <button type="submit" class="btn btn-primary "><i class='fa fa-trash-o'></i> Delete</button>
-                          </div>
-
+                          <?php foreach ($action_history as $each) { ?>
+                            <p>
+                              <b class="mr10"><?= $each['action_title'] ?></b>
+                              <span class="badge badge-secondary width65 mr5"><?= $each['visibility_type'] ?> </span>
+                              <br>
+                              <?= $each['action_description'] ?>
+                            </p>
+                            <div class="space_betwwen">
+                              <span class="gray_color "><i class="fa fa-clock-o"></i> <?= date('d M, Y h:m a ', strtotime($each['action_dt'])) ?></span>
+                              <button type="button" onclick="deleteActionHistory(<?= $each['id'] ?>)" class="btn btn-danger  "><i class='fa fa-trash-o'></i> Delete</button>
+                            </div>
+                            <hr>
+                          <?php } ?>
                           <div class="col-md-12 mt30 padding0">
                             <div class="card card-success">
                               <div class="card-header see_bg">
@@ -315,34 +339,42 @@ if (isset($_GET['id'])) {
                                   </button>
                                 </div>
                               </div>
-
-                              <div class="card-body res_col_form">
-                                <div class="row res_mb20">
-                                  <div class="col-4"><input type="text" class="form-control" placeholder="Action Title"></div>
-                                  <div class="col-4">
-                                    <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                      <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate" placeholder="Action Date">
-                                      <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar calendar_code"></i></div>
+                              <form id="add_sction_history_form">
+                                <div class="card-body res_col_form">
+                                  <div class="row res_mb20">
+                                    <input type="hidden" name="case_register_id" id="case_register_id" value="<?= $_GET['id'] ?? 0 ?>">
+                                    <input type="hidden" name="visibility_type" id="visibility_type" value="PRIVATE">
+                                    <div class="col-4">
+                                      <input type="text" name="action_title" id="action_title" class="form-control" placeholder="Action Title" required>
+                                      <div class="errorMessage" id="action_title_error" style="display:none"></div>
+                                    </div>
+                                    <div class="col-4">
+                                      <div class="input-group date" id="action_dt" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input" name="action_dt" id="action_dt_input" data-target="#action_dt" placeholder="Action Date">
+                                        <div class="input-group-append" data-target="#action_dt" data-toggle="datetimepicker">
+                                          <div class="input-group-text">
+                                            <i class="fa fa-calendar calendar_code"></i>
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
 
-                                  <div class="col-4">
+                                    <!-- <div class="col-4">
                                     <select class="form-control" placeholder="Visibility Type">
                                       <option value="">Visibility Type</option>
                                       <option value="PUBLIC">Public</option>
                                       <option value="PRIVATE">Private</option>
                                     </select>
+                                  </div> -->
+
+                                    <div class="col-12 mt25px res_mt0"><textarea class="form-control" name="action_description" id="action_description" rows="3" placeholder="Action Description"></textarea></div>
                                   </div>
 
-                                  <div class="col-12 mt25px res_mt0"><textarea class="form-control" rows="3" placeholder="Action Description"></textarea></div>
+                                  <div class="row mt25px res_mt10">
+                                    <div class="col-2 new_col"><button type="button" class="btn btn-primary" onclick="addActionHistory()">Save </button> </div>
+                                  </div>
                                 </div>
-
-                                <div class="row mt25px res_mt10">
-                                  <div class="col-2 new_col"><button type="submit" class="btn btn-primary wid100" onclick="stepper.next()">Save </button> </div>
-                                </div>
-                              </div>
+                              </form>
                             </div>
                           </div>
                         </div>
@@ -363,11 +395,13 @@ if (isset($_GET['id'])) {
                       </div>
 
                       <div class="card-body">
-                        <h4>Shezad Contractor</h4>
+                        <h4><?= $register['company_name'] ?></h4>
                         <p class="mb0">
-                          <i class="fa fa-user mr8"></i> Mr. Shezad Contractor<br>
-                          <i class="fa fa-envelope fs14 mr8"></i> shezad.pinks@gmail.com<br>
-                          <i class="fa fa-mobile mr8"></i> 9898289268<br>
+                          <i class="fa fa-user mr8"></i><?= $register['customer_name']; ?><br>
+                          <i class="fa fa-envelope fs14 mr8"></i><?= $register['customer_primary_email_id'] ?><br>
+                          <i class="fa fa-mobile mr8"></i><?= $register['customer_mobile_no1'] ?><br>
+                          <i class="fa fa-mobile mr8"></i><?= $register['customer_mobile_no2'] ?><br>
+                          <i class="fa fa-phone mr8"></i><?= $register['office_phone'] ?><br>
                         </p>
                       </div>
                     </div>
@@ -385,8 +419,8 @@ if (isset($_GET['id'])) {
                       </div>
 
                       <div class="card-body">
-                        <p><b class="mr8">Location :</b> Vadodara-DEALER </p>
-                        <p class="mb0"><b class="mr8">Office Address :</b> Shop No. 5, Rajeshwar Plaza, B/h, Harni Police Station, Vadodara </p>
+                        <p><b class="mr8">Location :</b><?= $register['city_name'] ?></p>
+                        <p class="mb0"><b class="mr8">Office Address :</b><?= $register['office_addressline'] ?></p>
                       </div>
                     </div>
                   </div>
@@ -400,18 +434,23 @@ if (isset($_GET['id'])) {
                           </button>
                         </div>
                       </div>
-
                       <div class="card-body">
-                        <div class="card card-outline card-danger">
-                          <div class="card-header">
-                            <p class="box_txt">Still Estimation Process is Pending, Plz Send Estimate Now</p>
+                        <?php if ($register['estimate_amount'] != '') { ?>
+                          <p><strong>Estimate Amount</strong> <?= $register['estimate_amount'] ?></p>
+                          <p><strong>Estimate Status</strong>
+                            <span class="badge badge-<?= $estimate_status_color[$register['case_result']] ?>"><?= $estimate_status[$register['case_result']] ?></span>
+                          </p>
+                          <p><strong>Estimation Details</strong><br><?= $register['customer_remarks'] ?></p>
+                        <?php } else { ?>
+                          <div class="card card-outline card-danger">
+                            <div class="card-header">
+                              <p class="box_txt">Still Estimation Process is Pending, Plz Send Estimate Now</p>
+                            </div>
                           </div>
-                        </div>
-
-                        <p><b>Estimation Details</b></p>
+                        <?php } ?>
                         <div class="flex_center">
-                          <button type="submit" class="btn btn-primary mr10" title="Send Estimate"><i class='fa fa-inr'></i> Send Estimate</button>
-                          <button type="submit" class="btn btn-primary " title="Send Data Tree"><i class='fa fa-file'></i> Send File</button>
+                          <button type="button" class="btn btn-primary mr10" onclick="sendEstimateModal('<?= $register['id'] ?>','<?= $register['customer_id'] ?>','<?= $register['estimate_amount'] ?>','<?= $register['customer_remarks'] ?>','<?= $register['estimate_approved_by_customer'] ?>')" title="Send Estimate"> Send Estimate</button>
+                          <!-- <button type="button" class="btn btn-primary " title="Send Data Tree"><i class='fa fa-file'></i> Send File</button> -->
                         </div>
                       </div>
                     </div>
@@ -428,10 +467,16 @@ if (isset($_GET['id'])) {
                       </div>
 
                       <div class="card-body device_info">
-                        <p><span>Device Received on</span> 05 Oct, 2023 01:01 pm</p>
-                        <p><span>Device Status</span> <span class="badge badge-success width100px">Open</span></p>
-                        <p><span>Device State</span> <span class="badge badge-success width100px">Inward</span></p>
-                        <p class="mb0"><span>Data Recovery Status</span> <span class="badge not-recovered width100px">Not Recovered</span></p>
+                        <p><span>Device Received on</span><?= date('d M, Y h:m a  ', strtotime($register['case_received_date'])) ?>
+                          <hr>
+                          <span>Device Returned on</span><?= date('d M, Y h:m a  ', strtotime($register['case_return_date'])) ?>
+                          <hr>
+                          <span>Device Status</span> <span class="badge badge-<?= $case_status_color[$register['case_status']] ?> width100px"><?= $case_status[$register['case_status']] ?></span>
+                          <hr>
+                          <span>Device State</span> <span class="badge badge-<?= $case_register_state_color[$register['case_register_state']] ?> width100px"><?= $case_register_state[$register['case_register_state']] ?></span>
+                          <hr>
+                          <span>Data Recovery Status</span> <span class="badge badge-<?= $recovery_status_color[$register['case_result']] ?> width100px"><?= $recovery_status[$register['case_result']] ?></span>
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -449,171 +494,150 @@ if (isset($_GET['id'])) {
   </div>
   <!-- ./wrapper -->
 
-  <script src="<?= $_SESSION['url_path'] ?>/public//jquery/jquery.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//datatables/jquery.dataTables.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-responsive/js/dataTables.responsive.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/dataTables.buttons.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//jszip/jszip.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//pdfmake/pdfmake.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//pdfmake/vfs_fonts.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/buttons.html5.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/buttons.print.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//datatables-buttons/js/buttons.colVis.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/jquery/jquery.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/js/adminlte.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/js/demo.js"></script>
   <!-- Page specific script -->
 
-
-  <script src="<?= $_SESSION['url_path'] ?>/public//select2/js/select2.full.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//moment/moment.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//inputmask/jquery.inputmask.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//daterangepicker/daterangepicker.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//bootstrap-switch/js/bootstrap-switch.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//bs-stepper/js/bs-stepper.min.js"></script>
-  <script src="<?= $_SESSION['url_path'] ?>/public//dropzone/min/dropzone.min.js"></script>
-
-
-
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/moment/moment.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/daterangepicker/daterangepicker.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
-    $(function() {
-      $("#example1").DataTable({
-        "responsive": true,
-        "lengthChange": false,
-        "autoWidth": false,
-        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-      }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-      $('#example2').DataTable({
-        "paging": true,
-        "lengthChange": false,
-        "searching": false,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "responsive": true,
-      });
-    });
-  </script>
-
-  <script>
-    $(function() {
-      $('.select2').select2()
-      $('.select2bs4').select2({
-        theme: 'bootstrap4'
-      })
-
-      $('#datemask').inputmask('dd/mm/yyyy', {
-        'placeholder': 'dd/mm/yyyy'
-      })
-      $('#datemask2').inputmask('mm/dd/yyyy', {
-        'placeholder': 'mm/dd/yyyy'
-      })
-      $('[data-mask]').inputmask()
-      $('#reservationdate').datetimepicker({
-        format: 'L'
-      });
-
-      $('#reservationdatetime').datetimepicker({
-        icons: {
-          time: 'far fa-clock'
-        }
-      });
-      $('#reservation').daterangepicker()
-      $('#reservationtime').daterangepicker({
-        timePicker: true,
-        timePickerIncrement: 30,
-        locale: {
-          format: 'MM/DD/YYYY hh:mm A'
-        }
-      })
-
-      $('#daterange-btn').daterangepicker({
-          ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-          },
-          startDate: moment().subtract(29, 'days'),
-          endDate: moment()
-        },
-        function(start, end) {
-          $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-        }
-      )
-
-      $('#timepicker').datetimepicker({
-        format: 'LT'
-      })
-
-      $('.duallistbox').bootstrapDualListbox()
-      $('.my-colorpicker1').colorpicker()
-      $('.my-colorpicker2').colorpicker()
-      $('.my-colorpicker2').on('colorpickerChange', function(event) {
-        $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
-      })
-
-      $("input[data-bootstrap-switch]").each(function() {
-        $(this).bootstrapSwitch('state', $(this).prop('checked'));
-      })
-
-    })
-    document.addEventListener('DOMContentLoaded', function() {
-      window.stepper = new Stepper(document.querySelector('.bs-stepper'))
-    })
-
-    Dropzone.autoDiscover = false
-
-    var previewNode = document.querySelector("#template")
-    previewNode.id = ""
-    var previewTemplate = previewNode.parentNode.innerHTML
-    previewNode.parentNode.removeChild(previewNode)
-
-    var myDropzone = new Dropzone(document.body, {
-      url: "/target-url",
-      thumbnailWidth: 80,
-      thumbnailHeight: 80,
-      parallelUploads: 20,
-      previewTemplate: previewTemplate,
-      autoQueue: false,
-      previewsContainer: "#previews",
-      clickable: ".fileinput-button"
-    })
-
-    myDropzone.on("addedfile", function(file) {
-      file.previewElement.querySelector(".start").onclick = function() {
-        myDropzone.enqueueFile(file)
+    $(document).ready(function() {
+      if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
+        toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      } else if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+        toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['error_message']); ?>"
       }
     })
 
-    myDropzone.on("totaluploadprogress", function(progress) {
-      document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
-    })
-
-    myDropzone.on("sending", function(file) {
-      document.querySelector("#total-progress").style.opacity = "1"
-      file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
-    })
-
-    myDropzone.on("queuecomplete", function(progress) {
-      document.querySelector("#total-progress").style.opacity = "0"
-    })
-
-    document.querySelector("#actions .start").onclick = function() {
-      myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
+    function sendEstimateModal(inward_register_id, customer_id, estimate_amount, customer_details, approval_status) {
+      $('#customer_id').val(customer_id);
+      $('#inward_register_id').val(inward_register_id);
+      $('#estimate_amount').val(estimate_amount);
+      $('#customer_details').val(customer_details);
+      $('#customer_estimate_status option[value="' + approval_status + '"]').prop('selected', true);
+      $('#modal_send_estimate').modal();
     }
-    document.querySelector("#actions .cancel").onclick = function() {
-      myDropzone.removeAllFiles(true)
+
+    function sendEstimate() {
+      formData = $('#send_estimate_form').serializeArray();
+      $.ajax({
+        url: '../../controllers/EmailController.php',
+        type: 'POST',
+        data: {
+          formData: formData,
+          event_name: 'send_estimate',
+          send_email: $('input[name="send_email"]:checked').val(),
+          customer_id: $('#customer_id').val(),
+          inward_register_id: $('#inward_register_id').val()
+        },
+        success: function(response) {
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/see_details.php" + "<?= isset($_GET['id']) ? '?id=' . $_GET['id'] : '' ?>";
+        },
+      });
     }
+
+    function addStorageDetailModal(inward_register_id, sd_hddno, sd_size, sd_remarks, recovery_status) {
+      $('#inward_register_id_storage').val(inward_register_id);
+      $('#sd_hddno').val(sd_hddno);
+      $('#sd_size').val(sd_size);
+      $('#sd_remarks').val(sd_remarks);
+      console.log((recovery_status == 0) ? 'false' : 'true');
+      if (recovery_status == 0) {
+        $('#case_result').removeAttr('checked');
+      } else {
+        $('#case_result').attr('checked', 'true');
+      }
+      $('#modal_add_storage_details').modal();
+    }
+
+    function moveToOwtward(inward_register_id) {
+      $.ajax({
+        url: '../../controllers/RegisterController.php',
+        type: 'POST',
+        data: {
+          inward_register_id: inward_register_id,
+          event_name: 'moveToOwtward'
+        },
+        success: function(response) {
+          location.reload(true);
+        },
+      });
+    }
+
+    function addStorageDetail() {
+      formData = $('#add_storage_detail_form').serializeArray();
+      $.ajax({
+        url: '../../controllers/RegisterController.php',
+        type: 'POST',
+        data: {
+          formData: formData,
+          event_name: 'add_storage_detail',
+          inward_register_id: $('#inward_register_id').val()
+        },
+        success: function(response) {
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/see_details.php" + "<?= isset($_GET['id']) ? '?id=' . $_GET['id'] : '' ?>";
+        },
+      });
+    }
+
+    function addActionHistory() {
+      if ($('#action_title').val() == "") {
+        $('#action_title_error').removeAttr('style').attr('style', "color:red;").html('Action title is required.');
+        return false;
+      } else {
+        $('#action_title_error').hide();
+      }
+
+      formData = $('#add_sction_history_form').serializeArray();
+      $.ajax({
+        url: '../../controllers/RegisterController.php',
+        type: 'POST',
+        data: {
+          formData: formData,
+          event_name: 'add_action_history',
+        },
+        success: function(response) {
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/see_details.php" + "<?= isset($_GET['id']) ? '?id=' . $_GET['id'] : '' ?>";
+        },
+      });
+    }
+
+    function deleteActionHistory(delete_id) {
+      $.ajax({
+        type: "POST",
+        url: "../../controllers/RegisterController.php",
+        data: {
+          table_name: 'action_history',
+          delete_id: delete_id
+        },
+        success: function(response) {
+          location.reload(true);
+        }
+      });
+    }
+    $(function() {
+      $("#action_dt").datetimepicker("format", 'Y-MM-DD hh:mm:ss a');
+      if ("<?= isset($_POST) && ($_POST['action_dt'] ?? '') ?>") {
+        $("#action_dt").datetimepicker("defaultDate", new Date("<?= $_POST['action_dt'] ?? '' ?>"));
+      }
+    });
   </script>
 </body>
 

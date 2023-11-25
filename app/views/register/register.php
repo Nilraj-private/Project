@@ -26,20 +26,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if ($flag && (isset($_POST['case_received_date']) && $_POST['case_received_date'] != '') && (isset($_POST['case_return_date']) && $_POST['case_return_date'] != '')) {
         $flag = 0;
         $where .= (($where == '') ? '' : ' AND ') . " case_received_date BETWEEN  '" . $_POST['case_received_date'] . "' AND '" . $_POST['case_return_date'] . "' ";
-      } else
-       if ($flag && $key == 'case_received_date') {
+      } else if ($flag && $key == 'case_received_date') {
         $where .= (($where == '') ? '' : ' AND ') . " $key > '" . $value . " 00:00:00' ";
       } else if ($flag && $key == 'case_return_date') {
         $where .= (($where == '') ? '' : ' AND ') . " $key < '" . $value . " 00:00:00' ";
       } else if ($key != 'case_received_date' && $key != 'case_return_date') {
-        $where .= (($where == '') ? '' : ' AND ') . " $key = '" . $value . "' ";
+        $where .= (($where == '') ? '' : ' AND ') . " $key like '%" . $value . "%' ";
       }
     }
   }
 }
 
 $join = ' LEFT JOIN customer as c on c.id=cr.customer_id ';
-$case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name', $where, $join);
+// 'c.customer_city_location as customer_city_id',
+$case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name, c.customer_city_location', $where, $join);
 $manufacturers = $model->select('device_manufacturer');
 $cities = $model->select('city_location');
 ?>
@@ -182,6 +182,26 @@ $cities = $model->select('city_location');
         </div>
       </div>
 
+      <!-- <div class="modal fade" id="modal_move_to_outward">
+        <div class="modal-dialog">
+          <div class="modal-cntent">
+            <div class="modal-header">
+              <h4 class="modal-title">Move to Outward</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-12">
+                  <div class="form-group">
+                    <label>Files and Directories to be recovered</label>
+                    <textarea class="form-control" rows="2" name="files_to_recover" id="files_to_recover" placeholder="Outward Remarks" required></textarea>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
       <div class="modal fade" id="modal_add_storage_details">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -191,43 +211,47 @@ $cities = $model->select('city_location');
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>HDD Numer</label>
-                    <input type="text" class="form-control" placeholder="Enter Storage HDD Number">
+            <form id="add_storage_detail_form">
+              <div class="modal-body">
+                <input type="hidden" name="inward_register_id_storage" id="inward_register_id_storage" value="">
+                <input type="hidden" name="type" id="type" value="<?= (isset($_GET['type']) ? $_GET['type'] : '') ?>">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>HDD Numer</label>
+                      <input type="text" name="sd_hddno" id="sd_hddno" class="form-control" placeholder="Enter Storage HDD Number">
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Storage Size</label>
-                    <input type="text" class="form-control" placeholder="Enter Storage Data Size. i.e. 205GB">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Storage Size</label>
+                      <input type="text" name="sd_size" id="sd_size" class="form-control" placeholder="Enter Storage Data Size. i.e. 205GB">
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Storage Remarks</label>
-                    <textarea class="form-control" rows="3" placeholder="Enter Remarks"></textarea>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Storage Remarks</label>
+                      <textarea class="form-control" name="sd_remarks" id="sd_remarks" rows="3" placeholder="Enter Remarks"></textarea>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12 mb-3">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="DataRecovered">
-                    <label class="form-check-label" for="exampleCheck1">Is Data Recovered</label>
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" name="case_result" id="case_result" class="form-check-input" id="DataRecovered">
+                      <label class="form-check-label" for="exampleCheck1">Is Data Recovered</label>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-6">
-                  <div class="form-group">
-                    <input class="submit btn btn-success" type="submit" name="yt0" value="Save">
+                  <div class="col-6">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-success mr10" onclick="addStorageDetail();">Save</button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
@@ -262,10 +286,10 @@ $cities = $model->select('city_location');
                         <input type="text" class="form-control" name="device_model" id="device_model" placeholder="Model No." value="<?= (isset($_POST) ? ($_POST['device_model'] ?? '') : '') ?>">
                       </div>
                       <div class="col-2">
-                        <input type="text" class="form-control" name="c.company_name" id="c.company_name" placeholder="Company Name" value="<?= (isset($_POST) ? ($_POST['c.company_name'] ?? '') : '') ?>">
+                        <input type="text" class="form-control" name="company_name" id="company_name" placeholder="Company Name" value="<?= (isset($_POST) ? ($_POST['company_name'] ?? '') : '') ?>">
                       </div>
                       <div class="col-2">
-                        <input type="text" class="form-control" name="c.customer_name" id="c.customer_name" placeholder="Customer Name" value="<?= (isset($_POST) ? ($_POST['c.customer_name'] ?? '') : '') ?>">
+                        <input type="text" class="form-control" name="customer_name" id="customer_name" placeholder="Customer Name" value="<?= (isset($_POST) ? ($_POST['customer_name'] ?? '') : '') ?>">
                       </div>
                     </div>
                     <div class="row mt25px res_mt0">
@@ -399,30 +423,26 @@ $cities = $model->select('city_location');
                               <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                               <ul class="dropdown-menu">
                                 <?php if ($case_register_state[$case_register['case_register_state']] !== 'Outward') { ?>
-                                  <!-- <li class="dropdown-item">
-                                  <a href="see_details.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
-                                </li> -->
+                                  <li class="dropdown-item">
+                                    <a href="see_details.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
+                                  </li>
                                   <li class="dropdown-item">
                                     <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
                                   </li>
                                   <li class="dropdown-divider"></li>
                                   <li class="dropdown-item">
-                                    <a href="#" onclick="sendEstimateModal(<?= $case_register['id'] ?>,<?= $case_register['customer_id'] ?>,<?= $case_register['estimate_approved_by_customer'] ?>)" style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
+                                    <a href="#" onclick="sendEstimateModal('<?= $case_register['id'] ?>','<?= $case_register['customer_id'] ?>','<?= $case_register['estimate_amount'] ?>','<?= $case_register['customer_remarks'] ?>','<?= $case_register['estimate_approved_by_customer'] ?>')" style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
+                                  </li>
+                                  <li class="dropdown-item">
+                                    <a href="#" onclick="addStorageDetailModal('<?= $case_register['id'] ?>','<?= $case_register['sd_hddno'] ?>','<?= $case_register['sd_size'] ?>','<?= $case_register['sd_remarks'] ?>','<?= $case_register['case_result'] ?>')"><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
                                   </li>
                                   <!-- <li class="dropdown-item">
-                                  <a href="#" data-toggle="modal" data-target="#modal_add_storage_details"><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
-                                </li> -->
-                                  <!-- <li class="dropdown-item">
-                                  <a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a>
-                                </li> -->
-                                  <!-- <li class="dropdown-divider"></li>
-                                <li class="dropdown-item">
-                                  <a href="#"><i class='fa fa-print mr5'></i> Print</a>
-                                </li> -->
-                                  <!-- <li class="dropdown-divider"></li> -->
-                                  <!-- <li class="dropdown-item">
-                                  <a href="#"><i class='fa fa-inbox mr5'></i> Move to Stock</a>
-                                </li> -->
+                                    <a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a>
+                                  </li> -->
+                                  <li class="dropdown-divider"></li>
+                                  <li class="dropdown-item">
+                                    <!-- <a href="#" onclick="print(<?= $case_register['id'] ?>,<?= $case_register['customer_id'] ?>,<?= $case_register['customer_city_location'] ?>)" style="pointer:cursor"><i class='fa fa-print mr5'></i> Print</a> -->
+                                  </li>
                                   <li class="dropdown-item">
                                     <a href="#" onclick="moveToOwtward(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
                                   </li>
@@ -496,12 +516,29 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
-    function sendEstimateModal(inward_register_id, customer_id, approval_status) {
+    function sendEstimateModal(inward_register_id, customer_id, estimate_amount, customer_details, approval_status) {
       $('#customer_id').val(customer_id);
       $('#inward_register_id').val(inward_register_id);
+      $('#estimate_amount').val(estimate_amount);
+      $('#customer_details').val(customer_details);
       $('#customer_estimate_status option[value="' + approval_status + '"]').prop('selected', true);
       $('#modal_send_estimate').modal();
     }
+
+    function addStorageDetailModal(inward_register_id, sd_hddno, sd_size, sd_remarks, recovery_status) {
+      $('#inward_register_id_storage').val(inward_register_id);
+      $('#sd_hddno').val(sd_hddno);
+      $('#sd_size').val(sd_size);
+      $('#sd_remarks').val(sd_remarks);
+      console.log((recovery_status == 0) ? 'false' : 'true');
+      if (recovery_status == 0) {
+        $('#case_result').removeAttr('checked');
+      } else {
+        $('#case_result').attr('checked', 'true');
+      }
+      $('#modal_add_storage_details').modal();
+    }
+
     $('.select-all').click(function() {
       if ($('.select-all:checked')[0]) {
         $('input[name="id[]"]').attr('checked', true);
@@ -514,7 +551,6 @@ $cities = $model->select('city_location');
       var delete_ids = $("input[name='id[]:checked:checked']").map(function() {
         return $(this).val();
       }).get();
-      console.log(delete_ids)
 
       var atLeastOneIsChecked = total > 0;
       if (!atLeastOneIsChecked) {
@@ -547,6 +583,71 @@ $cities = $model->select('city_location');
         },
         success: function(response) {
           window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
+        },
+      });
+    }
+
+    function addStorageDetail() {
+      formData = $('#add_storage_detail_form').serializeArray();
+      $.ajax({
+        url: '../../controllers/RegisterController.php',
+        type: 'POST',
+        data: {
+          formData: formData,
+          event_name: 'add_storage_detail',
+          inward_register_id: $('#inward_register_id').val()
+        },
+        success: function(response) {
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
+        },
+      });
+    }
+
+    function print(inward_register_id, customer_id, city_id) {
+      $.ajax({
+        url: '../../controllers/RegisterController.php',
+        type: 'POST',
+        data: {
+          event_name: 'print',
+          customer_id: customer_id,
+          city_id: city_id,
+          inward_register_id: inward_register_id,
+          user_type: 'admin'
+        },
+        success: function(response) {
+
+          var contents = response;
+
+
+          var idname = name;
+
+
+          var frame1 = document.createElement('iframe');
+          frame1.name = "frame1";
+          frame1.style.position = "absolute";
+          frame1.style.top = "-1000000px";
+          document.body.appendChild(frame1);
+          var frameDoc = frame1.contentWindow ? frame1.contentWindow : frame1.contentDocument.document ? frame1.contentDocument.document : frame1.contentDocument;
+          frameDoc.document.open();
+          frameDoc.document.write('<html><head><title></title>');
+
+          frameDoc.document.write('<style>table {  border-collapse: collapse;  border-spacing: 0; width:100%; margin-top:20px;} .table td, .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th{ padding:8px 18px;  } .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {     border: 1px solid #e2e2e2;} </style>');
+
+          // your title
+          frameDoc.document.title = "Print Content with ajax in php";
+
+
+          frameDoc.document.write('</head><body>');
+          frameDoc.document.write(contents);
+          frameDoc.document.write('</body></html>');
+          frameDoc.document.close();
+          setTimeout(function() {
+            window.frames["frame1"].focus();
+            window.frames["frame1"].print();
+            document.body.removeChild(frame1);
+          }, 500);
+          return false;
+
         },
       });
     }
