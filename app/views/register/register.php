@@ -37,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 }
 
+$where .= (($where == '') ? '' : ' AND ') . " c.customer_city_location= " . $_SESSION['user_city'];
 $join = ' LEFT JOIN customer as c on c.id=cr.customer_id ';
 // 'c.customer_city_location as customer_city_id',
 $case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name, c.customer_city_location', $where, $join);
@@ -343,10 +344,10 @@ $cities = $model->select('city_location');
                       </div>
 
                       <div class="col-2">
-                        <select class="form-control" name="customer_city_location" id="customer_city_location" placeholder="Select Location">
+                        <select class="form-control" name="customer_city_id" id="customer_city_id" placeholder="Select Location">
                           <option value="">Select Location</option>
                           <?php foreach ($cities as $city) { ?>
-                            <option value="<?= $city['id'] ?>" <?= (isset($_POST) && ($_POST['customer_city_location'] ?? '') == $city['id']) ? 'selected' : ''; ?>><?= $city['city_name'] ?></option>
+                            <option value="<?= $city['id'] ?>" <?= (isset($_POST) && ($_POST['customer_city_id'] ?? '') == $city['id']) ? 'selected' : ''; ?>><?= $city['city_name'] ?></option>
                           <?php } ?>
                         </select>
                       </div>
@@ -441,7 +442,7 @@ $cities = $model->select('city_location');
                                   </li> -->
                                   <li class="dropdown-divider"></li>
                                   <li class="dropdown-item">
-                                    <!-- <a href="#" onclick="print(<?= $case_register['id'] ?>,<?= $case_register['customer_id'] ?>,<?= $case_register['customer_city_location'] ?>)" style="pointer:cursor"><i class='fa fa-print mr5'></i> Print</a> -->
+                                    <a href="javascript:void(0);" onclick="javascript:window.open('print_inward.php?id=<?= $case_register['id'] ?>&customer_id=<?= $case_register['customer_id'] ?>&city_id=<?= $case_register['customer_city_location'] ?>', '_Details', 'width=750, height=500, scrollbars=1, resizable=1');" style="pointer:cursor"><i class='fa fa-print mr5'></i> Print</a>
                                   </li>
                                   <li class="dropdown-item">
                                     <a href="#" onclick="moveToOwtward(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
@@ -571,6 +572,10 @@ $cities = $model->select('city_location');
 
     function sendEstimate() {
       formData = $('#send_estimate_form').serializeArray();
+      var case_status = 0;
+      if ($('#customer_estimate_status').val() == '1') {
+        case_status = 1;
+      }
       $.ajax({
         url: '../../controllers/EmailController.php',
         type: 'POST',
@@ -579,7 +584,8 @@ $cities = $model->select('city_location');
           event_name: 'send_estimate',
           send_email: $('input[name="send_email"]:checked').val(),
           customer_id: $('#customer_id').val(),
-          inward_register_id: $('#inward_register_id').val()
+          inward_register_id: $('#inward_register_id').val(),
+          case_status: case_status
         },
         success: function(response) {
           window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
@@ -599,55 +605,6 @@ $cities = $model->select('city_location');
         },
         success: function(response) {
           window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
-        },
-      });
-    }
-
-    function print(inward_register_id, customer_id, city_id) {
-      $.ajax({
-        url: '../../controllers/RegisterController.php',
-        type: 'POST',
-        data: {
-          event_name: 'print',
-          customer_id: customer_id,
-          city_id: city_id,
-          inward_register_id: inward_register_id,
-          user_type: 'admin'
-        },
-        success: function(response) {
-
-          var contents = response;
-
-
-          var idname = name;
-
-
-          var frame1 = document.createElement('iframe');
-          frame1.name = "frame1";
-          frame1.style.position = "absolute";
-          frame1.style.top = "-1000000px";
-          document.body.appendChild(frame1);
-          var frameDoc = frame1.contentWindow ? frame1.contentWindow : frame1.contentDocument.document ? frame1.contentDocument.document : frame1.contentDocument;
-          frameDoc.document.open();
-          frameDoc.document.write('<html><head><title></title>');
-
-          frameDoc.document.write('<style>table {  border-collapse: collapse;  border-spacing: 0; width:100%; margin-top:20px;} .table td, .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th{ padding:8px 18px;  } .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {     border: 1px solid #e2e2e2;} </style>');
-
-          // your title
-          frameDoc.document.title = "Print Content with ajax in php";
-
-
-          frameDoc.document.write('</head><body>');
-          frameDoc.document.write(contents);
-          frameDoc.document.write('</body></html>');
-          frameDoc.document.close();
-          setTimeout(function() {
-            window.frames["frame1"].focus();
-            window.frames["frame1"].print();
-            document.body.removeChild(frame1);
-          }, 500);
-          return false;
-
         },
       });
     }

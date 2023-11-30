@@ -317,19 +317,30 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                         </div>
 
                         <div class="card-body">
-                          <?php foreach ($action_history as $each) { ?>
-                            <p>
-                              <b class="mr10"><?= $each['action_title'] ?></b>
-                              <span class="badge badge-secondary width65 mr5"><?= $each['visibility_type'] ?> </span>
-                              <br>
-                              <?= $each['action_description'] ?>
-                            </p>
-                            <div class="space_betwwen">
-                              <span class="gray_color "><i class="fa fa-clock-o"></i> <?= date('d M, Y h:m a ', strtotime($each['action_dt'])) ?></span>
-                              <button type="button" onclick="deleteActionHistory(<?= $each['id'] ?>)" class="btn btn-danger  "><i class='fa fa-trash-o'></i> Delete</button>
+                          <?php
+                          if (gettype($action_history) == 'boolean') {
+                          ?>
+                            <div class="card card-outline card-danger">
+                              <div class="card-header">
+                                <p class="box_txt">There is no action taken on Device, Record Action for Device.
+                                </p>
+                              </div>
                             </div>
-                            <hr>
-                          <?php } ?>
+                            <?php } else {
+                            foreach ($action_history as $each) { ?>
+                              <p>
+                                <b class="mr10"><?= $each['action_title'] ?></b>
+                                <span class="badge badge-secondary width65 mr5"><?= $each['visibility_type'] ?> </span>
+                                <br>
+                                <?= $each['action_description'] ?>
+                              </p>
+                              <div class="space_betwwen">
+                                <span class="gray_color "><i class="fa fa-clock-o"></i> <?= date('d M, Y h:m a ', strtotime($each['action_dt'])) ?></span>
+                                <button type="button" onclick="deleteActionHistory(<?= $each['id'] ?>)" class="btn btn-danger  "><i class='fa fa-trash-o'></i> Delete</button>
+                              </div>
+                              <hr>
+                          <?php }
+                          } ?>
                           <div class="col-md-12 mt30 padding0">
                             <div class="card card-success">
                               <div class="card-header see_bg">
@@ -400,8 +411,12 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                           <i class="fa fa-user mr8"></i><?= $register['customer_name']; ?><br>
                           <i class="fa fa-envelope fs14 mr8"></i><?= $register['customer_primary_email_id'] ?><br>
                           <i class="fa fa-mobile mr8"></i><?= $register['customer_mobile_no1'] ?><br>
-                          <i class="fa fa-mobile mr8"></i><?= $register['customer_mobile_no2'] ?><br>
-                          <i class="fa fa-phone mr8"></i><?= $register['office_phone'] ?><br>
+                          <?php if ($register['customer_mobile_no2'] != '') { ?>
+                            <i class="fa fa-mobile mr8"></i><?= $register['customer_mobile_no2'] ?><br>
+                          <?php } ?>
+                          <?php if ($register['office_phone'] != '') { ?>
+                            <i class="fa fa-phone mr8"></i><?= $register['office_phone'] ?><br>
+                          <?php } ?>
                         </p>
                       </div>
                     </div>
@@ -419,8 +434,11 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                       </div>
 
                       <div class="card-body">
-                        <p><b class="mr8">Location :</b><?= $register['city_name'] ?></p>
-                        <p class="mb0"><b class="mr8">Office Address :</b><?= $register['office_addressline'] ?></p>
+                        <p>
+                          <b class="mr8">Location :</b><?= $register['city_name'] ?>
+                          <br>
+                          <b class="mr8">Office Address :</b><?= $register['office_addressline'] ?>
+                        </p>
                       </div>
                     </div>
                   </div>

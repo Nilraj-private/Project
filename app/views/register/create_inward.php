@@ -16,6 +16,37 @@ if (isset($_GET['id'])) {
   $inward = $model->select('case_register', '*', ' id=' . $_GET['id'])[0];
 }
 ?>
+<style>
+  #container {
+    padding: 20px;
+  }
+
+  h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  #overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2305px !important;
+    /*change to YOUR page height*/
+    background-color: #000;
+    filter: alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+    z-index: 998;
+  }
+
+  #remove_overlay {
+    position: relative;
+    z-index: 1000;
+  }
+</style>
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
@@ -70,7 +101,7 @@ if (isset($_GET['id'])) {
                         <select class="form-control" name="customer_id" id="customer_id" required>
                           <option value="">Select Client</option>
                           <?php foreach ($customers as $customer) { ?>
-                            <option value="<?= $customer['id'] ?>" <?= (($inward['customer_id'] ?? '') == $customer['id']) ? 'selected' : '' ?>><?= $customer['customer_name'] ?></option>
+                            <option value="<?= $customer['id'] ?>" <?= (($inward['customer_id'] ?? '') == $customer['id']) ? 'selected' : '' ?>><?= $customer['company_name'] ?></option>
                           <?php } ?>
                         </select>
                         <!-- <input class="lh30" name="customer_id" id="CaseRegister_customer_id" type="search" /> -->
@@ -362,6 +393,15 @@ if (isset($_GET['id'])) {
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    var page_overlay = jQuery('<div id="overlay"> </div>');
+
+    function showOverlay() {
+      page_overlay.appendTo(document.body);
+    }
+
+    function hideOverlay() {
+      page_overlay.remove();
+    }
     $(document).ready(function() {
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
@@ -394,17 +434,18 @@ if (isset($_GET['id'])) {
       } else {
         $('#customer_id_error').hide();
       }
-      
-      if ($.trim($('#device_serial_number').val()) =='') {
+
+      if ($.trim($('#device_serial_number').val()) == '') {
         $('#device_serial_number_error').removeAttr('style').attr('style', "color:red;").html('Device serial number is required.');
         validation = false;
       } else {
         $('#device_serial_number_error').hide();
       }
-      if(!validation){
+      if (!validation) {
         return false;
       }
       formData = $('#inward_form').serializeArray();
+      $(showOverlay);
       $.ajax({
         url: '../../controllers/RegisterController.php',
         type: 'POST',
@@ -414,6 +455,7 @@ if (isset($_GET['id'])) {
           type: "<?= $_GET['type'] ?? 0 ?>"
         },
         success: function(response) {
+          $(hideOverlay);
           if (retry == 1) {
             window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
           } else {
@@ -828,6 +870,7 @@ if (isset($_GET['id'])) {
   <script>
     $(function() {
       $("#case_received_date").datetimepicker("format", 'Y-M-D h:m:s');
+      $("#case_received_date").datetimepicker("defaultDate", new Date());
       if ("<?= isset($inward) && $inward['case_received_date'] ?>")
         $("#case_received_date").datetimepicker("defaultDate", new Date("<?= $inward['case_received_date'] ?? '' ?>"));
     })

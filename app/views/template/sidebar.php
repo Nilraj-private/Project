@@ -1,8 +1,8 @@
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-light-primary elevation-1">
     <!-- Brand Logo -->
     <a href="<?= $_SESSION['url_path'] ?>/app/views/dashboard.php" class="brand-link brand_logo">
-        <img src="<?= $_SESSION['url_path'] ?>/public/images/logo.png" alt="Niki Data Recovery Services" class="brand-image">
+        <img src="<?= $_SESSION['url_path'] ?>/public/images/logo1.png" alt="Niki Data Recovery Services" class="brand-image">
     </a>
 
     <!-- Sidebar -->
@@ -123,7 +123,7 @@
                     </a>
                     <ul class="nav nav-treeview ml30" style="display: <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'change_password.php' || $_SESSION['page'] == 'problems.php')) ? 'block' : 'none' ?>;">
                         <li class="nav-item">
-                            <a href="<?= $_SESSION['url_path'] ?>/app/views/change_password.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'change_password.php') ? 'active' : '' ?>">
+                            <a href="<?= $_SESSION['url_path'] ?>/app/views/auth/change_password.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'change_password.php') ? 'active' : '' ?>">
                                 <p>Change Password</p>
                             </a>
                         </li>

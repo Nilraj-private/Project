@@ -8,8 +8,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $model = new Model();
     if (isset($_POST["login_page"])) {
         unset($_POST["login_page"]);
-        $model->user_authentication($_POST);
+        $result = $model->user_authentication($_POST);
+        if ($result['success'] == 'false') {
+            header("Location: ../views/auth/login.php");
+        }
         header("Location: ../views/dashboard.php");
+    } else if (isset($_POST["change_password"])) {
+        return $model->change_password($_POST);
     }
     //  else if (isset($_POST["auth_type"]) && $_POST["auth_type"] == 'register') {
     //     if (isset($_POST["formData"])) {

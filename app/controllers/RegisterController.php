@@ -9,8 +9,6 @@ $model = (new Model());
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["event_name"]) && $_POST["event_name"] == 'add_action_history') {
         return $model->insert('action_history', $_POST['formData'], 'Action history added');
-    } else if (isset($_POST["event_name"]) && $_POST["event_name"] == 'print') {
-        $model->print($_POST);
     } else if (isset($_POST["event_name"]) && $_POST["event_name"] == 'add_storage_detail') {
         return $model->update('case_register', $_POST, 'Storage detail added');
     } else if (isset($_POST["index"]) && $_POST["index"] == true) {

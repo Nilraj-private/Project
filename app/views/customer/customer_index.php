@@ -8,18 +8,18 @@ use app\models\Model;
 $_SESSION['page'] = 'customer_index.php';
 
 $model = (new Model());
-$join = " left join city_location as cl on cl.id=c.customer_city_location ";
 
+$where = ' customer_city_location=' . $_SESSION['user_city'];
+$join = " left join city_location as cl on cl.id=c.customer_city_location ";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $where = '';
   foreach ($_POST as $key => $value) {
     if ($value != '')
-      $where .= (($where == '') ? '' : ' AND ') . " $key LIKE '%" . $value . "%' ";
+      $where .= " AND $key LIKE '%" . $value . "%' ";
   }
-  $customers = $model->select('customer as c', ' c.*,cl.city_name ', $where, $join);
-} else {
-  $customers = $model->select('customer as c', ' c.*,cl.city_name ', '', $join);
 }
+
+$customers = $model->select('customer as c', ' c.*,cl.city_name ', $where, $join);
+
 $cities = $model->select('city_location');
 ?>
 
@@ -221,7 +221,9 @@ $cities = $model->select('city_location');
     <!-- /.control-sidebar -->
   </div>
   <!-- ./wrapper -->
-
+  <form id="viewCustomerInward" action="../register/register.php?type=inward" method="post">
+    <input type="hidden" name="customer_id" id="customer_id" value="">
+  </form>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/jquery/jquery.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables/jquery.dataTables.min.js"></script>
@@ -297,7 +299,8 @@ $cities = $model->select('city_location');
     })
 
     function viewCustomerInward(customer_id) {
-
+      $('#customer_id').val(customer_id);
+      document.getElementById('viewCustomerInward').submit();
     }
 
     function deleteCustomer(delete_id, customer_primary_email_id) {

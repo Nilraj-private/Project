@@ -38,7 +38,7 @@ include('../../template/head.php');
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="<?= $_SESSION['url_path'] ?>/app/views/dashboard.php">Home</a></li>
-                <li class="breadcrumb-item "><a href="<?= $_SESSION['url_path'] ?>/app/views/general/problems/problems.html">Manage Problem Issue</a> </li>
+                <li class="breadcrumb-item "><a href="<?= $_SESSION['url_path'] ?>/app/views/general/problems/problems.php">Manage Problem Issue</a> </li>
                 <li class="breadcrumb-item active"> Details #0001</li>
               </ol>
             </div>
@@ -65,7 +65,7 @@ include('../../template/head.php');
                       <p><span>Solution:</span></p>
                       <p></p>
 
-                      <a href="problems.html" class="btn btn-primary "><i class="fa fa-angle-left"></i> Back To List</a>
+                      <a href="problems.php" class="btn btn-primary "><i class="fa fa-angle-left"></i> Back To List</a>
                     </div>
                   </div>
                 </div>
@@ -130,12 +130,6 @@ include('../../template/head.php');
         "responsive": true,
       });
     });
-
-    $(function() {
-      $('#reservationdate').datetimepicker({
-        format: 'L'
-      });
-    })
   </script>
 </body>
 
