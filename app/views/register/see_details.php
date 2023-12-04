@@ -15,7 +15,7 @@ $action_history = $model->select("action_history", '*', ' case_register_id=' . $
 
 if (isset($_GET['id'])) {
   $join = ' LEFT JOIN customer as c on c.id=cr.customer_id LEFT JOIN device_manufacturer as m on m.id=cr.device_maker_id LEFT JOIN city_location cl on cl.id=c.customer_city_location ';
-  $register = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name,c.customer_primary_email_id,c.customer_mobile_no1,c.customer_mobile_no2,c.office_phone, c.office_addressline, m.manufacturer_name, cl.city_name', ' cr.id=' . $_GET['id'], $join)[0];
+  $register = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name,c.customer_primary_email_id,c.customer_mobile_no1,c.customer_mobile_no2,c.office_phone, c.office_addressline, c.customer_city_location, m.manufacturer_name, cl.city_name', ' cr.id=' . $_GET['id'], $join)[0];
 }
 
 $case_register_state = [1 => 'Inward', 2 => 'Outward', 3 => 'Register'];
@@ -222,6 +222,57 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
           </div>
         </div>
       </div>
+      <div class="modal fade" id="modal_move_to_outward">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Move to Outward</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="move_to_outward_form">
+              <div class="modal-body">
+                <input type="hidden" name="inward_register_id_outward" id="inward_register_id_outward" value="">
+                <input type="hidden" name="type" id="type" value="">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Outward Note</label>
+                      <textarea class="form-control" name="outward_remarks" id="outward_remarks" rows="3" placeholder="Outward Remarks"></textarea>
+                    </div>
+                  </div>
+
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" name="deliver_through_courier" id="deliver_through_courier" class="form-check-input">
+                      <label class="form-check-label" for="deliver_through_courier">Deliver through courier</label>
+                    </div>
+                  </div>
+
+                  <div class="col-12" id="courier_details" style="display: none;">
+                    <div class="form-group">
+                      <label>Courier Name</label>
+                      <input type="text" class="form-control" name="courier_name" id="courier_name" placeholder="Courier Service Name">
+                    </div>
+
+                    <div class="form-group">
+                      <label>Docket Number</label>
+                      <input type="text" class="form-control" name="courier_dock_number" id="courier_dock_number" placeholder="Courier Docket Number">
+                    </div>
+                  </div>
+
+                  <div class="col-6">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-success mr10" onclick="moveToOwtward();">Save</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
       <!-- modal -->
 
       <!-- Main content -->
@@ -251,10 +302,13 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                           <!-- <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a></li> -->
                           <li class="dropdown-divider"></li>
                           <li class="dropdown-item">
-                            <a href="#" onclick="moveToOwtward(<?= $register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
+                            <a href="#" onclick="moveToOwtwardModal(<?= $register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
                           </li>
                           <!-- <li class="dropdown-divider"></li> -->
-                          <!-- <li class="dropdown-item"><a href="#"><i class='fa fa-print mr5'></i> Print</a></li> -->
+                          <li class="dropdown-item">
+                            <a href="javascript:void(0);" onclick="javascript:window.open('print_inward.php?id=<?= $register['id'] ?>&customer_id=<?= $register['customer_id'] ?>&city_id=<?= $register['customer_city_location'] ?>', '_Details', 'width=750, height=500, scrollbars=1, resizable=1');" style="pointer:cursor"><i class='fa fa-print mr5'></i> Print</a>
+
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -544,6 +598,19 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
       }
     })
 
+    $('#deliver_through_courier').change(function() {
+      if ($('#deliver_through_courier:checked').val() == 'on') {
+        $('#courier_details').removeAttr('style');
+      } else {
+        $('#courier_details').attr('style', 'display: none;');
+      }
+    });
+
+    function moveToOwtwardModal(inward_register_id) {
+      $('#inward_register_id_outward').val(inward_register_id);
+      $('#modal_move_to_outward').modal();
+    }
+
     function sendEstimateModal(inward_register_id, customer_id, estimate_amount, customer_details, approval_status) {
       $('#customer_id').val(customer_id);
       $('#inward_register_id').val(inward_register_id);
@@ -585,13 +652,15 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
       $('#modal_add_storage_details').modal();
     }
 
-    function moveToOwtward(inward_register_id) {
+    function moveToOwtward() {
+      formData = $('#move_to_outward_form').serializeArray();
       $.ajax({
         url: '../../controllers/RegisterController.php',
         type: 'POST',
         data: {
-          inward_register_id: inward_register_id,
-          event_name: 'moveToOwtward'
+          formData: formData,
+          inward_register_id: $('#inward_register_id_outward').val(),
+          event_name: 'move_to_owtward'
         },
         success: function(response) {
           location.reload(true);
@@ -638,17 +707,18 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
     }
 
     function deleteActionHistory(delete_id) {
-      $.ajax({
-        type: "POST",
-        url: "../../controllers/RegisterController.php",
-        data: {
-          table_name: 'action_history',
-          delete_id: delete_id
-        },
-        success: function(response) {
-          location.reload(true);
-        }
-      });
+      if (confirm('Are you sure you want to delete?'))
+        $.ajax({
+          type: "POST",
+          url: "../../controllers/RegisterController.php",
+          data: {
+            table_name: 'action_history',
+            delete_id: delete_id
+          },
+          success: function(response) {
+            location.reload(true);
+          }
+        });
     }
     $(function() {
       $("#action_dt").datetimepicker("format", 'Y-MM-DD hh:mm:ss a');

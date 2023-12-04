@@ -14,7 +14,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         header("Location: ../views/dashboard.php");
     } else if (isset($_POST["change_password"])) {
-        return $model->change_password($_POST);
+        $result = json_encode($model->change_password($_POST));
+        return $result;
     }
     //  else if (isset($_POST["auth_type"]) && $_POST["auth_type"] == 'register') {
     //     if (isset($_POST["formData"])) {

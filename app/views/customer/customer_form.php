@@ -118,7 +118,7 @@ $cities = $model->select('city_location');
                         </div>
                       </div>
 
-                      <input type="hidden" name="user_id" value="<?= $user->id ?? 0 ?>">
+                      <input type="hidden" name="user_id" value="<?= $_SESSION['user_id'] ?? 0 ?>">
                       <div class="col-3 mt25px res_auto_btn max_width100 flex_100">
                         <div class="form-group">
                           <button type="submit" class="btn btn-success mr10"><?= (!isset($_GET['id']) ? 'Add' : 'Update') ?> </button>

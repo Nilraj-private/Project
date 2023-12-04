@@ -183,26 +183,6 @@ $cities = $model->select('city_location');
         </div>
       </div>
 
-      <!-- <div class="modal fade" id="modal_move_to_outward">
-        <div class="modal-dialog">
-          <div class="modal-cntent">
-            <div class="modal-header">
-              <h4 class="modal-title">Move to Outward</h4>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Files and Directories to be recovered</label>
-                    <textarea class="form-control" rows="2" name="files_to_recover" id="files_to_recover" placeholder="Outward Remarks" required></textarea>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-
       <div class="modal fade" id="modal_add_storage_details">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -248,6 +228,58 @@ $cities = $model->select('city_location');
                   <div class="col-6">
                     <div class="form-group">
                       <button type="button" class="btn btn-success mr10" onclick="addStorageDetail();">Save</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modal_move_to_outward">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Move to Outward</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="move_to_outward_form">
+              <div class="modal-body">
+                <input type="hidden" name="inward_register_id_outward" id="inward_register_id_outward" value="">
+                <input type="hidden" name="type" id="type" value="<?= (isset($_GET['type']) ? $_GET['type'] : '') ?>">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Outward Note</label>
+                      <textarea class="form-control" name="outward_remarks" id="outward_remarks" rows="3" placeholder="Outward Remarks"></textarea>
+                    </div>
+                  </div>
+
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" name="deliver_through_courier" id="deliver_through_courier" class="form-check-input">
+                      <label class="form-check-label" for="deliver_through_courier">Deliver through courier</label>
+                    </div>
+                  </div>
+
+                  <div class="col-12" id="courier_details" style="display: none;">
+                    <div class="form-group">
+                      <label>Courier Name</label>
+                      <input type="text" class="form-control" name="courier_name" id="courier_name" placeholder="Courier Service Name">
+                    </div>
+
+                    <div class="form-group">
+                      <label>Docket Number</label>
+                      <input type="text" class="form-control" name="courier_dock_number" id="courier_dock_number" placeholder="Courier Docket Number">
+                    </div>
+                  </div>
+
+                  <div class="col-6">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-success mr10" onclick="moveToOwtward();">Save</button>
                     </div>
                   </div>
                 </div>
@@ -445,7 +477,7 @@ $cities = $model->select('city_location');
                                     <a href="javascript:void(0);" onclick="javascript:window.open('print_inward.php?id=<?= $case_register['id'] ?>&customer_id=<?= $case_register['customer_id'] ?>&city_id=<?= $case_register['customer_city_location'] ?>', '_Details', 'width=750, height=500, scrollbars=1, resizable=1');" style="pointer:cursor"><i class='fa fa-print mr5'></i> Print</a>
                                   </li>
                                   <li class="dropdown-item">
-                                    <a href="#" onclick="moveToOwtward(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
+                                    <a href="#" onclick="moveToOwtwardModal(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
                                   </li>
                                 <?php } ?>
                               </ul>
@@ -531,13 +563,26 @@ $cities = $model->select('city_location');
       $('#sd_hddno').val(sd_hddno);
       $('#sd_size').val(sd_size);
       $('#sd_remarks').val(sd_remarks);
-      console.log((recovery_status == 0) ? 'false' : 'true');
+
       if (recovery_status == 0) {
         $('#case_result').removeAttr('checked');
       } else {
         $('#case_result').attr('checked', 'true');
       }
       $('#modal_add_storage_details').modal();
+    }
+
+    $('#deliver_through_courier').change(function() {
+      if ($('#deliver_through_courier:checked').val() == 'on') {
+        $('#courier_details').removeAttr('style');
+      } else {
+        $('#courier_details').attr('style', 'display: none;');
+      }
+    });
+
+    function moveToOwtwardModal(inward_register_id) {
+      $('#inward_register_id_outward').val(inward_register_id);
+      $('#modal_move_to_outward').modal();
     }
 
     $('.select-all').click(function() {
@@ -601,7 +646,7 @@ $cities = $model->select('city_location');
         data: {
           formData: formData,
           event_name: 'add_storage_detail',
-          inward_register_id: $('#inward_register_id').val()
+          inward_register_id: $('#inward_register_id_storage').val()
         },
         success: function(response) {
           window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
@@ -609,16 +654,18 @@ $cities = $model->select('city_location');
       });
     }
 
-    function moveToOwtward(inward_register_id) {
+    function moveToOwtward() {
+      formData = $('#move_to_outward_form').serializeArray();
       $.ajax({
         url: '../../controllers/RegisterController.php',
         type: 'POST',
         data: {
-          inward_register_id: inward_register_id,
-          event_name: 'moveToOwtward'
+          formData: formData,
+          inward_register_id: $('#inward_register_id_outward').val(),
+          event_name: 'move_to_owtward'
         },
         success: function(response) {
-          location.reload(true);
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
         },
       });
     }

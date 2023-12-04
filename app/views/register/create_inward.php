@@ -161,7 +161,7 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="row mt25px res_mt0">
-                      <div class="col-2">
+                      <div class="col-3">
                         <div class="form-group">
                           <label>Device Type</label>
                           <select class="form-control" name="device_type" id="device_type" placeholder="Select Device Type">
@@ -184,7 +184,7 @@ if (isset($_GET['id'])) {
                         </div>
                       </div>
 
-                      <div class="col-2">
+                      <div class="col-3">
                         <div class="form-group">
                           <label>Device Size</label>
                           <div>
@@ -199,7 +199,7 @@ if (isset($_GET['id'])) {
                         </div>
                       </div>
 
-                      <div class="col-2">
+                      <div class="col-3">
                         <div class="form-group">
                           <label>Crash Type</label>
                           <select class="form-control" name="crash_type" id="crash_type" placeholder="Crash Type">
@@ -216,20 +216,13 @@ if (isset($_GET['id'])) {
                           <input type="text" class="form-control" name="device_firmware" id="device_firmware" placeholder="Firmware Number" value="<?= $inward['device_firmware'] ?? '' ?>">
                         </div>
                       </div>
+                    </div>
 
+                    <div class="row mt25px res_mt0_991">
                       <div class="col-3">
                         <div class="form-group">
                           <label>Device MLC</label>
                           <input type="text" class="form-control" name="device_mlc" id="device_mlc" placeholder="Device MLC" value="<?= $inward['device_mlc'] ?? '' ?>">
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="row mt25px res_mt0_991">
-                      <div class="col-6">
-                        <div class="form-group">
-                          <label>Files and Directories to be recovered</label>
-                          <textarea class="form-control" rows="2" name="files_to_recover" id="files_to_recover" placeholder="Enter Files to bis Recovered Details"><?= $inward['files_to_recover'] ?? '' ?></textarea>
                         </div>
                       </div>
 
@@ -242,9 +235,37 @@ if (isset($_GET['id'])) {
                           </div>
                         </div>
                       </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label>Files and Directories to be recovered</label>
+                          <textarea class="form-control" rows="2" name="files_to_recover" id="files_to_recover" placeholder="Enter Files to bis Recovered Details"><?= $inward['files_to_recover'] ?? '' ?></textarea>
+                        </div>
+                      </div>
                       <input type="hidden" name="case_register_state" value="1">
                       <input type="hidden" name="case_status" value="1">
                       <input type="hidden" name="estimate_approved_by_customer" value="0">
+                    </div>
+                    <div class="row mt25px res_mt0">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label for="deliver_through_courier">Deliver through courier</label>
+                          <input type="checkbox" name="deliver_through_courier" id="deliver_through_courier" class="form-control">
+                        </div>
+                      </div>
+
+                      <div class="col-3 courier_details" style="display: none;">
+                        <div class="form-group">
+                          <label>Courier Name</label>
+                          <input type="text" class="form-control" name="courier_name" id="courier_name" placeholder="Courier Service Name">
+                        </div>
+                      </div>
+
+                      <div class="col-3 courier_details" style="display: none;">
+                        <div class="form-group">
+                          <label>Docket Number</label>
+                          <input type="text" class="form-control" name="courier_dock_number" id="courier_dock_number" placeholder="Courier Docket Number">
+                        </div>
+                      </div>
                     </div>
                     <div class="row mt25px res_auto_btn res_mb12 ">
                       <?php if (!isset($_GET['id'])) { ?>
@@ -339,6 +360,7 @@ if (isset($_GET['id'])) {
                         </select>
                       </div>
                     </div>
+
                     <input type="hidden" name="user_id" value="<?= $user->id ?? 0 ?>">
 
                     <div class="col-6 res_mt10">
@@ -393,6 +415,14 @@ if (isset($_GET['id'])) {
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    $('#deliver_through_courier').change(function() {
+      if ($('#deliver_through_courier:checked').val() == 'on') {
+        $('.courier_details').removeAttr('style');
+      } else {
+        $('.courier_details').attr('style', 'display: none;');
+      }
+    });
+
     var page_overlay = jQuery('<div id="overlay"> </div>');
 
     function showOverlay() {

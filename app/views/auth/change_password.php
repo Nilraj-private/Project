@@ -43,11 +43,11 @@ $_SESSION['page'] = 'change_password.php';
         <div class="container-fluid">
           <form id="change_password_form">
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-md-6">
                 <div class="card">
                   <div class="card-body res_col_form">
                     <div class="row">
-                      <div class="col-3">
+                      <div class="col-6">
                         <div class="form-group">
                           <!-- <label>Current Password</label> -->
                           <input type="password" name="current_password" id="current_password" class="form-control" placeholder="Current Password" required>
@@ -56,7 +56,7 @@ $_SESSION['page'] = 'change_password.php';
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-3">
+                      <div class="col-6">
                         <div class="form-group">
                           <!-- <label>New Password</label> -->
                           <input type="password" name="new_password" id="new_password" class="form-control" placeholder="New Password" required>
@@ -65,7 +65,7 @@ $_SESSION['page'] = 'change_password.php';
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-3">
+                      <div class="col-6">
                         <div class="form-group">
                           <!-- <label>Repeat Password</label> -->
                           <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Confirm Password" required>
@@ -129,12 +129,14 @@ $_SESSION['page'] = 'change_password.php';
       var validation = true;
       if ($('#current_password').val() == "") {
         $('#current_password_error').removeAttr('style').attr('style', "color:red;").html('Current Password is required.');
+        $('#current_password_error').show();
         validation = false;
       } else {
         $('#current_password_error').hide();
       }
       if ($('#new_password').val() == "") {
         $('#new_password_error').removeAttr('style').attr('style', "color:red;").html('New Password is required.');
+        $('#new_password_error').show();
         validation = false;
       } else {
         $('#new_password_error').hide();
@@ -142,12 +144,14 @@ $_SESSION['page'] = 'change_password.php';
 
       if ($('#confirm_password').val() == "") {
         $('#confirm_password_error').removeAttr('style').attr('style', "color:red;").html('Confirm Password is required.');
+        $('#confirm_password_error').show();
         validation = false;
       } else {
         $('#confirm_password_error').hide();
 
         if ($('#new_password').val() != "" && ($('#confirm_password').val() != $('#new_password').val())) {
           $('#confirm_password_error').removeAttr('style').attr('style', "color:red;").html('Confirm Password should be same as New password.');
+          $('#confirm_password_error').show();
           validation = false;
         }
       }
@@ -165,8 +169,14 @@ $_SESSION['page'] = 'change_password.php';
           confirm_password: $('#confirm_password').val(),
           id: "<?= $_SESSION['user_id'] ?? 0 ?>"
         },
+        dataType: "json",
         success: function(response) {
-          window.location.href = "change_password.php";
+            if(response.success == false){
+                $('#current_password_error').removeAttr('style').attr('style', "color:red;").html(response.message);
+                $('#current_password_error').show();
+            }else if(response.success == true){
+                window.location.href = "change_password.php";
+            }
         },
       });
     }

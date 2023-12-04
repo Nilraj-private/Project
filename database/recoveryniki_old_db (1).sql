@@ -20,14 +20,13 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `action_history`
 --
-
 CREATE TABLE `action_history` (
   `id` int(11) NOT NULL,
   `case_register_id` int(11) NOT NULL,
   `action_title` varchar(256) DEFAULT NULL,
   `action_description` varchar(1024) DEFAULT NULL,
   `visibility_type` varchar(10) DEFAULT NULL,
-  `action_dt` datetime NOT NULL
+  `action_dt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
