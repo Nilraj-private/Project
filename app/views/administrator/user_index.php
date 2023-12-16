@@ -58,7 +58,7 @@ $cities = $model->select('city_location');
               <div class="card">
                 <div class="card-header">
                   <h3 class="float-left res_mt5 res_fs22">Search Employee</h3>
-                  <!-- <button type="submit" class="btn btn-primary float-right"><i class="fa fa-plus"></i> Add User</button> -->
+                  <a type="button" class="btn btn-primary float-right" href="<?= $_SESSION['url_path'] ?>/app/views/administrator/user_employee_form.php"><i class="fa fa-plus"></i> Add User</a>
                 </div>
                 <div class="card-body res_col_form">
                   <div class="row">
@@ -97,10 +97,10 @@ $cities = $model->select('city_location');
                       <?php if (isset($employees) && $employees != '') foreach ($employees as $employee) { ?>
                         <tr>
                           <td><?= $employee['id'] ?></td>
-                          <td><?= $employee['employee_name'] ?>Rajkot-DEALERS</td>
-                          <td><?= $employee['employee_email_id'] ?>rajkot@recoveryourdata.co.in</td>
-                          <td><?= $employee['employee_mobile_no1'] ?>9876543210</td>
-                          <td><?= $employee['city_name'] ?>Rajkot-DEALERS </td>
+                          <td><?= $employee['employee_name'] ?></td>
+                          <td><?= $employee['employee_email_id'] ?></td>
+                          <td><?= $employee['employee_mobile_no1'] ?></td>
+                          <td><?= $employee['city_name'] ?> </td>
                           <td>
                             <!-- <small class="badge badge-danger">Block</small> -->
                           </td>
@@ -108,15 +108,17 @@ $cities = $model->select('city_location');
                             <div class="input-group-prepend">
                               <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                               <ul class="dropdown-menu">
-                                <!-- <li class="dropdown-item">
-                                  <a href="employee_form.php?id=<?= $employee['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Details</a>
-                                </li> -->
                                 <li class="dropdown-item">
-                                  <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a>
+                                  <!-- <a href="employee_form.php?id=<?= $employee['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Details</a> -->
                                 </li>
                                 <li class="dropdown-item">
-                                  <a type="button" onclick="deleteEmployee(<?= $employee['id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete</a>
+                                  <!-- <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a> -->
                                 </li>
+                                <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'SuperAdmin') { ?>
+                                  <li class="dropdown-item">
+                                    <a type="button" onclick="deleteEmployee(<?= $employee['id'] ?>,<?= $employee['employee_email_id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete</a>
+                                  </li>
+                                <?php } ?>
                               </ul>
                             </div>
                           </td>
@@ -171,17 +173,19 @@ $cities = $model->select('city_location');
       }
     })
 
-    function deleteEmployee(delete_id) {
-      $.ajax({
-        type: "POST",
-        url: "../../controllers/EmployeeController.php",
-        data: {
-          delete_id: delete_id,
-        },
-        success: function(response) {
-          location.reload(true);
-        }
-      });
+    function deleteEmployee(delete_id, employee_primary_email_id) {
+      if (confirm('Are you sure you want to delete employee?'))
+        $.ajax({
+          type: "POST",
+          url: "../../controllers/EmployeeController.php",
+          data: {
+            delete_id: delete_id,
+            primary_email_id: employee_primary_email_id
+          },
+          success: function(response) {
+            location.reload(true);
+          }
+        });
     }
 
     $(function() {

@@ -199,6 +199,23 @@ CREATE TABLE `rights` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `templates`
+--
+
+CREATE TABLE `templates` (
+  `id` int(11) NOT NULL,
+  `template_name` varchar(255) NOT NULL,
+  `template_name_slug` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+INSERT INTO `templates` (`id`, `template_name`, `template_name_slug`) VALUES
+(1, 'Browse Catalog on Whatsapp', 'browse_catalog_on_whatsapp'),
+(2, 'Rajkot Office', 'rajkot_office_'),
+(3, 'Vadodara Office', 'vadodara_office');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `user`
 --
 
@@ -291,6 +308,12 @@ ALTER TABLE `rights`
   ADD PRIMARY KEY (`itemname`);
 
 --
+-- Indexes for table `templates`
+--
+ALTER TABLE `templates`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
@@ -341,6 +364,12 @@ ALTER TABLE `employee`
 --
 ALTER TABLE `problem_issues`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `templates`
+--
+ALTER TABLE `templates`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `user`

@@ -10,7 +10,7 @@ $_SESSION['page'] = 'customer_index.php';
 $model = (new Model());
 $where = '';
 
-if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'Super Admin') {
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'SuperAdmin') {
   $where = ' customer_city_location=' . $_SESSION['user_city'];
 }
 $join = " left join city_location as cl on cl.id=c.customer_city_location ";
@@ -304,7 +304,7 @@ $cities = $model->select('city_location');
           url: "../../controllers/CustomerController.php",
           data: {
             delete_id: delete_id,
-            customer_primary_email_id: customer_primary_email_id
+            primary_email_id: customer_primary_email_id
           },
           success: function(response) {
             location.reload(true);

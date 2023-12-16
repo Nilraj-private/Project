@@ -58,6 +58,7 @@ class Model
 
   function insert($tableName, $data, $title = '')
   {
+
     $columnArray = array_column($data, 'name');
     $valueArray = array_column($data, 'value');
 
@@ -77,6 +78,14 @@ class Model
           return false;
         }
         $user_id = $this->select("user", 'id', "username = '" . $dataArray['customer_primary_email_id'] . "'")[0]['id'];
+        $dataArray['user_id'] = $user_id;
+      } elseif ($tableName == 'employee') {
+        $sql = "INSERT INTO user (username,password,user_type) VALUES ('" . $dataArray['employee_email_id'] . "','" . md5($dataArray['employee_mobile_no1']) . "','Employee');";
+        $result = mysqli_query($this->conn, $sql);
+        if (!$result) {
+          return false;
+        }
+        $user_id = $this->select("user", 'id', "username = '" . $dataArray['employee_email_id'] . "'")[0]['id'];
         $dataArray['user_id'] = $user_id;
       }
 
@@ -115,6 +124,7 @@ class Model
 
         $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray['id'], 'register/inward_email.php', $modelArray);
       }
+      
       $_SESSION['success_message'] = $title . ' created successfully';
       return $result;
     } else {
@@ -231,8 +241,8 @@ class Model
 
   function delete($tableName, $data, $title = '')
   {
-    if ($tableName == 'customer') {
-      $sql = "DELETE FROM user WHERE username = '" . $data['customer_primary_email_id'] . "' AND user_type='Customer'";
+    if ($tableName == 'customer' || $tableName == 'employee') {
+      $sql = "DELETE FROM user WHERE username = '" . $data['primary_email_id'] . "' AND user_type='Customer'";
       $resultSubQuery = mysqli_query($this->conn, $sql);
       if (!$resultSubQuery) {
         $_SESSION['error_message'] = 'User not Found';

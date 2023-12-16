@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 }
-if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'Super Admin') {
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'SuperAdmin') {
   $where .= (($where == '') ? '' : ' AND ') . " c.customer_city_location= " . $_SESSION['user_city'];
 }
 $join = ' LEFT JOIN customer as c on c.id=cr.customer_id ';
