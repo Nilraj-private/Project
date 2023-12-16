@@ -32,47 +32,7 @@ $_SESSION['page'] = 'dashboard.php';
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid pb35 res_pb10">
-
-          <h5 class="mt-4 mb-2 title_txt res_mt2">Register Activity<span class="title-lines"></span></h5>
-          <div class="row">
-            <div class="col-md-3 col-sm-6 col-12 col-md-3n ">
-              <div class="block_holder">
-                <div class="div1">
-                  <p>Inward</p>
-                </div>
-                <div class="div_info">
-                  <p>Inward Register</p>
-                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?type=inward" class="button btn_1">More Info</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-3 col-sm-6 col-12 col-md-3n ">
-              <div class="block_holder">
-                <div class="div1">
-                  <p>Outward</p>
-                </div>
-                <div class="div_info">
-                  <p>Outward Register</p>
-                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?type=outward" class="button btn_1">More Info</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-3 col-sm-6 col-12 col-md-3n ">
-              <div class="block_holder">
-                <div class="div1">
-                  <p>Create Inward</p>
-                </div>
-                <div class="div_info">
-                  <p>New Inward Form</p>
-                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/create_inward.php" class="button btn_1">More Info</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <h5 class="mt45 res_mt5 mb-2 title_txt">Inward Work Status<span class="title-lines title-lines2"></span></h5>
+        <h5 class="mt45 res_mt5 mb-2 title_txt">Inward Work Status<span class="title-lines title-lines2"></span></h5>
           <div class="row">
             <div class="col-md-3 col-sm-6 col-12 col-md-3n ">
               <div class="block_holder">
@@ -122,10 +82,49 @@ $_SESSION['page'] = 'dashboard.php';
               </div>
             </div>
           </div>
+          
+          <h5 class="mt-4 mb-2 title_txt res_mt2">Register Activity<span class="title-lines"></span></h5>
+          <div class="row">
+            <div class="col-md-3 col-sm-6 col-12 col-md-3n ">
+              <div class="block_holder">
+                <div class="div1">
+                  <p>Inward</p>
+                </div>
+                <div class="div_info">
+                  <p>Inward Register</p>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?type=inward" class="button btn_1">More Info</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-12 col-md-3n ">
+              <div class="block_holder">
+                <div class="div1">
+                  <p>Outward</p>
+                </div>
+                <div class="div_info">
+                  <p>Outward Register</p>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php?type=outward" class="button btn_1">More Info</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-12 col-md-3n ">
+              <div class="block_holder">
+                <div class="div1">
+                  <p>Create Inward</p>
+                </div>
+                <div class="div_info">
+                  <p>New Inward Form</p>
+                  <a href="<?= $_SESSION['url_path'] ?>/app/views/register/create_inward.php" class="button btn_1">More Info</a>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="flex_row res_flex_column">
             <div class="col-md-6 col_w100">
-              <h5 class="mt45 res_mt5 mb-2 title_txt">Customer Managment<span class="title-lines title-lines4"></span></h5>
+              <h5 class="mt45 res_mt5 mb-2 title_txt">Customer Management<span class="title-lines title-lines4"></span></h5>
               <div class="row">
                 <div class="col-md-6">
                   <div class="block_holder">
@@ -133,7 +132,7 @@ $_SESSION['page'] = 'dashboard.php';
                       <p>My Customer</p>
                     </div>
                     <div class="div_info">
-                      <p>Outward Details</p>
+                      <p>Customer Listing</p>
                       <a href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_index.php" class="button btn_1 btn_4">More Info</a>
                     </div>
                   </div>
@@ -145,24 +144,8 @@ $_SESSION['page'] = 'dashboard.php';
                       <p>Add Customer</p>
                     </div>
                     <div class="div_info">
-                      <p>Outward Details</p>
+                      <p>Add Customer</p>
                       <a href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_form.php" class="button btn_1 btn_4">More Info</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 col_w100">
-              <h5 class="mt45 res_mt5 mb-2 title_txt">SMS Gateway<span class="title-lines title-lines5"></span></h5>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="block_holder">
-                    <div class="div1 div5">
-                      <p>Promo: | Trans:</p>
-                    </div>
-                    <div class="div_info">
-                      <p>SMS Credit</p>
-                      <a href="#" class="button btn_1 btn_5">More Info</a>
                     </div>
                   </div>
                 </div>

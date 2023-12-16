@@ -13,8 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         return $model->update('case_register', $_POST, 'Storage detail added');
     } else if (isset($_POST["index"]) && $_POST["index"] == true) {
         return $model->select('case_register', '*', '', '', $_POST);
-    } else if (isset($_POST["event_name"]) && $_POST["event_name"] == 'move_to_owtward') {
-        return $model->update('case_register', $_POST, 'Device moved to outward');
     } else if (isset($_POST["id"]) && $_POST["id"] > 0) {
         return $model->update('case_register', $_POST, 'Inward updated');
     } else if (isset($_POST["delete_id"])) {

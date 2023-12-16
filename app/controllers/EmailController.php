@@ -27,5 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $model->update('case_register', $_POST, 'Inward updated');
             header("Location: ../views/register/register.php?type=" . $_POST['type']);
         }
+    } else if (isset($_POST["event_name"]) && $_POST["event_name"] == 'move_to_owtward') {
+        return $model->update('case_register', $_POST, 'Device moved to outward');
     }
 }

@@ -229,6 +229,20 @@ $_SESSION['page'] = 'problems.php';
       }
     })
 
+    function deleteCustomer(delete_id, customer_primary_email_id) {
+      $.ajax({
+        type: "POST",
+        url: "../../controllers/CustomerController.php",
+        data: {
+          delete_id: delete_id,
+          customer_primary_email_id: customer_primary_email_id
+        },
+        success: function(response) {
+          location.reload(true);
+        }
+      });
+    }
+
     $(function() {
       $("#example1").DataTable({
         "responsive": true,

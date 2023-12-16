@@ -8,8 +8,11 @@ use app\models\Model;
 $_SESSION['page'] = 'customer_index.php';
 
 $model = (new Model());
+$where = '';
 
-$where = ' customer_city_location=' . $_SESSION['user_city'];
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'Super Admin') {
+  $where = ' customer_city_location=' . $_SESSION['user_city'];
+}
 $join = " left join city_location as cl on cl.id=c.customer_city_location ";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   foreach ($_POST as $key => $value) {
@@ -19,6 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 $customers = $model->select('customer as c', ' c.*,cl.city_name ', $where, $join);
+$templates = $model->select('templates');
 
 $cities = $model->select('city_location');
 ?>
@@ -61,39 +65,6 @@ $cities = $model->select('city_location');
         </div><!-- /.container-fluid -->
       </section>
 
-      <!-- modal -->
-      <div class="modal fade" id="modal_sms">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">Type Your Message</h4>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-12">
-                  <label>No of Selected Record: <span id="selected-record-no"></span></label>
-                </div>
-
-                <div class="col-12">
-                  <div class="form-group">
-                    <label>Your Message</label>
-                    <textarea class="form-control" id="sms_message_text" name="message" rows="3" placeholder="Enter Your Message"></textarea>
-                  </div>
-                </div>
-
-                <div class="col-6">
-                  <div class="form-group">
-                    <button id="submitBulkSms" type="button" class="btn btn-primary"><i class="fa fa-envelope"></i> Send message</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
       <!-- modal -->
       <!-- Main content -->
       <section class="content">
@@ -173,7 +144,7 @@ $cities = $model->select('city_location');
                           <td><?= $customer['company_name'] ?></td>
                           <td><?= $customer['customer_name'] ?></td>
                           <td><?= $customer['customer_primary_email_id'] ?></td>
-                          <td><?= $customer['customer_mobile_no1']   ?></td>
+                          <td><?= $customer['customer_mobile_no1'] ?></td>
                           <td><?= $customer['office_addressline'] ?></td>
                           <td><?= $customer['city_name'] ?></td>
                           <td><small class="badge badge-<?= ($user['is_active'] ?? 0 == 0) ? 'danger' : 'success' ?>"><?= ($user['is_active'] ?? 0 == 0) ? 'Block' : 'Active' ?></small></td>
@@ -181,6 +152,9 @@ $cities = $model->select('city_location');
                             <div class="input-group-prepend">
                               <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                               <ul class="dropdown-menu">
+                                <li class="dropdown-item">
+                                  <a href="javascript:void(0);" onclick="sendMessageModal('<?= $customer['company_name'] ?>', <?= $customer['customer_mobile_no1'] ?>)"><i class="fa fa-pencil mr5"></i> Send Message</a>
+                                </li>
                                 <li class="dropdown-item">
                                   <a href="customer_form.php?id=<?= $customer['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Customer</a>
                                 </li>
@@ -204,10 +178,6 @@ $cities = $model->select('city_location');
                 </div>
               </div>
             </div>
-
-            <div class="container-fluid mb35">
-              <button type="button" id="send_sms" class="btn btn-primary float-left mb35 res_mb25"><i class="fa fa-envelope"></i> Send SMS</button>
-            </div>
           </div>
         </div>
       </section>
@@ -224,6 +194,43 @@ $cities = $model->select('city_location');
   <form id="viewCustomerInward" action="../register/register.php?type=inward" method="post">
     <input type="hidden" name="customer_id" id="customer_id" value="">
   </form>
+
+  <div class="modal fade" id="modal_send_message">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Send Message</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="send_estimate_form">
+          <div class="modal-body">
+            <div class="row">
+              <input type="hidden" name="send_message_customer_name" id="send_message_customer_name" value="">
+              <input type="hidden" name="send_message_customer_mobile_no" id="send_message_customer_mobile_no" value="">
+
+              <div class="col-12">
+                <div class="form-group">
+                  <label>Messages Template</label>
+                  <select class="form-control" name="send_message_template_name" id="send_message_template_name">
+                    <?php foreach ($templates as $template) { ?>
+                      <option value="<?= $template['template_name_slug'] ?>"><?= $template['template_name'] ?></option>
+                    <?php } ?>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-6">
+                <button type="button" class="btn btn-success mr10" onclick="sendMessage();">Save</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/jquery/jquery.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables/jquery.dataTables.min.js"></script>
@@ -248,6 +255,28 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    function sendMessageModal(customer_name, customer_mobile_no) {
+      $('#send_message_customer_name').val(customer_name);
+      $('#send_message_customer_mobile_no').val(customer_mobile_no);
+      $('#modal_send_message').modal();
+    }
+
+    function sendMessage() {
+      $.ajax({
+        type: "POST",
+        url: "../../controllers/whatsAppAPIController.php",
+        data: {
+          event_name: 'send_message',
+          API_KEY: 'eGNMdHhRUjlkc2lHZ0FkUVNRZ2pLOW13MENSNGJGSHJROUZIVFRSRmwwRTo=',
+          customer_name: $('#send_message_customer_name').val(),
+          template_name: $('#send_message_template_name').find(":selected").val(),
+          customer_mobile_no: $('#send_message_customer_mobile_no').val()
+        },
+        success: function(response) {
+          location.reload(true);
+        }
+      });
+    }
     $('.select-all').click(function() {
       if ($('.select-all:checked')[0]) {
         $('input[name="id[]"]').attr('checked', true);
@@ -256,41 +285,6 @@ $cities = $model->select('city_location');
       }
     });
 
-    $('#send_sms').click(function(e) {
-      var total = $('input[name="id[]"]:checked').length;
-      var atLeastOneIsChecked = total > 0;
-
-      if (!atLeastOneIsChecked) {
-        alert('Please select atleast one customer');
-      } else {
-        $("#selected-record-no").html(total);
-        $('#modal_sms').modal();
-      }
-    });
-    $("#submitBulkSms").click(function() {
-      var text_message = $("#sms_message_text").val();
-      if (text_message != "") {
-
-        var checkedValues = $('input[name="id[]"]:checked').map(function() {
-          return this.value;
-        }).get();
-
-        $.ajax({
-          url: "SendBulkSMS",
-          data: {
-            userid: checkedValues,
-            message: text_message
-          },
-          method: 'POST',
-        }).done(function() {
-          $(this).addClass("done");
-          alert('Message Successfully Send');
-          $('#SendSmsModal').modal('hide');
-        });
-      } else {
-        alert("Plz... Enter Message.");
-      }
-    });
     $(document).ready(function() {
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
@@ -304,17 +298,18 @@ $cities = $model->select('city_location');
     }
 
     function deleteCustomer(delete_id, customer_primary_email_id) {
-      $.ajax({
-        type: "POST",
-        url: "../../controllers/CustomerController.php",
-        data: {
-          delete_id: delete_id,
-          customer_primary_email_id: customer_primary_email_id
-        },
-        success: function(response) {
-          location.reload(true);
-        }
-      });
+      if (confirm('Are you sure you want to delete customer?'))
+        $.ajax({
+          type: "POST",
+          url: "../../controllers/CustomerController.php",
+          data: {
+            delete_id: delete_id,
+            customer_primary_email_id: customer_primary_email_id
+          },
+          success: function(response) {
+            location.reload(true);
+          }
+        });
     }
 
     $(function() {

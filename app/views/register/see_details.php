@@ -655,7 +655,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
     function moveToOwtward() {
       formData = $('#move_to_outward_form').serializeArray();
       $.ajax({
-        url: '../../controllers/RegisterController.php',
+        url: '../../controllers/EmailController.php',
         type: 'POST',
         data: {
           formData: formData,

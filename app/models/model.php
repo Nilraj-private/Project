@@ -113,7 +113,7 @@ class Model
           $modelArray = array_merge($manufacturer, $modelArray);
         }
 
-        $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray['id'], 'register/inward_submit_email.php', $modelArray);
+        $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray['id'], 'register/inward_email.php', $modelArray);
       }
       $_SESSION['success_message'] = $title . ' created successfully';
       return $result;
@@ -207,6 +207,22 @@ class Model
 
     if ($result) {
       $_SESSION['success_message'] = $title . ' successfully';
+
+      if ($data['event_name'] == 'move_to_owtward') {
+        $inward_device = $this->select($tableName, '*', 'id=' . $data["inward_register_id"], '', '', 1)[0];
+        $customer = $this->select('customer', '*', "id = " . $inward_device['customer_id'] ?? 0)[0];
+        $modelArray = array_merge($customer, $inward_device);
+
+        if (!empty($modelArray['device_maker_id'])) {
+          $manufacturer = $this->select('device_manufacturer', 'manufacturer_name', 'id = ' . $modelArray['device_maker_id'] ?? 0, '', '', 1)[0];
+          $modelArray = array_merge($manufacturer, $modelArray);
+        }
+
+        $modelArray['courier_name'] = $data['formData'][3]['value'];
+        $modelArray['courier_dock_number'] = $data['formData'][4]['value'];
+
+        $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray['id'], 'register/outward_email.php', $modelArray);
+      }
       return $result;
     } else {
       return false;

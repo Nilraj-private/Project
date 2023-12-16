@@ -36,8 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 }
-
-$where .= (($where == '') ? '' : ' AND ') . " c.customer_city_location= " . $_SESSION['user_city'];
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'Super Admin') {
+  $where .= (($where == '') ? '' : ' AND ') . " c.customer_city_location= " . $_SESSION['user_city'];
+}
 $join = ' LEFT JOIN customer as c on c.id=cr.customer_id ';
 // 'c.customer_city_location as customer_city_id',
 $case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name, c.customer_city_location', $where, $join);
@@ -479,6 +480,10 @@ $cities = $model->select('city_location');
                                   <li class="dropdown-item">
                                     <a href="#" onclick="moveToOwtwardModal(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
                                   </li>
+                                <?php } else { ?>
+                                  <li class="dropdown-item">
+                                    <a href="see_details.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
+                                  </li>
                                 <?php } ?>
                               </ul>
                             </div>
@@ -657,7 +662,7 @@ $cities = $model->select('city_location');
     function moveToOwtward() {
       formData = $('#move_to_outward_form').serializeArray();
       $.ajax({
-        url: '../../controllers/RegisterController.php',
+        url: '../../controllers/EmailController.php',
         type: 'POST',
         data: {
           formData: formData,
