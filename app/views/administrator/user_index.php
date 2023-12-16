@@ -109,7 +109,7 @@ $cities = $model->select('city_location');
                               <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                               <ul class="dropdown-menu">
                                 <li class="dropdown-item">
-                                  <!-- <a href="employee_form.php?id=<?= $employee['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Details</a> -->
+                                  <a href="user_employee_form.php?id=<?= $employee['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Details</a>
                                 </li>
                                 <li class="dropdown-item">
                                   <!-- <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a> -->

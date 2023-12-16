@@ -25,17 +25,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($value != '') {
       if ($flag && (isset($_POST['case_received_date']) && $_POST['case_received_date'] != '') && (isset($_POST['case_return_date']) && $_POST['case_return_date'] != '')) {
         $flag = 0;
-        $where .= (($where == '') ? '' : ' AND ') . " case_received_date BETWEEN  '" . $_POST['case_received_date'] . "' AND '" . $_POST['case_return_date'] . "' ";
+        $where .= (($where == '') ? '' : ' AND ') . " case_received_date >=  '" . $_POST['case_received_date'] . "' OR case_return_date <= '" . $_POST['case_return_date'] . "' ";
       } else if ($flag && $key == 'case_received_date') {
-        $where .= (($where == '') ? '' : ' AND ') . " $key > '" . $value . " 00:00:00' ";
+        $where .= (($where == '') ? '' : ' AND ') . " $key >= '" . $value . " 00:00:00' ";
       } else if ($flag && $key == 'case_return_date') {
-        $where .= (($where == '') ? '' : ' AND ') . " $key < '" . $value . " 00:00:00' ";
+        $where .= (($where == '') ? '' : ' OR ') . " $key <= '" . $value . " 00:00:00' ";
       } else if ($key != 'case_received_date' && $key != 'case_return_date') {
-        $where .= (($where == '') ? '' : ' AND ') . " $key like '%" . $value . "%' ";
+        if ($key == 'id') {
+          $where .= (($where == '') ? '' : ' AND ') . " cr.$key like '%" . $value . "%' ";
+        } else {
+          $where .= (($where == '') ? '' : ' AND ') . " $key like '%" . $value . "%' ";
+        }
       }
     }
   }
 }
+
 if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'SuperAdmin') {
   $where .= (($where == '') ? '' : ' AND ') . " c.customer_city_location= " . $_SESSION['user_city'];
 }
@@ -311,7 +316,7 @@ $cities = $model->select('city_location');
                         </select>
                       </div>
                       <div class="col-2">
-                        <input type="text" class="form-control" name="cr.id" id="cr.id" placeholder="Inward Id" value="<?= (isset($_POST) ? ($_POST['cr.id'] ?? '') : '') ?>">
+                        <input type="text" class="form-control" name="id" id="id" placeholder="Inward Id" value="<?= (isset($_POST) ? ($_POST['id'] ?? '') : '') ?>">
                       </div>
                       <div class="col-2">
                         <input type="text" class="form-control" name="device_serial_number" id="device_serial_number" placeholder="Serial #" value="<?= (isset($_POST) ? ($_POST['device_serial_number'] ?? '') : '') ?>">

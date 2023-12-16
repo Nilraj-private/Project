@@ -143,6 +143,17 @@ class Model
           $update = '  case_status=3, ';
         }
         $update .= ' estimate_amount="' . $data['formData'][3]['value'] . '", customer_remarks="' . $data['formData'][4]['value'] . '", estimate_approved_by_customer="' . $data['formData'][5]['value'] . '" WHERE id=' . $data['inward_register_id'];
+
+        if($data['formData'][5]['value'] == '0'){
+          $action_description = 'Media estimation email sent to customer';
+          self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Media Estimation", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
+        }elseif($data['formData'][5]['value'] == '1'){
+          $action_description = 'Media estimation charges approved by client';
+          self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Estimation Approved", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
+        }elseif($data['formData'][5]['value'] == '2'){
+          $action_description = 'Media estimation charges rejected by client';
+          self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Estimation Reject", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
+        }
       } else if ($data['event_name'] == 'move_to_owtward') {
         $update = ' case_status=4, case_register_state=2, outward_remarks="' . $data['formData'][2]['value'] . '" WHERE id=' . $data['inward_register_id'];
 
@@ -154,7 +165,6 @@ class Model
 
         self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Media Outward", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
       } else if ($data["event_name"] == "add_storage_detail") {
-
         $register_id = 0;
         $name = array_column($data['formData'], 'name');
         $value = array_column($data['formData'], 'value');
