@@ -23,14 +23,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $flag = 1;
   foreach ($_POST as $key => $value) {
     if ($value != '') {
-      if ($flag && (isset($_POST['case_received_date']) && $_POST['case_received_date'] != '') && (isset($_POST['case_return_date']) && $_POST['case_return_date'] != '')) {
+      if ($flag && (isset($_POST['start_date']) && $_POST['end_date'] != '') && (isset($_POST['end_date']) && $_POST['end_date'] != '')) {
         $flag = 0;
-        $where .= (($where == '') ? '' : ' AND ') . " case_received_date >=  '" . $_POST['case_received_date'] . "' OR case_return_date <= '" . $_POST['case_return_date'] . "' ";
-      } else if ($flag && $key == 'case_received_date') {
-        $where .= (($where == '') ? '' : ' AND ') . " $key >= '" . $value . " 00:00:00' ";
-      } else if ($flag && $key == 'case_return_date') {
-        $where .= (($where == '') ? '' : ' OR ') . " $key <= '" . $value . " 00:00:00' ";
-      } else if ($key != 'case_received_date' && $key != 'case_return_date') {
+        $where .= (($where == '') ? '' : ' AND ') . " case_received_date >=  '" . $_POST['start_date'] . " 00:00:00' AND case_received_date <= '" . $_POST['end_date'] . " 23:59:59' ";
+      } else if ($key != 'start_date' && $key != 'end_date') {
         if ($key == 'id') {
           $where .= (($where == '') ? '' : ' AND ') . " cr.$key like '%" . $value . "%' ";
         } else {
@@ -333,9 +329,9 @@ $cities = $model->select('city_location');
                     </div>
                     <div class="row mt25px res_mt0">
                       <div class="col-2">
-                        <div class="input-group date" id="case_received_date" data-target-input="nearest">
-                          <input type="text" class="form-control datetimepicker-input" name="case_received_date" id="case_received_date_input" data-target="#case_received_date" placeholder="Start Date">
-                          <div class="input-group-append" data-target="#case_received_date" data-toggle="datetimepicker">
+                        <div class="input-group date" id="start_date" data-target-input="nearest">
+                          <input type="text" class="form-control datetimepicker-input" name="start_date" id="start_date_input" data-target="#start_date" placeholder="Start Date">
+                          <div class="input-group-append" data-target="#start_date" data-toggle="datetimepicker">
                             <div class="input-group-text">
                               <i class="fa fa-calendar calendar_code"></i>
                             </div>
@@ -344,9 +340,9 @@ $cities = $model->select('city_location');
                       </div>
 
                       <div class="col-2">
-                        <div class="input-group date" id="case_return_date" data-target-input="nearest">
-                          <input type="text" class="form-control datetimepicker-input" name="case_return_date" id="case_return_date_input" data-target="#case_return_date" placeholder="End Date">
-                          <div class="input-group-append" data-target="#case_return_date" data-toggle="datetimepicker">
+                        <div class="input-group date" id="end_date" data-target-input="nearest">
+                          <input type="text" class="form-control datetimepicker-input" name="end_date" id="end_date_input" data-target="#end_date" placeholder="End Date">
+                          <div class="input-group-append" data-target="#end_date" data-toggle="datetimepicker">
                             <div class="input-group-text">
                               <i class="fa fa-calendar calendar_code"></i>
                             </div>
@@ -708,13 +704,13 @@ $cities = $model->select('city_location');
     });
 
     $(function() {
-      $("#case_received_date").datetimepicker("format", 'Y-MM-DD');
-      $("#case_return_date").datetimepicker("format", 'Y-MM-DD');
-      if ("<?= isset($_POST) && ($_POST['case_received_date'] ?? '') ?>") {
-        $("#case_received_date").datetimepicker("defaultDate", new Date("<?= $_POST['case_received_date'] ?? '' ?>"));
+      $("#start_date").datetimepicker("format", 'Y-MM-DD');
+      $("#end_date").datetimepicker("format", 'Y-MM-DD');
+      if ("<?= isset($_POST) && ($_POST['start_date'] ?? '') ?>") {
+        $("#start_date").datetimepicker("defaultDate", new Date("<?= $_POST['start_date'] ?? '' ?>"));
       }
-      if ("<?= isset($_POST) && ($_POST['case_return_date'] ?? '') ?>") {
-        $("#case_return_date").datetimepicker("defaultDate", new Date("<?= $_POST['case_return_date'] ?? '' ?>"));
+      if ("<?= isset($_POST) && ($_POST['end_date'] ?? '') ?>") {
+        $("#end_date").datetimepicker("defaultDate", new Date("<?= $_POST['end_date'] ?? '' ?>"));
       }
     });
   </script>
