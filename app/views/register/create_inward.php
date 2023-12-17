@@ -8,7 +8,7 @@ use app\models\Model;
 $_SESSION['page'] = 'create_inward.php';
 
 $model = (new Model());
-$customers = $model->select("customer");
+$customers = $model->select("customer", '*', ' customer_city_location = ' . $_SESSION['user_city']);
 $manufacturers = $model->select("device_manufacturer");
 $cities = $model->select("city_location");
 
@@ -57,7 +57,7 @@ if (isset($_GET['id'])) {
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <section class="content-header">
+      <!-- <section class="content-header">
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="date_strip">
@@ -66,7 +66,7 @@ if (isset($_GET['id'])) {
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <!-- Content Header (Page header) -->
       <section class="content-header res_mb5 res_pt2">
@@ -245,28 +245,30 @@ if (isset($_GET['id'])) {
                       <input type="hidden" name="case_status" value="1">
                       <input type="hidden" name="estimate_approved_by_customer" value="0">
                     </div>
-                    <div class="row mt25px res_mt0">
-                      <div class="col-3">
-                        <div class="form-group">
-                          <label for="deliver_through_courier">Deliver through courier</label>
-                          <input type="checkbox" name="deliver_through_courier" id="deliver_through_courier" class="form-control">
+                    <?php if (!isset($inward)) { ?>
+                      <div class="row mt25px res_mt0">
+                        <div class="col-3">
+                          <div class="form-group">
+                            <label for="deliver_through_courier">Deliver through courier</label>
+                            <input type="checkbox" name="deliver_through_courier" id="deliver_through_courier" class="form-control">
+                          </div>
                         </div>
-                      </div>
 
-                      <div class="col-3 courier_details" style="display: none;">
-                        <div class="form-group">
-                          <label>Courier Name</label>
-                          <input type="text" class="form-control" name="courier_name" id="courier_name" placeholder="Courier Service Name">
+                        <div class="col-3 courier_details" style="display: none;">
+                          <div class="form-group">
+                            <label>Courier Name</label>
+                            <input type="text" class="form-control" name="courier_name" id="courier_name" placeholder="Courier Service Name">
+                          </div>
                         </div>
-                      </div>
 
-                      <div class="col-3 courier_details" style="display: none;">
-                        <div class="form-group">
-                          <label>Docket Number</label>
-                          <input type="text" class="form-control" name="courier_dock_number" id="courier_dock_number" placeholder="Courier Docket Number">
+                        <div class="col-3 courier_details" style="display: none;">
+                          <div class="form-group">
+                            <label>Docket Number</label>
+                            <input type="text" class="form-control" name="courier_dock_number" id="courier_dock_number" placeholder="Courier Docket Number">
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    <?php } ?>
                     <div class="row mt25px res_auto_btn res_mb12 ">
                       <?php if (!isset($_GET['id'])) { ?>
                         <button type="button" class="btn btn-success mr10" onClick="addInward(0);">Save & Add New </button>

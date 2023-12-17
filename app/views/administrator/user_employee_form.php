@@ -56,8 +56,8 @@ $cities = $model->select('city_location');
                                             <div class="col-6">
                                                 <div class="form-group">
                                                     <label>Name *</label>
-                                                    <input type="text" class="form-control" name="employee_name" id="employee_name" placeholder="Employee Name *" value="<?= ($employee['employee_name'] ?? '') ?>" required>
-                                                    <div id="employee_name_error" style="display:none;">Employee Name cannot be blank.</div>
+                                                    <input type="text" class="form-control" name="employee_name" id="employee_name" placeholder="User Name *" value="<?= ($employee['employee_name'] ?? '') ?>" required>
+                                                    <div id="employee_name_error" style="display:none;">User Name cannot be blank.</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -90,6 +90,19 @@ $cities = $model->select('city_location');
                                                         <?php } ?>
                                                     </select>
                                                     <div id="employee_city_location_error" style="display:none;">Location cannot be blank.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>Location</label>
+                                                    <select class="form-control" name="user_type" id="user_type" placeholder="Select Location (City)" required>
+                                                        <option value="">Select Role</option>
+                                                        <option value="SuperAdmin" <?= (($employee['user_type'] ?? '') == 'SuperAdmin' ? 'selected' : '') ?>>Super Admin</option>
+                                                        <option value="Employee" <?= (($employee['user_type'] ?? '') == 'Employee' ? 'selected' : '') ?>>Employee(Only Register Module Permission)</option>
+                                                    </select>
+                                                    <div id="user_type_error" style="display:none;">Role cannot be blank.</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -154,6 +167,12 @@ $cities = $model->select('city_location');
                     validate = true;
                 } else {
                     $('#employee_city_location_error').hide();
+                }
+                if ($('#user_type').find(':selected').val() == '') {
+                    $('#user_type_error').attr('style', "color:red;");
+                    validate = true;
+                } else {
+                    $('#user_type_error').hide();
                 }
                 if (validate == true) {
                     return;

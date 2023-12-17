@@ -15,8 +15,7 @@
                     <img src="<?= $_SESSION['url_path'] ?>/public/images/avtar.jpg" class="img-circle elevation-2" alt="User Image">
                 </div>
                 <div class="info online_txt">
-                    <a href="#" class="d-block">Hello, superadmin</a>
-                    <p><span class="dot"></span>Online</p>
+                    <a href="#" class="d-block">Hello, <?= ucwords($_SESSION['user_name']) ?></a>
                 </div>
             </div>
 
@@ -58,84 +57,84 @@
                         </li>
                     </ul>
                 </li>
+                <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'SuperAdmin') { ?>
+                    <li class="nav-item <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'customer_index.php' || $_SESSION['page'] == 'customer_form.php')) ? 'nav-item menu-is-opening menu-open' : '' ?>">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fa fa-laptop mr5"></i>
+                            <p>
+                                Customer
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview ml30" style="display: <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'customer_index.php' || $_SESSION['page'] == 'customer_form.php')) ? 'block' : 'none' ?>;">
+                            <li class="nav-item">
+                                <a href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_index.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'customer_index.php') ? 'active' : '' ?>">
+                                    <p>Customer List</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_form.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'customer_form.php') ? 'active' : '' ?>">
+                                    <p>Add Customer</p>
+                                </a>
+                            </li>
 
-                <li class="nav-item <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'customer_index.php' || $_SESSION['page'] == 'customer_form.php')) ? 'nav-item menu-is-opening menu-open' : '' ?>">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fa fa-laptop mr5"></i>
-                        <p>
-                            Customer
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview ml30" style="display: <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'customer_index.php' || $_SESSION['page'] == 'customer_form.php')) ? 'block' : 'none' ?>;">
-                        <li class="nav-item">
-                            <a href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_index.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'customer_index.php') ? 'active' : '' ?>">
-                                <p>Customer List</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= $_SESSION['url_path'] ?>/app/views/customer/customer_form.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'customer_form.php') ? 'active' : '' ?>">
-                                <p>Add Customer</p>
-                            </a>
-                        </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'user_index.php' || $_SESSION['page'] == 'device_manufacturer_index.php' || $_SESSION['page'] == 'database_backup.php')) ? 'nav-item menu-is-opening menu-open' : '' ?>">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-edit mr5"></i>
+                            <p>
+                                Administrator
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview ml30" style="display: <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'user_index.php' || $_SESSION['page'] == 'device_manufacturer_index.php' || $_SESSION['page'] == 'database_backup.php')) ? 'block' : 'none' ?>;">
+                            <li class="nav-item">
+                                <a href="<?= $_SESSION['url_path'] ?>/app/views/administrator/user_index.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'user_index.php') ? 'active' : '' ?>">
+                                    <p>User Management</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= $_SESSION['url_path'] ?>/app/views/administrator/device_manufacturer_index.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'device_manufacturer_index.php') ? 'active' : '' ?>">
+                                    <p>Device Manufacturer</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= $_SESSION['url_path'] ?>/app/views/administrator/database_backup.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'database_backup.php') ? 'active' : '' ?>">
+                                    <p>Database Backup</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= $_SESSION['url_path'] ?>/app/views/administrator/city_index.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'city_index.php') ? 'active' : '' ?>">
+                                    <p>City</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
-                    </ul>
-                </li>
-                <li class="nav-item <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'user_index.php' || $_SESSION['page'] == 'device_manufacturer_index.php' || $_SESSION['page'] == 'database_backup.php')) ? 'nav-item menu-is-opening menu-open' : '' ?>">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-edit mr5"></i>
-                        <p>
-                            Administrator
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview ml30" style="display: <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'user_index.php' || $_SESSION['page'] == 'device_manufacturer_index.php' || $_SESSION['page'] == 'database_backup.php')) ? 'block' : 'none' ?>;">
-                        <li class="nav-item">
-                            <a href="<?= $_SESSION['url_path'] ?>/app/views/administrator/user_index.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'user_index.php') ? 'active' : '' ?>">
-                                <p>User Management</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= $_SESSION['url_path'] ?>/app/views/administrator/device_manufacturer_index.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'device_manufacturer_index.php') ? 'active' : '' ?>">
-                                <p>Device Manufacturer</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= $_SESSION['url_path'] ?>/app/views/administrator/database_backup.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'database_backup.php') ? 'active' : '' ?>">
-                                <p>Database Backup</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= $_SESSION['url_path'] ?>/app/views/administrator/city_index.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'city_index.php') ? 'active' : '' ?>">
-                                <p>City</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="nav-item <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'change_password.php' || $_SESSION['page'] == 'problems.php')) ? 'nav-item menu-is-opening menu-open' : '' ?>">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-edit mr5"></i>
+                            <p>
+                                General
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview ml30" style="display: <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'change_password.php' || $_SESSION['page'] == 'problems.php')) ? 'block' : 'none' ?>;">
+                            <li class="nav-item">
+                                <a href="<?= $_SESSION['url_path'] ?>/app/views/auth/change_password.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'change_password.php') ? 'active' : '' ?>">
+                                    <p>Change Password</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= $_SESSION['url_path'] ?>/app/views/general/problems/problems.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'problems.php') ? 'active' : '' ?>">
+                                    <p>Problems</p>
+                                </a>
+                            </li>
 
-                <li class="nav-item <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'change_password.php' || $_SESSION['page'] == 'problems.php')) ? 'nav-item menu-is-opening menu-open' : '' ?>">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-edit mr5"></i>
-                        <p>
-                            General
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview ml30" style="display: <?= (isset($_SESSION['page']) && ($_SESSION['page'] == 'change_password.php' || $_SESSION['page'] == 'problems.php')) ? 'block' : 'none' ?>;">
-                        <li class="nav-item">
-                            <a href="<?= $_SESSION['url_path'] ?>/app/views/auth/change_password.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'change_password.php') ? 'active' : '' ?>">
-                                <p>Change Password</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= $_SESSION['url_path'] ?>/app/views/general/problems/problems.php" class="nav-link <?= (isset($_SESSION['page']) && $_SESSION['page'] == 'problems.php') ? 'active' : '' ?>">
-                                <p>Problems</p>
-                            </a>
-                        </li>
-
-                    </ul>
-                </li>
-
+                        </ul>
+                    </li>
+                <?php } ?>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

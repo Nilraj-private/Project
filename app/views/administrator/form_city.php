@@ -21,7 +21,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <section class="content-header">
+      <!-- <section class="content-header">
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="date_strip">
@@ -30,7 +30,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <!-- Content Header (Page header) -->
       <section class="content-header res_mb5 res_pt2">

@@ -15,7 +15,7 @@ $_SESSION['page'] = 'database_backup.php';
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
 
-      <section class="content-header">
+      <!-- <section class="content-header">
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="date_strip">
@@ -24,7 +24,7 @@ $_SESSION['page'] = 'database_backup.php';
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
       <!-- Content Header (Page header) -->
       <section class="content-header res_mb5 res_pt2">
         <div class="container-fluid">

@@ -20,7 +20,7 @@ $cities = $model->select("city_location");
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <section class="content-header">
+      <!-- <section class="content-header">
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="date_strip">
@@ -29,7 +29,7 @@ $cities = $model->select("city_location");
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <!-- Content Header (Page header) -->
       <section class="content-header res_mb5 res_pt2">

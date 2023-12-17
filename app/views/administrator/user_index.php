@@ -22,7 +22,7 @@ $cities = $model->select('city_location');
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <section class="content-header">
+      <!-- <section class="content-header">
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="date_strip">
@@ -31,14 +31,14 @@ $cities = $model->select('city_location');
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <!-- Content Header (Page header) -->
       <section class="content-header res_mb5 res_pt2">
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6 res_width50">
-              <h1>Employee List</h1>
+              <h1>User List</h1>
             </div>
             <div class="col-sm-6 res_width50">
               <ol class="breadcrumb float-sm-right">
@@ -62,7 +62,7 @@ $cities = $model->select('city_location');
                 </div>
                 <div class="card-body res_col_form">
                   <div class="row">
-                    <div class="col-2"><input type="text" class="form-control" placeholder="Employee Name"></div>
+                    <div class="col-2"><input type="text" class="form-control" placeholder="User Name"></div>
                     <div class="col-2">
                       <select class="form-control" placeholder="Select Location">
                         <option>Select Location</option>
@@ -85,7 +85,7 @@ $cities = $model->select('city_location');
                     <thead>
                       <tr class="color_blue_bg">
                         <th>SI No</th>
-                        <th>Employee Name</th>
+                        <th>User Name</th>
                         <th>Email Address</th>
                         <th>Mobile No.</th>
                         <th>Location</th>
@@ -112,9 +112,9 @@ $cities = $model->select('city_location');
                                   <a href="user_employee_form.php?id=<?= $employee['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Details</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <!-- <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a> -->
+                                  <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a>
                                 </li>
-                                <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'SuperAdmin') { ?>
+                                <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'SuperAdmin') { ?>
                                   <li class="dropdown-item">
                                     <a type="button" onclick="deleteEmployee(<?= $employee['id'] ?>,<?= $employee['employee_email_id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete</a>
                                   </li>

@@ -5,18 +5,23 @@ require("../../models/model.php");
 
 use app\models\Model;
 
-$_SESSION['page'] = 'register.php' . (isset($_GET['type']) ? '?type=' . $_GET['type'] : '');
+$_SESSION['page'] = 'register.php' . (isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '');
 
 $model = (new Model());
 $where = '';
+$case_status = [0 => '', 1 => 'open', 2 => 'inprogress', 3 => 'processed', 4 => 'close'];
 
-if (isset($_GET["type"]) && ($_GET["type"] == 'inward' || $_GET["type"] == 'outward')) {
-  $type = $_GET["type"];
-  if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    $where .= " case_register_state=" . ($_GET['type'] == 'outward' ? 2 : ($_GET['type'] == 'inward' ? 1 : 3));
+$type = '';
+
+if ($_SERVER["REQUEST_METHOD"] != "POST") {
+  if ((isset($_REQUEST["type"]) && ($_REQUEST["type"] == 'inward' || $_REQUEST["type"] == 'outward'))) {
+    $type = $_REQUEST["type"];
+    $where .= " case_register_state=" . ($_REQUEST['type'] == 'outward' ? 2 : ($_REQUEST['type'] == 'inward' ? 1 : 3));
   }
-} elseif (!isset($_GET["type"])) {
-  $type = '';
+  if (isset($_REQUEST['case_status']) && !empty($_REQUEST['case_status'])) {
+    $_REQUEST['case_status'] = array_search($_REQUEST['case_status'], $case_status);
+    $where .= " case_status=" . $_REQUEST['case_status'];
+  }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -56,7 +61,7 @@ $cities = $model->select('city_location');
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <section class="content-header">
+      <!-- <section class="content-header">
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="date_strip">
@@ -65,7 +70,7 @@ $cities = $model->select('city_location');
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
       <div id="flash_message">
 
       </div>
@@ -100,7 +105,7 @@ $cities = $model->select('city_location');
                 <div class="row">
                   <input type="hidden" name="inward_register_id" id="inward_register_id" value="">
                   <input type="hidden" name="customer_id" id="customer_id" value="">
-                  <input type="hidden" name="type" id="type" value="<?= (isset($_GET['type']) ? $_GET['type'] : '') ?>">
+                  <input type="hidden" name="type" id="type" value="<?= (isset($_REQUEST['type']) ? $_REQUEST['type'] : '') ?>">
                   <div class="col-12">
                     <div class="form-group">
                       <label>Estimate Amount</label>
@@ -197,7 +202,7 @@ $cities = $model->select('city_location');
             <form id="add_storage_detail_form">
               <div class="modal-body">
                 <input type="hidden" name="inward_register_id_storage" id="inward_register_id_storage" value="">
-                <input type="hidden" name="type" id="type" value="<?= (isset($_GET['type']) ? $_GET['type'] : '') ?>">
+                <input type="hidden" name="type" id="type" value="<?= (isset($_REQUEST['type']) ? $_REQUEST['type'] : '') ?>">
                 <div class="row">
                   <div class="col-12">
                     <div class="form-group">
@@ -251,7 +256,7 @@ $cities = $model->select('city_location');
             <form id="move_to_outward_form">
               <div class="modal-body">
                 <input type="hidden" name="inward_register_id_outward" id="inward_register_id_outward" value="">
-                <input type="hidden" name="type" id="type" value="<?= (isset($_GET['type']) ? $_GET['type'] : '') ?>">
+                <input type="hidden" name="type" id="type" value="<?= (isset($_REQUEST['type']) ? $_REQUEST['type'] : '') ?>">
                 <div class="row">
                   <div class="col-12">
                     <div class="form-group">
@@ -299,16 +304,16 @@ $cities = $model->select('city_location');
               <div class="card">
                 <div class="card-header">
                   <h3 class="float-left res_mt5 res_fs22">Search Device</h3>
-                  <a type="button" class="btn btn-primary float-right" href="<?= $_SESSION['url_path'] ?>/app/views/register/create_inward.php<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>">Create Inward</a>
+                  <a type="button" class="btn btn-primary float-right" href="<?= $_SESSION['url_path'] ?>/app/views/register/create_inward.php<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>">Create Inward</a>
                 </div>
-                <form id="register_filter_form" method="post" action="register.php<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>">
+                <form id="register_filter_form" method="post" action="register.php<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>">
                   <div class="card-body res_col_form">
                     <div class="row">
                       <div class="col-2">
                         <select class="form-control" name="case_register_state" id="case_register_state" placeholder="All Register">
                           <option value="">All Register</option>
-                          <option value="1" <?= (($_SERVER["REQUEST_METHOD"] == 'GET') && isset($_GET) && ($_GET['type'] == 'inward')) ? 'selected' : ''; ?> <?= (isset($_POST) && ($_POST['case_register_state'] ?? '') == 1) ? 'selected' : ''; ?>>Inward</option>
-                          <option value="2" <?= (($_SERVER["REQUEST_METHOD"] == 'GET') && isset($_GET) && ($_GET['type'] == 'outward')) ? 'selected' : ''; ?> <?= (isset($_POST) && ($_POST['case_register_state'] ?? '') == 2) ? 'selected' : ''; ?>>Outward</option>
+                          <option value="1" <?= (($_REQUEST['type'] ?? '') == 'inward') ? 'selected' : ''; ?>>Inward</option>
+                          <option value="2" <?= (($_REQUEST['type'] ?? '') == 'outward') ? 'selected' : ''; ?>>Outward</option>
                         </select>
                       </div>
                       <div class="col-2">
@@ -362,10 +367,10 @@ $cities = $model->select('city_location');
                       <div class="col-2">
                         <select class="form-control" name="case_status" id="case_status" placeholder="Device Status">
                           <option value="">Device Status</option>
-                          <option value="1" <?= (isset($_POST) && ($_POST['case_status'] ?? '') == 1) ? 'selected' : ''; ?>>Open</option>
-                          <option value="2" <?= (isset($_POST) && ($_POST['case_status'] ?? '') == 2) ? 'selected' : ''; ?>>Inprocess</option>
-                          <option value="3" <?= (isset($_POST) && ($_POST['case_status'] ?? '') == 3) ? 'selected' : ''; ?>>Processed</option>
-                          <option value="4" <?= (isset($_POST) && ($_POST['case_status'] ?? '') == 4) ? 'selected' : ''; ?>>Close</option>
+                          <option value="1" <?= (isset($_REQUEST) && ($_REQUEST['case_status'] ?? '') == 1) ? 'selected' : ''; ?>>Open</option>
+                          <option value="2" <?= (isset($_REQUEST) && ($_REQUEST['case_status'] ?? '') == 2) ? 'selected' : ''; ?>>Inprocess</option>
+                          <option value="3" <?= (isset($_REQUEST) && ($_REQUEST['case_status'] ?? '') == 3) ? 'selected' : ''; ?>>Processed</option>
+                          <option value="4" <?= (isset($_REQUEST) && ($_REQUEST['case_status'] ?? '') == 4) ? 'selected' : ''; ?>>Close</option>
                         </select>
                       </div>
 
@@ -393,7 +398,7 @@ $cities = $model->select('city_location');
                         <button type="submit" class="btn btn-primary wid100">Search </button>
                       </div>
                       <div class="col-1 max_width100">
-                        <a class="btn btn-default wid100" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_GET['type']) ? '?type=' . $_GET['type'] : '') ?>">Clear</a>
+                        <a class="btn btn-default wid100" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '') ?>">Clear</a>
                       </div>
                     </div>
                   </div>
@@ -459,10 +464,10 @@ $cities = $model->select('city_location');
                               <ul class="dropdown-menu">
                                 <?php if ($case_register_state[$case_register['case_register_state']] !== 'Outward') { ?>
                                   <li class="dropdown-item">
-                                    <a href="see_details.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
+                                    <a href="see_details.php<?= (isset($_REQUEST['type'])) ? '?type=' . $_REQUEST['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
                                   </li>
                                   <li class="dropdown-item">
-                                    <a href="create_inward.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
+                                    <a href="create_inward.php<?= (isset($_REQUEST['type'])) ? '?type=' . $_REQUEST['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit</a>
                                   </li>
                                   <li class="dropdown-divider"></li>
                                   <li class="dropdown-item">
@@ -483,7 +488,7 @@ $cities = $model->select('city_location');
                                   </li>
                                 <?php } else { ?>
                                   <li class="dropdown-item">
-                                    <a href="see_details.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
+                                    <a href="see_details.php<?= (isset($_REQUEST['type'])) ? '?type=' . $_REQUEST['type'] . '&' : '?' ?>id=<?= $case_register['id'] ?>"><i class='fa fa-search mr5'></i> See Details</a>
                                   </li>
                                 <?php } ?>
                               </ul>
@@ -555,6 +560,16 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    var page_overlay = jQuery('<div id="overlay"> </div>');
+
+    function showOverlay() {
+      page_overlay.appendTo(document.body);
+    }
+
+    function hideOverlay() {
+      page_overlay.remove();
+    }
+
     function sendEstimateModal(inward_register_id, customer_id, estimate_amount, customer_details, approval_status) {
       $('#customer_id').val(customer_id);
       $('#inward_register_id').val(inward_register_id);
@@ -627,6 +642,7 @@ $cities = $model->select('city_location');
       if ($('#customer_estimate_status').val() == '1') {
         case_status = 1;
       }
+      $(showOverlay);
       $.ajax({
         url: '../../controllers/EmailController.php',
         type: 'POST',
@@ -639,13 +655,15 @@ $cities = $model->select('city_location');
           case_status: case_status
         },
         success: function(response) {
-          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
+          $(hideOverlay);
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>";
         },
       });
     }
 
     function addStorageDetail() {
       formData = $('#add_storage_detail_form').serializeArray();
+      $(showOverlay);
       $.ajax({
         url: '../../controllers/RegisterController.php',
         type: 'POST',
@@ -655,13 +673,15 @@ $cities = $model->select('city_location');
           inward_register_id: $('#inward_register_id_storage').val()
         },
         success: function(response) {
-          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
+          $(hideOverlay);
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>";
         },
       });
     }
 
     function moveToOwtward() {
       formData = $('#move_to_outward_form').serializeArray();
+      $(showOverlay);
       $.ajax({
         url: '../../controllers/EmailController.php',
         type: 'POST',
@@ -671,7 +691,8 @@ $cities = $model->select('city_location');
           event_name: 'move_to_owtward'
         },
         success: function(response) {
-          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
+          $(hideOverlay);
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>";
         },
       });
     }
@@ -690,7 +711,7 @@ $cities = $model->select('city_location');
         "responsive": true,
         "lengthChange": false,
         "autoWidth": false,
-        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        "buttons": "<?= (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'SuperAdmin') ?>" ? ["copy", "csv", "excel", "pdf", "print", "colvis"] : []
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
       $('#example2').DataTable({
         "paging": true,

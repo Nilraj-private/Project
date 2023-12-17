@@ -56,7 +56,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
             <div class="col-sm-6 pc_view">
               <div class="date_strip no_strip">
                 <h1><?= date('M d, Y') ?></h1>
-                <p><?= date('H:i:s A') ?></p>
+                <!-- <p><?= date('H:i:s A') ?></p> -->
               </div>
             </div>
             <div class="col-sm-6">
@@ -389,7 +389,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                                 <?= $each['action_description'] ?>
                               </p>
                               <div class="space_betwwen">
-                                <span class="gray_color "><i class="fa fa-clock-o"></i> <?= date('d M, Y h:m a ', strtotime($each['action_dt'])) ?></span>
+                                <span class="gray_color "><i class="fa fa-clock-o"></i> <?= (!empty($each['action_dt'])) ? date('d M, Y h:m a ', strtotime($each['action_dt'])) : '' ?></span>
                                 <button type="button" onclick="deleteActionHistory(<?= $each['id'] ?>)" class="btn btn-danger  "><i class='fa fa-trash-o'></i> Delete</button>
                               </div>
                               <hr>
@@ -539,9 +539,9 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                       </div>
 
                       <div class="card-body device_info">
-                        <p><span>Device Received on</span><?= date('d M, Y h:m a  ', strtotime($register['case_received_date'])) ?>
+                        <p><span>Device Received on</span><?= (!empty($register['case_received_date'])) ? date('d M, Y h:m a  ', strtotime($register['case_received_date'])) : '' ?>
                           <hr>
-                          <span>Device Returned on</span><?= date('d M, Y h:m a  ', strtotime($register['case_return_date'])) ?>
+                          <span>Device Returned on</span><?= (!empty($register['case_return_date'])) ? date('d M, Y h:m a  ', strtotime($register['case_return_date'])) : '' ?>
                           <hr>
                           <span>Device Status</span> <span class="badge badge-<?= $case_status_color[$register['case_status']] ?> width100px"><?= $case_status[$register['case_status']] ?></span>
                           <hr>
@@ -588,6 +588,15 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    var page_overlay = jQuery('<div id="overlay"> </div>');
+
+    function showOverlay() {
+      page_overlay.appendTo(document.body);
+    }
+
+    function hideOverlay() {
+      page_overlay.remove();
+    }
     $(document).ready(function() {
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
@@ -622,6 +631,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
 
     function sendEstimate() {
       formData = $('#send_estimate_form').serializeArray();
+      $(showOverlay);
       $.ajax({
         url: '../../controllers/EmailController.php',
         type: 'POST',
@@ -633,6 +643,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
           inward_register_id: $('#inward_register_id').val()
         },
         success: function(response) {
+          $(hideOverlay);
           window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/see_details.php" + "<?= isset($_GET['id']) ? '?id=' . $_GET['id'] : '' ?>";
         },
       });
@@ -643,7 +654,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
       $('#sd_hddno').val(sd_hddno);
       $('#sd_size').val(sd_size);
       $('#sd_remarks').val(sd_remarks);
-      console.log((recovery_status == 0) ? 'false' : 'true');
+
       if (recovery_status == 0) {
         $('#case_result').removeAttr('checked');
       } else {
@@ -654,6 +665,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
 
     function moveToOwtward() {
       formData = $('#move_to_outward_form').serializeArray();
+      $(showOverlay);
       $.ajax({
         url: '../../controllers/EmailController.php',
         type: 'POST',
@@ -663,6 +675,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
           event_name: 'move_to_owtward'
         },
         success: function(response) {
+          $(hideOverlay);
           location.reload(true);
         },
       });
@@ -670,6 +683,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
 
     function addStorageDetail() {
       formData = $('#add_storage_detail_form').serializeArray();
+      $(showOverlay);
       $.ajax({
         url: '../../controllers/RegisterController.php',
         type: 'POST',
@@ -679,6 +693,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
           inward_register_id: $('#inward_register_id').val()
         },
         success: function(response) {
+          $(hideOverlay);
           window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/see_details.php" + "<?= isset($_GET['id']) ? '?id=' . $_GET['id'] : '' ?>";
         },
       });
@@ -693,6 +708,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
       }
 
       formData = $('#add_sction_history_form').serializeArray();
+      $(showOverlay);
       $.ajax({
         url: '../../controllers/RegisterController.php',
         type: 'POST',
@@ -701,13 +717,15 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
           event_name: 'add_action_history',
         },
         success: function(response) {
+          $(hideOverlay);
           window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/see_details.php" + "<?= isset($_GET['id']) ? '?id=' . $_GET['id'] : '' ?>";
         },
       });
     }
 
     function deleteActionHistory(delete_id) {
-      if (confirm('Are you sure you want to delete?'))
+      if (confirm('Are you sure you want to delete?')) {
+        $(showOverlay);
         $.ajax({
           type: "POST",
           url: "../../controllers/RegisterController.php",
@@ -716,9 +734,11 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
             delete_id: delete_id
           },
           success: function(response) {
+            $(hideOverlay);
             location.reload(true);
           }
         });
+      }
     }
     $(function() {
       $("#action_dt").datetimepicker("format", 'Y-MM-DD hh:mm:ss a');

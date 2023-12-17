@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use DateTime;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class Model
@@ -72,7 +73,7 @@ class Model
       }
 
       if ($tableName == 'customer') {
-        $sql = "INSERT INTO user (username,password,user_type) VALUES ('" . $dataArray['customer_primary_email_id'] . "','" . md5($dataArray['customer_mobile_no1']) . "','Customer');";
+        $sql = "INSERT INTO user (username,password,user_type,is_active) VALUES ('" . $dataArray['customer_primary_email_id'] . "','" . md5($dataArray['customer_mobile_no1']) . "','Customer',1);";
         $result = mysqli_query($this->conn, $sql);
         if (!$result) {
           return false;
@@ -80,12 +81,14 @@ class Model
         $user_id = $this->select("user", 'id', "username = '" . $dataArray['customer_primary_email_id'] . "'")[0]['id'];
         $dataArray['user_id'] = $user_id;
       } elseif ($tableName == 'employee') {
-        $sql = "INSERT INTO user (username,password,user_type) VALUES ('" . $dataArray['employee_email_id'] . "','" . md5($dataArray['employee_mobile_no1']) . "','Employee');";
+        $sql = "INSERT INTO user (username,password,user_type,is_active) VALUES ('" . $dataArray['employee_email_id'] . "','" . md5($dataArray['employee_mobile_no1']) . "','" . $dataArray['user_type'] . "',1);";
         $result = mysqli_query($this->conn, $sql);
         if (!$result) {
           return false;
         }
         $user_id = $this->select("user", 'id', "username = '" . $dataArray['employee_email_id'] . "'")[0]['id'];
+        if ($dataArray['user_type'] != 'SuperAdmin')
+          unset($dataArray['user_type']);
         $dataArray['user_id'] = $user_id;
       }
 
@@ -124,7 +127,7 @@ class Model
 
         $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray['id'], 'register/inward_email.php', $modelArray);
       }
-      
+
       $_SESSION['success_message'] = $title . ' created successfully';
       return $result;
     } else {
@@ -144,13 +147,13 @@ class Model
         }
         $update .= ' estimate_amount="' . $data['formData'][3]['value'] . '", customer_remarks="' . $data['formData'][4]['value'] . '", estimate_approved_by_customer="' . $data['formData'][5]['value'] . '" WHERE id=' . $data['inward_register_id'];
 
-        if($data['formData'][5]['value'] == '0'){
+        if ($data['formData'][5]['value'] == '0') {
           $action_description = 'Media estimation email sent to customer';
           self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Media Estimation", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
-        }elseif($data['formData'][5]['value'] == '1'){
+        } elseif ($data['formData'][5]['value'] == '1') {
           $action_description = 'Media estimation charges approved by client';
           self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Estimation Approved", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
-        }elseif($data['formData'][5]['value'] == '2'){
+        } elseif ($data['formData'][5]['value'] == '2') {
           $action_description = 'Media estimation charges rejected by client';
           self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Estimation Reject", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
         }
@@ -210,6 +213,7 @@ class Model
           }
         }
       }
+
       $update .= " WHERE id = " . $data['id'];
     } else {
       $id = $data['id'];
@@ -222,13 +226,12 @@ class Model
     }
 
     $sql = "UPDATE $tableName SET $update";
-
     $result = mysqli_query($this->conn, $sql);
 
     if ($result) {
       $_SESSION['success_message'] = $title . ' successfully';
 
-      if ($data['event_name'] == 'move_to_owtward') {
+      if (isset($data['event_name']) && $data['event_name'] == 'move_to_owtward') {
         $inward_device = $this->select($tableName, '*', 'id=' . $data["inward_register_id"], '', '', 1)[0];
         $customer = $this->select('customer', '*', "id = " . $inward_device['customer_id'] ?? 0)[0];
         $modelArray = array_merge($customer, $inward_device);
@@ -290,16 +293,19 @@ class Model
         $data[] = $row;
       }
 
-      $customer = "SELECT company_name,customer_city_location FROM customer Where user_id= '" . $data[0]['id'] . "'";
-
-      $customerResult = mysqli_query($this->conn, $customer);
-      $customerData = mysqli_fetch_assoc($customerResult);
+      if ($data[0]['user_type'] == 'Employee') {
+        $user = "SELECT employee_name as user_name,employee_city_location as city FROM employee Where user_id= '" . $data[0]['id'] . "'";
+      } elseif ($data[0]['user_type'] == 'Employee') {
+        $user = "SELECT company_name as user_name,customer_city_location as city FROM customer Where user_id= '" . $data[0]['id'] . "'";
+      }
+      $userResult = mysqli_query($this->conn, $user);
+      $userData = mysqli_fetch_assoc($userResult);
 
       $_SESSION['success_message'] = 'Login successfully';
       $_SESSION['user_id'] = $data[0]['id'];
       $_SESSION['user_type'] = $data[0]['user_type'];
-      $_SESSION['company_name'] = $customerData['company_name'];
-      $_SESSION['user_city'] = $customerData['customer_city_location'];
+      $_SESSION['user_name'] = $userData['user_name'];
+      $_SESSION['user_city'] = $userData['city'];
       return true;
     } else {
       return ['success' => 'false'];
