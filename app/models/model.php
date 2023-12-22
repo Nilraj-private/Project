@@ -59,7 +59,6 @@ class Model
 
   function insert($tableName, $data, $title = '')
   {
-
     $columnArray = array_column($data, 'name');
     $valueArray = array_column($data, 'value');
 
@@ -124,115 +123,119 @@ class Model
           $manufacturer = $this->select('device_manufacturer', 'manufacturer_name', 'id = ' . $modelArray['device_maker_id'] ?? 0, '', '', 1)[0];
           $modelArray = array_merge($manufacturer, $modelArray);
         }
-
         $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray['id'], 'register/inward_email.php', $modelArray);
-      }
 
+        $this->generateWhatsappMessage($modelArray, 'Create Inward');
+      }
       $_SESSION['success_message'] = $title . ' created successfully';
-      return $result;
+
+      return true;
     } else {
       return false;
     }
   }
 
-  function update($tableName, $data, $title = '')
+  function update($tableName, $datas, $title = '')
   {
-    $update = $where = $action_description = '';
-    if (isset($data['event_name'])) {
-      if ($data['event_name'] == 'send_estimate') {
-        if (isset($data['send_email'])) {
+    $update = $where = $action_description = $action_title = '';
+    $columnArray = $valueArray = $dataArray = [];
+    foreach ($datas as $key => $data) {
+      if ($key == 'formData') {
+        $columnArray = array_column($data, 'name');
+        $valueArray = array_column($data, 'value');
+      } else {
+        $columnArray[] = $key;
+        $valueArray[] = $data;
+      }
+    }
+
+    if (!empty($columnArray)) {
+      foreach ($columnArray as $key => $column) {
+        $dataArray[$column] = $valueArray[$key];
+      }
+    }
+
+    if (isset($dataArray['event_name'])) {
+      if ($dataArray['event_name'] == 'send_estimate') {
+        if (isset($dataArray['send_email'])) {
           $update = '  case_status=2, ';
-        } elseif (isset($data['case_status']) && $data['case_status'] != 0) {
+        } elseif (isset($dataArray['case_status']) && $dataArray['case_status'] != 0) {
           $update = '  case_status=3, ';
         }
-        $update .= ' estimate_amount="' . $data['formData'][3]['value'] . '", customer_remarks="' . $data['formData'][4]['value'] . '", estimate_approved_by_customer="' . $data['formData'][5]['value'] . '" WHERE id=' . $data['inward_register_id'];
+        $update .= ' estimate_amount="' . $dataArray['estimate_amount'] . '", customer_remarks="' . $dataArray['customer_remarks'] . '", estimate_approved_by_customer="' . $dataArray['customer_estimate_status'] . '" WHERE id=' . $dataArray['inward_register_id'];
 
-        if ($data['formData'][5]['value'] == '0') {
+        if ($dataArray['customer_estimate_status'] == '0') {
+          $action_title = 'Media Estimation';
           $action_description = 'Media estimation email sent to customer';
-          self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Media Estimation", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
-        } elseif ($data['formData'][5]['value'] == '1') {
+        } elseif ($dataArray['customer_estimate_status'] == '1') {
+          $action_title = 'Estimation Approved';
           $action_description = 'Media estimation charges approved by client';
-          self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Estimation Approved", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
-        } elseif ($data['formData'][5]['value'] == '2') {
+        } elseif ($dataArray['customer_estimate_status'] == '2') {
+          $action_title = 'Estimation Reject';
           $action_description = 'Media estimation charges rejected by client';
-          self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Estimation Reject", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
         }
-      } else if ($data['event_name'] == 'move_to_owtward') {
-        $update = ' case_status=4, case_register_state=2, outward_remarks="' . $data['formData'][2]['value'] . '" WHERE id=' . $data['inward_register_id'];
+        self::insert("action_history", ["case_register_id" => $dataArray["inward_register_id"], "action_title" => $action_title, "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
+      } else if ($dataArray['event_name'] == 'move_to_outward') {
+        $update = ' case_status=4, case_register_state=2, outward_remarks="' . $dataArray['outward_remarks'] . '" WHERE id=' . $dataArray['inward_register_id'];
 
-        if (isset($data["formData"][3]) && $data["formData"][3]["name"] == "deliver_through_courier") {
-          $action_description = "Media Outward Courier Doc.#:" . $data["formData"][5]["value"] . " || " . $data["formData"][4]["value"];
+        if (isset($dataArray['deliver_through_courier'])) {
+          $action_description = "Media Outward Courier Doc.#:" . $dataArray['courier_dock_number'] . " || " . $dataArray['courier_name'];
         } else {
           $action_description = "Media Outward Hand Delivery to the bearer of Inward Sheet";
         }
 
-        self::insert("action_history", ["case_register_id" => $data["inward_register_id"], "action_title" => "Media Outward", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
-      } else if ($data["event_name"] == "add_storage_detail") {
+        self::insert("action_history", ["case_register_id" => $dataArray["inward_register_id"], "action_title" => "Media Outward", "action_description" => $action_description, "visibility_type" => "PRIVATE"], "");
+      } else if ($dataArray["event_name"] == "add_storage_detail") {
         $register_id = 0;
-        $name = array_column($data['formData'], 'name');
-        $value = array_column($data['formData'], 'value');
-        for ($i = 0; $i < count($name); $i++) {
-          if ($name[$i] == 'sd_hddno') {
-            $action_description = ($action_description == '') ? "HDD#" . $value[$i] : " || HDD#" . $value[$i];
-          } elseif ($name[$i] == 'sd_size') {
-            $action_description = ($action_description == '') ? "storage size : " . $value[$i] : " || storage size : " . $value[$i];
-          } elseif ('sd_remarks') {
-            $action_description = ($action_description == '') ? "Note : " . $value[$i] : " || Note : " . $value[$i];
-          }
-          if ($name[$i] != 'inward_register_id_storage' && $name[$i] != 'type') {
-            if ($name[$i] == 'case_result' && $value[$i] == 'on') {
-              $value[$i] = 1;
-            } else {
-              $value[$i] = '"' . $value[$i] . '"';
-            }
-            $update .= ' ' . $name[$i] . '= ' . $value[$i] . '' . ((count($name) - 1 != $i) ? ',' : '');
+        unset($dataArray['type']);
+        unset($dataArray['inward_register_id_storage']);
+        unset($dataArray['event_name']);
+        foreach ($dataArray as $column => $data) {
+          if ($column == 'inward_register_id') {
+            $register_id = $data;
+            $where = " WHERE id = " . $data;
           } else {
-            if ($name[$i] == 'inward_register_id_storage') {
-              $register_id = $value[$i];
-              $where = " WHERE id = " . $value[$i];
+            if ($column == 'case_result' && $data == 'on') {
+              $data = 1;
+            } else {
+              $data = '"' . $data . '"';
             }
+            $update .= ((empty($update)) ? ' ' . $column . '= ' . $data : ',' . $column . '= ' . $data);
           }
         }
         if ($register_id != 0) {
-          self::insert('action_history', ['case_register_id' => $register_id, 'action_title' => 'storage_detail', 'action_description' => '', 'visibility_type' => 'PRIVATE'], '');
+          self::insert('action_history', ['case_register_id' => $register_id, 'action_title' => 'storage_detail', 'action_description' => 'Recovered data storage details HDD#' . $dataArray['sd_hddno'] . ' || storage size : ' . $dataArray['sd_size'] . ' || Note : ' . $dataArray['sd_remarks'], 'visibility_type' => 'PRIVATE'], '');
         }
 
-        if (!in_array("case_result", array_column($data['formData'], 'name'))) {
+        if (!isset($dataArray['case_result'])) {
           $update .= ' ,case_result = 0';
         }
         $update .= $where;
       }
-    } elseif (isset($data['formData'])) {
-      $name = array_column($data['formData'], 'name');
-      for ($i = 0; $i < count($name); $i++) {
-        if ($name[$i] != 'case_status' || $name[$i] != 'estimate_approved_by_customer') {
-          if ($tableName == 'customer' && ($name[$i] == 'user_id' || $name[$i] == 'customer_city_location')) {
-            $update .= ' ' . $name[$i] . '=' . array_column($data['formData'], 'value')[$i] . ' ' . ((count($name) - 1 != $i) ? ',' : '');
-          } else {
-            $update .= ' ' . $name[$i] . '="' . array_column($data['formData'], 'value')[$i] . '"' . ((count($name) - 1 != $i) ? ',' : '');
+    } else {
+      foreach ($dataArray as $column => $data) {
+        if (!isset($dataArray['password'])) {
+          if ($column != 'case_status' || $column != 'estimate_approved_by_customer') {
+            if ($tableName == 'customer' && ($column == 'user_id' || $column == 'customer_city_location')) {
+            } else {
+              $data = '"' . $data . '"';
+            }
+            $update .= (empty($update)) ? ' ' . $column . '=' . $data . ' ' : ',' . $column . '=' . $data . ' ';
           }
+        } else {
+          $query = " $column = '" . $data . "' ";
+          $update .= (empty($update) ? $query : " ,$query");
         }
       }
-
-      $update .= " WHERE id = " . $data['id'];
-    } else {
-      $id = $data['id'];
-      unset($data['id']);
-      foreach ($data as $key => $value) {
-        $query = " $key = '" . $value . "' ";
-        $update .= (($update == '') ? $query : " ,$query");
-      }
-      $update .= " WHERE id = " . $id;
+      $update .= " WHERE id = " . $dataArray['id'];
     }
-
     $sql = "UPDATE $tableName SET $update";
     $result = mysqli_query($this->conn, $sql);
 
     if ($result) {
       $_SESSION['success_message'] = $title . ' successfully';
-
-      if (isset($data['event_name']) && $data['event_name'] == 'move_to_owtward') {
-        $inward_device = $this->select($tableName, '*', 'id=' . $data["inward_register_id"], '', '', 1)[0];
+      if (isset($dataArray['event_name']) && ($dataArray['event_name'] == 'move_to_outward' || $dataArray['event_name'] == 'send_estimate')) {
+        $inward_device = $this->select($tableName, '*', 'id=' . $dataArray["inward_register_id"], '', '', 1)[0];
         $customer = $this->select('customer', '*', "id = " . $inward_device['customer_id'] ?? 0)[0];
         $modelArray = array_merge($customer, $inward_device);
 
@@ -240,12 +243,24 @@ class Model
           $manufacturer = $this->select('device_manufacturer', 'manufacturer_name', 'id = ' . $modelArray['device_maker_id'] ?? 0, '', '', 1)[0];
           $modelArray = array_merge($manufacturer, $modelArray);
         }
+        if ($dataArray['event_name'] == 'move_to_outward') {
+          if (isset($dataArray['deliver_through_courier']))
+            $modelArray['deliver_through_courier'] = $dataArray['deliver_through_courier'];
+          $modelArray['courier_name'] = (isset($dataArray['courier_name'])) ? $dataArray['courier_name'] : '';
+          $modelArray['courier_dock_number'] = (isset($dataArray['courier_dock_number'])) ? $dataArray['courier_dock_number'] : '';
 
-        $modelArray['courier_name'] = $data['formData'][3]['value'];
-        $modelArray['courier_dock_number'] = $data['formData'][4]['value'];
+          $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray['id'], 'register/outward_email.php', $modelArray);
 
-        $this->sendMail($customer['customer_primary_email_id'], "Media Details for #" . $modelArray['id'], 'register/outward_email.php', $modelArray);
+          $this->generateWhatsappMessage($modelArray, 'Move to Outward');
+        } elseif ($dataArray['event_name'] == 'send_estimate') {
+          if (isset($dataArray['send_email'])) {
+            $this->sendMail($customer['customer_primary_email_id'], "Device Data Recovery Estimate (Inward# {$modelArray['id']}) - Ni-Ki Data Recovery Services", 'email/send_estimation.php', $modelArray);
+
+            $this->generateWhatsappMessage($modelArray, 'Send Estimation');
+          }
+        }
       }
+
       return $result;
     } else {
       return false;
@@ -295,17 +310,20 @@ class Model
 
       if ($data[0]['user_type'] == 'Employee') {
         $user = "SELECT employee_name as user_name,employee_city_location as city FROM employee Where user_id= '" . $data[0]['id'] . "'";
-      } elseif ($data[0]['user_type'] == 'Employee') {
+      } elseif ($data[0]['user_type'] == 'Customer') {
         $user = "SELECT company_name as user_name,customer_city_location as city FROM customer Where user_id= '" . $data[0]['id'] . "'";
       }
-      $userResult = mysqli_query($this->conn, $user);
-      $userData = mysqli_fetch_assoc($userResult);
+
+      if (isset($user)) {
+        $userResult = mysqli_query($this->conn, $user);
+        $userData = mysqli_fetch_assoc($userResult);
+        $_SESSION['user_name'] = $userData['user_name'];
+        $_SESSION['user_city'] = $userData['city'];
+      }
 
       $_SESSION['success_message'] = 'Login successfully';
       $_SESSION['user_id'] = $data[0]['id'];
       $_SESSION['user_type'] = $data[0]['user_type'];
-      $_SESSION['user_name'] = $userData['user_name'];
-      $_SESSION['user_city'] = $userData['city'];
       return true;
     } else {
       return ['success' => 'false'];
@@ -381,5 +399,103 @@ class Model
     $content = ob_get_contents();
     ob_end_clean();
     return $content;
+  }
+
+  public function sendWhatsAppMessage($data, $bodyVariableArray)
+  {
+    $curl = curl_init();
+    /*  "headerValues": [
+      "https://interaktprodstorage.blob.core.windows.net/mediaprodstoragecontainer/acfcda27-3c33-45d3-8726-f6c5435828c0/message_template_media/ltdFpVSxLWQG/logo-no_background-high-21-removebg-preview%20%282%29.png?se=2028-12-06T09%3A19%3A52Z&sp=rt&sv=2019-12-12&sr=b&sig=JjKlzPAbzoxwo/dgIC3jMvV%2BLdxE7h/xHLM%2By0ZpEwo%3D"
+    ], */
+
+    $bodyValues = $header = '';
+    foreach ($bodyVariableArray as $variableValue) {
+      $bodyValues .= (empty($bodyValues)) ? '"' . $variableValue . '"' : ',"' . $variableValue . '"';
+    }
+    if (isset($data['header_1']) && $data['header_1'] != '') {
+      $header = '"headerValues": [ "' . $data['header_1'] . '" ],';
+    }
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => 'https://api.interakt.ai/v1/public/message/',
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_ENCODING => '',
+      CURLOPT_MAXREDIRS => 10,
+      CURLOPT_TIMEOUT => 0,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => 'POST',
+      CURLOPT_POSTFIELDS => '{
+                "countryCode": "+91",
+                "phoneNumber": "' . $data['customer_mobile_no'] . '",
+                "callbackData": "",
+                "type": "Template",
+                "template": {
+                    "name": "' . $data['template_name'] . '",
+                    "languageCode": "en",
+                    ' . $header . '
+                    "bodyValues": [
+                        ' . $bodyValues . '
+                        ]
+                    }
+                }',
+      CURLOPT_HTTPHEADER => array(
+        'Authorization: Basic ' . $this->API_KEY,
+        'Content-Type: application/json'
+      ),
+    ));
+
+    $response = curl_exec($curl);
+
+    curl_close($curl);
+    return $response;
+  }
+
+  public function generateWhatsappMessage($modelArray, $template_name)
+  {
+    $template_slug = $this->select('templates', 'template_name_slug', ' template_name="' . $template_name . '"')[0]['template_name_slug'];
+
+    if (empty($template_slug)) {
+      $_SESSION['error_message'] = 'Whatsapp API template value cannot be empty.';
+      return false;
+    } elseif (empty($modelArray['customer_mobile_no1'])) {
+      $_SESSION['error_message'] = 'Client Primary Mobile No. cannot be empty.';
+      return false;
+    } elseif (strlen($modelArray['customer_mobile_no1']) != 10) {
+      $_SESSION['error_message'] = 'Client Primary Mobile No. should be 10 digit number only, Invalid mobile number entered.';
+      return false;
+    }
+
+    $params = $bodyVariableArray = [];
+
+    $params['customer_mobile_no'] = $modelArray['customer_mobile_no1'];
+    $params['template_name'] = $template_slug;
+    $params['header_1'] = (isset($modelArray['id']) && !empty($modelArray['id'])) ? $modelArray['id'] : 'N/A';
+
+    $bodyVariableArray['1'] = (isset($modelArray['customer_name']) && !empty($modelArray['customer_name'])) ? $modelArray['customer_name'] : 'N/A';
+    $bodyVariableArray['2'] = (isset($modelArray['device_serial_number']) && !empty($modelArray['device_serial_number'])) ? $modelArray['device_serial_number'] : 'N/A';
+    $bodyVariableArray['3'] = (isset($modelArray['manufacturer_name']) && !empty($modelArray['manufacturer_name'])) ? $modelArray['manufacturer_name'] : 'N/A';
+    $bodyVariableArray['4'] = (isset($modelArray['device_model']) && !empty($modelArray['device_model'])) ? $modelArray['device_model'] : 'N/A';
+    $bodyVariableArray['5'] = (isset($modelArray['device_type']) && !empty($modelArray['device_type'])) ? $modelArray['device_type'] : 'N/A';
+    $bodyVariableArray['6'] = (isset($modelArray['device_size']) && !empty($modelArray['device_size']) && !in_array($modelArray['device_size'], ['TB', 'GB', 'MB'])) ? $modelArray['device_size'] : 'N/A';
+    $bodyVariableArray['7'] = (isset($modelArray['crash_type']) && !empty($modelArray['crash_type'])) ? $modelArray['crash_type'] : 'N/A';
+    $bodyVariableArray['8'] = (isset($modelArray['case_received_date']) && !empty($modelArray['case_received_date']) && $modelArray['case_received_date'] != '0000-00-00 00:00:00') ? date('d M, Y h:m a', strtotime($modelArray['case_received_date'])) : 'N/A';
+
+    if ($template_name == 'Move to Outward') {
+      $bodyVariableArray['9'] = (isset($modelArray['deliver_through_courier'])) ? $bodyVariableArray['8'] : 'N/A';
+      $bodyVariableArray['10'] = (isset($modelArray['deliver_through_courier']) && !empty($modelArray['courier_name'])) ? $modelArray['courier_name'] : 'N/A';
+      $bodyVariableArray['11'] = (isset($modelArray['deliver_through_courier']) && !empty($modelArray['courier_dock_number'])) ? $modelArray['courier_dock_number'] : 'N/A';
+      $bodyVariableArray['12'] = (isset($modelArray['deliver_through_courier'])) ? 'Yes' : 'No';
+      $bodyVariableArray['13'] = (isset($modelArray['outward_remarks']) && !empty($modelArray['outward_remarks'])) ? $modelArray['outward_remarks'] : 'N/A';
+    } elseif ($template_name == 'Send Estimation') {
+      $bodyVariableArray['9'] = (isset($modelArray['estimate_amount']) && !empty($modelArray['estimate_amount'])) ? $modelArray['estimate_amount'] : 'N/A';
+      $bodyVariableArray['10'] = (isset($modelArray['customer_remarks']) && !empty($modelArray['customer_remarks'])) ? $modelArray['customer_remarks'] : 'N/A';
+    }
+
+    $api_response = json_decode($this->sendWhatsAppMessage($params, $bodyVariableArray));
+
+    if (isset($api_response->result) && $api_response->result == false) {
+      $_SESSION['error_message'] = 'Whatsapp message not send, ' . $api_response->message;
+    }
+    return $api_response;
   }
 }

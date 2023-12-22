@@ -153,7 +153,7 @@ $cities = $model->select('city_location');
                               <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                               <ul class="dropdown-menu">
                                 <li class="dropdown-item">
-                                  <a href="javascript:void(0);" onclick="sendMessageModal('<?= $customer['company_name'] ?>', <?= $customer['customer_mobile_no1'] ?>)"><i class="fa fa-pencil mr5"></i> Send Message</a>
+                                  <!-- <a href="javascript:void(0);" onclick="sendMessageModal('<?= $customer['company_name'] ?>', <?= $customer['customer_mobile_no1'] ?>)"><i class="fa fa-pencil mr5"></i> Send Message</a> -->
                                 </li>
                                 <li class="dropdown-item">
                                   <a href="customer_form.php?id=<?= $customer['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Customer</a>
@@ -255,28 +255,30 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
-    function sendMessageModal(customer_name, customer_mobile_no) {
-      $('#send_message_customer_name').val(customer_name);
-      $('#send_message_customer_mobile_no').val(customer_mobile_no);
-      $('#modal_send_message').modal();
-    }
+    // function sendMessageModal(customer_name, customer_mobile_no) {
+    //   $('#send_message_customer_name').val(customer_name);
+    //   $('#send_message_customer_mobile_no').val(customer_mobile_no);
+    //   $('#modal_send_message').modal();
+    // }
 
-    function sendMessage() {
-      $.ajax({
-        type: "POST",
-        url: "../../controllers/whatsAppAPIController.php",
-        data: {
-          event_name: 'send_message',
-          API_KEY: 'eGNMdHhRUjlkc2lHZ0FkUVNRZ2pLOW13MENSNGJGSHJROUZIVFRSRmwwRTo=',
-          customer_name: $('#send_message_customer_name').val(),
-          template_name: $('#send_message_template_name').find(":selected").val(),
-          customer_mobile_no: $('#send_message_customer_mobile_no').val()
-        },
-        success: function(response) {
-          location.reload(true);
-        }
-      });
-    }
+    // function sendMessage() {
+    //   $.ajax({
+    //     type: "POST",
+    //     url: "../../controllers/whatsAppAPIController.php",
+    //     data: {
+    //       event_name: 'send_message',
+    //       customer_name: $('#send_message_customer_name').val(),
+    //       template_name: $('#send_message_template_name').find(":selected").val(),
+    //       customer_mobile_no: $('#send_message_customer_mobile_no').val()
+    //     },
+    //     success: function(response) {
+    //       console.log(response)
+    //       if (response.result) {
+    //         location.reload(true);
+    //       }
+    //     }
+    //   });
+    // }
     $('.select-all').click(function() {
       if ($('.select-all:checked')[0]) {
         $('input[name="id[]"]').attr('checked', true);
@@ -289,6 +291,10 @@ $cities = $model->select('city_location');
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      }
+      if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+        toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['error_message']); ?>"
       }
     })
 

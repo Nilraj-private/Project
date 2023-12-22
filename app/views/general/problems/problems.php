@@ -227,6 +227,10 @@ $_SESSION['page'] = 'problems.php';
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
       }
+      if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+        toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['error_message']); ?>"
+      }
     })
 
     function deleteCustomer(delete_id, customer_primary_email_id) {
@@ -260,7 +264,6 @@ $_SESSION['page'] = 'problems.php';
         "responsive": true,
       });
     });
-
   </script>
 </body>
 

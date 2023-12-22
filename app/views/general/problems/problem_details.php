@@ -111,6 +111,10 @@ include('../../template/head.php');
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
       }
+      if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+        toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['error_message']); ?>"
+      }
     })
 
     $(function() {

@@ -8,7 +8,11 @@ use app\models\Model;
 $_SESSION['page'] = 'create_inward.php';
 
 $model = (new Model());
-$customers = $model->select("customer", '*', ' customer_city_location = ' . $_SESSION['user_city']);
+$where = '';
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'SuperAdmin') {
+  $where = ' customer_city_location = ' . $_SESSION['user_city'];
+}
+$customers = $model->select("customer", '*', $where);
 $manufacturers = $model->select("device_manufacturer");
 $cities = $model->select("city_location");
 
@@ -295,7 +299,6 @@ if (isset($_GET['id'])) {
                 </button>
               </div>
               <form id="customer_form" method="POST" action="../../controllers/CustomerController.php">
-                <!-- <form id="customer_form" method="POST" action="../../controllers/CustomerController.php"> -->
                 <div class="modal-body res_col_form">
                   <div class="row">
                     <div class="col-6">
@@ -438,7 +441,8 @@ if (isset($_GET['id'])) {
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
-      } else if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+      } 
+      if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
         toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['error_message']); ?>"
       }

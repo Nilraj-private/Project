@@ -264,7 +264,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
 
                   <div class="col-6">
                     <div class="form-group">
-                      <button type="button" class="btn btn-success mr10" onclick="moveToOwtward();">Save</button>
+                      <button type="button" class="btn btn-success mr10" onclick="moveToOutward();">Save</button>
                     </div>
                   </div>
                 </div>
@@ -302,7 +302,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                           <!-- <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a></li> -->
                           <li class="dropdown-divider"></li>
                           <li class="dropdown-item">
-                            <a href="#" onclick="moveToOwtwardModal(<?= $register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
+                            <a href="#" onclick="moveToOutwardModal(<?= $register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
                           </li>
                           <!-- <li class="dropdown-divider"></li> -->
                           <li class="dropdown-item">
@@ -601,7 +601,8 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
-      } else if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+      }
+      if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
         toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['error_message']); ?>"
       }
@@ -615,7 +616,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
       }
     });
 
-    function moveToOwtwardModal(inward_register_id) {
+    function moveToOutwardModal(inward_register_id) {
       $('#inward_register_id_outward').val(inward_register_id);
       $('#modal_move_to_outward').modal();
     }
@@ -663,7 +664,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
       $('#modal_add_storage_details').modal();
     }
 
-    function moveToOwtward() {
+    function moveToOutward() {
       formData = $('#move_to_outward_form').serializeArray();
       $(showOverlay);
       $.ajax({
@@ -672,7 +673,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
         data: {
           formData: formData,
           inward_register_id: $('#inward_register_id_outward').val(),
-          event_name: 'move_to_owtward'
+          event_name: 'move_to_outward'
         },
         success: function(response) {
           $(hideOverlay);

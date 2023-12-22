@@ -74,7 +74,7 @@ $_SESSION['page'] = 'change_password.php';
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-3">
+                      <div class="col-6">
                         <button type="button" class="btn btn-success mr10" onClick="changePassword();">Change Password</button>
                       </div>
                     </div>
@@ -122,6 +122,10 @@ $_SESSION['page'] = 'change_password.php';
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
+      }
+      if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+        toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
+        var unnset = "<?php unset($_SESSION['error_message']); ?>"
       }
     })
 
@@ -171,12 +175,12 @@ $_SESSION['page'] = 'change_password.php';
         },
         dataType: "json",
         success: function(response) {
-            if(response.success == false){
-                $('#current_password_error').removeAttr('style').attr('style', "color:red;").html(response.message);
-                $('#current_password_error').show();
-            }else if(response.success == true){
-                window.location.href = "change_password.php";
-            }
+          if (response.success == false) {
+            $('#current_password_error').removeAttr('style').attr('style', "color:red;").html(response.message);
+            $('#current_password_error').show();
+          } else if (response.success == true) {
+            window.location.href = "change_password.php";
+          }
         },
       });
     }

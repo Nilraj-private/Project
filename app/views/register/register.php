@@ -116,7 +116,7 @@ $cities = $model->select('city_location');
                   <div class="col-12">
                     <div class="form-group">
                       <label>Estimation Details</label>
-                      <textarea class="form-control" rows="3" name="customer_details" id="customer_details" placeholder="Enter Customer Update Details"></textarea>
+                      <textarea class="form-control" rows="3" name="customer_remarks" id="customer_remarks" placeholder="Enter Customer Update Details"></textarea>
                     </div>
                   </div>
 
@@ -267,7 +267,7 @@ $cities = $model->select('city_location');
 
                   <div class="col-12 mb-3">
                     <div class="form-check">
-                      <input type="checkbox" name="deliver_through_courier" id="deliver_through_courier" class="form-check-input">
+                      <input type="checkbox" name="deliver_through_courier" id="deliver_through_courier" class="form-check-input" >
                       <label class="form-check-label" for="deliver_through_courier">Deliver through courier</label>
                     </div>
                   </div>
@@ -286,7 +286,7 @@ $cities = $model->select('city_location');
 
                   <div class="col-6">
                     <div class="form-group">
-                      <button type="button" class="btn btn-success mr10" onclick="moveToOwtward();">Save</button>
+                      <button type="button" class="btn btn-success mr10" onclick="moveToOutward();">Save</button>
                     </div>
                   </div>
                 </div>
@@ -484,7 +484,7 @@ $cities = $model->select('city_location');
                                     <a href="javascript:void(0);" onclick="javascript:window.open('print_inward.php?id=<?= $case_register['id'] ?>&customer_id=<?= $case_register['customer_id'] ?>&city_id=<?= $case_register['customer_city_location'] ?>', '_Details', 'width=750, height=500, scrollbars=1, resizable=1');" style="pointer:cursor"><i class='fa fa-print mr5'></i> Print</a>
                                   </li>
                                   <li class="dropdown-item">
-                                    <a href="#" onclick="moveToOwtwardModal(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
+                                    <a href="#" onclick="moveToOutwardModal(<?= $case_register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
                                   </li>
                                 <?php } else { ?>
                                   <li class="dropdown-item">
@@ -570,11 +570,11 @@ $cities = $model->select('city_location');
       page_overlay.remove();
     }
 
-    function sendEstimateModal(inward_register_id, customer_id, estimate_amount, customer_details, approval_status) {
+    function sendEstimateModal(inward_register_id, customer_id, estimate_amount, customer_remarks, approval_status) {
       $('#customer_id').val(customer_id);
       $('#inward_register_id').val(inward_register_id);
       $('#estimate_amount').val(estimate_amount);
-      $('#customer_details').val(customer_details);
+      $('#customer_remarks').val(customer_remarks);
       $('#customer_estimate_status option[value="' + approval_status + '"]').prop('selected', true);
       $('#modal_send_estimate').modal();
     }
@@ -601,7 +601,7 @@ $cities = $model->select('city_location');
       }
     });
 
-    function moveToOwtwardModal(inward_register_id) {
+    function moveToOutwardModal(inward_register_id) {
       $('#inward_register_id_outward').val(inward_register_id);
       $('#modal_move_to_outward').modal();
     }
@@ -679,7 +679,7 @@ $cities = $model->select('city_location');
       });
     }
 
-    function moveToOwtward() {
+    function moveToOutward() {
       formData = $('#move_to_outward_form').serializeArray();
       $(showOverlay);
       $.ajax({
@@ -688,7 +688,7 @@ $cities = $model->select('city_location');
         data: {
           formData: formData,
           inward_register_id: $('#inward_register_id_outward').val(),
-          event_name: 'move_to_owtward'
+          event_name: 'move_to_outward'
         },
         success: function(response) {
           $(hideOverlay);
@@ -700,7 +700,8 @@ $cities = $model->select('city_location');
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
-      } else if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+      }
+      if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
         toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['error_message']); ?>"
       }

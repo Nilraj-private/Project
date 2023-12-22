@@ -15,7 +15,7 @@
                     <img src="<?= $_SESSION['url_path'] ?>/public/images/avtar.jpg" class="img-circle elevation-2" alt="User Image">
                 </div>
                 <div class="info online_txt">
-                    <a href="#" class="d-block">Hello, <?= ucwords($_SESSION['user_name']) ?></a>
+                    <a href="#" class="d-block">Hello, <?= (!isset($_SESSION['user_name'])) ? 'Super Admin' :  ucwords($_SESSION['user_name']) ?></a>
                 </div>
             </div>
 
