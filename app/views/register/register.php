@@ -47,7 +47,13 @@ if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'SuperAdmin') {
 }
 $join = ' LEFT JOIN customer as c on c.id=cr.customer_id ';
 // 'c.customer_city_location as customer_city_id',
-$case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name, c.customer_city_location', $where, $join);
+
+$recordsPerPage = 10;
+$currentPage = (isset($_GET['page'])) ? $_GET['page'] : 1;
+$totalCount = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name, c.customer_city_location,COUNT(*) AS total', $where, $join)[0]['total'];
+$totalPages = ceil($totalCount / $recordsPerPage);
+
+$case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name, c.customer_city_location', $where, $join, [], 10, (($currentPage * $recordsPerPage) - 10));
 $manufacturers = $model->select('device_manufacturer');
 $cities = $model->select('city_location');
 ?>
@@ -267,7 +273,7 @@ $cities = $model->select('city_location');
 
                   <div class="col-12 mb-3">
                     <div class="form-check">
-                      <input type="checkbox" name="deliver_through_courier" id="deliver_through_courier" class="form-check-input" >
+                      <input type="checkbox" name="deliver_through_courier" id="deliver_through_courier" class="form-check-input">
                       <label class="form-check-label" for="deliver_through_courier">Deliver through courier</label>
                     </div>
                   </div>
@@ -498,6 +504,65 @@ $cities = $model->select('city_location');
                       <?php } ?>
                     </tbody>
                   </table>
+
+                  <div class="row">
+                    <div class="col-6">
+                      Total Pages: <?= $totalPages ?>
+                    </div>
+                    <div class="col-6">
+                      <div class="paginator float-right">
+                        <ul class="pagination mb-1">
+                          <li class="paginate_button page-item <?= ($currentPage == 1) ? 'disabled' : '' ?>">
+                            <a href="<?= '?page=' . ($currentPage - 1) ?>" class="page-link">
+                              Previous
+                            </a>
+                          </li>
+                          <?php if ($totalPages < 11) {
+                            for ($i = 1; $i <= $totalPages; $i++) {
+                          ?>
+                              <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                <a href="<?= '?page=' . $i ?>" class="page-link">
+                                  <?= $i ?>
+                                </a>
+                              </li>
+                              <?php }
+                          } else {
+                            for ($i = 1; $i < $totalPages; $i++) {
+                              if ($i >= ($currentPage - 3) && $i < $currentPage) {
+                              ?>
+                                <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                  <a href="<?= '?page=' . $i ?>" class="page-link">
+                                    <?= $i ?>
+                                  </a>
+                                </li>
+                          <?php }
+                            }
+                          }
+                          ?>
+                          <li class="paginate_button page-item active">
+                            <a href="<?= '?page=' . $currentPage ?>" class="page-link">
+                              <?= $currentPage ?>
+                            </a>
+                          </li>
+                          <?php for ($i = 1; $i < $totalPages; $i++) {
+                            if ($i <= ($currentPage + 3) && $i > $currentPage) { ?>
+                              <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                <a href="<?= '?page=' . $i ?>" class="page-link">
+                                  <?= $i ?>
+                                </a>
+                              </li>
+                          <?php
+                            }
+                          } ?>
+                          <li class="paginate_button page-item <?= ($currentPage == $totalPages) ? 'disabled' : '' ?>">
+                            <a href="<?= '?page=' . ($currentPage + 1) ?>" class="page-link">
+                              Next
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -712,17 +777,10 @@ $cities = $model->select('city_location');
         "responsive": true,
         "lengthChange": false,
         "autoWidth": false,
+        "bPaginate": false,
+        "info": false,
         "buttons": "<?= (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'SuperAdmin') ?>" ? ["copy", "csv", "excel", "pdf", "print", "colvis"] : []
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-      $('#example2').DataTable({
-        "paging": true,
-        "lengthChange": false,
-        "searching": false,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "responsive": true,
-      });
     });
 
     $(function() {

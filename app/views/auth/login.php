@@ -1,10 +1,11 @@
-<?php 
+<?php
 
 $is_login_page = 1;
 
 include('../template/head.php');
 
 ?>
+
 <body class="hold-transition login-page">
     <div class="login-box">
         <div class="card">
@@ -68,6 +69,10 @@ include('../template/head.php');
             if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
                 toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
                 var unnset = "<?php unset($_SESSION['success_message']); ?>"
+            }
+            if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
+                toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
+                var unnset = "<?php unset($_SESSION['error_message']); ?>"
             }
         })
     </script>

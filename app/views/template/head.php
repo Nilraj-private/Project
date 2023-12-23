@@ -36,7 +36,7 @@ $_SESSION['url_path'] = 'https://recoveryourdata.co.in/module1';
   <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
   <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/css/adminlte.min.css">
-  <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css?v=1.0.1" />
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css?v=1.0.1" />
 
   <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
   <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
