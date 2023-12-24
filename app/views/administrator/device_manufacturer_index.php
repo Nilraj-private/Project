@@ -85,7 +85,7 @@ $manufacturers = $model->select("device_manufacturer");
                                   <a href="form_device_manufacturer.php?id=<?= $manufacturer['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Details</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a type="button" onclick="deleteManufacturer(<?= $manufacturer['id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete Record</a>
+                                  <a href="javascript:void(0)" type="button" onclick="deleteManufacturer(<?= $manufacturer['id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete Record</a>
                                 </li>
                               </ul>
                             </div>

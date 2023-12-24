@@ -8,8 +8,8 @@ use app\models\Model;
 $_SESSION['page'] = 'user_index.php';
 
 $model = (new Model());
-$join = " left join city_location as cl on cl.id=e.employee_city_location ";
-$employees = $model->select('employee as e', ' e.*,cl.city_name ', '', $join);
+$join = " left join city_location as cl on cl.id=e.employee_city_location left join user as u on u.id= e.user_id ";
+$employees = $model->select('employee as e', ' e.*,cl.city_name,u.is_active ', '', $join);
 $cities = $model->select('city_location');
 ?>
 
@@ -102,7 +102,7 @@ $cities = $model->select('city_location');
                           <td><?= $employee['employee_mobile_no1'] ?></td>
                           <td><?= $employee['city_name'] ?> </td>
                           <td>
-                            <!-- <small class="badge badge-danger">Block</small> -->
+                            <small class="badge badge-<?= ($employee['is_active'] == 1) ? 'primary' : 'danger' ?>"><?= ($employee['is_active'] == 1) ? 'Active' : 'Block' ?></small>
                           </td>
                           <td>
                             <div class="input-group-prepend">
@@ -112,16 +112,16 @@ $cities = $model->select('city_location');
                                   <a href="user_employee_form.php?id=<?= $employee['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Details</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a>
+                                  <a href="../auth/change_password.php?id=<?= $employee['user_id'] ?>&type=employee"><i class='fa fa-user mr5'></i> Reset Password</a>
                                 </li>
                                 <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'SuperAdmin') { ?>
-                                  <!-- <li class="dropdown-item">
-                                    <a type="button" onclick="blockUnblockUser(<?= $employee['id'] ?>,<?= $employee['is_active'] ?>)"><i class='fa fa-trash-o mr5'></i> <?= ($employee['is_active'] == 1) ? 'Block' : 'Unblock' ?></a>
-                                  </li> -->
+                                  <li class="dropdown-item">
+                                    <a href="javascript:void(0)" type="button" onclick="blockUnblockUser(<?= $employee['id'] ?>,<?= $employee['is_active'] ?>)"><i class='fa fa-trash-o mr5'></i> <?= ($employee['is_active'] == 1) ? 'Block' : 'Unblock' ?></a>
+                                  </li>
                                 <?php } ?>
                                 <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'SuperAdmin') { ?>
                                   <li class="dropdown-item">
-                                    <a type="button" onclick="deleteEmployee(<?= $employee['id'] ?>,<?= $employee['employee_email_id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete</a>
+                                    <a href="javascript:void(0)" type="button" onclick="deleteEmployee(<?= $employee['id'] ?>,<?= $employee['employee_email_id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete</a>
                                   </li>
                                 <?php } ?>
                               </ul>
@@ -185,7 +185,7 @@ $cities = $model->select('city_location');
     function blockUnblockUser(user_id, block_status) {
       if (block_status) {
         var message = 'Block this user';
-      }else{
+      } else {
         var message = 'Unblock this user';
       }
       if (confirm('Are you sure you want to ' + message + '?'))

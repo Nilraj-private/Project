@@ -77,9 +77,11 @@ $cities = $model->select("city_location");
                             <div class="input-group-prepend center_m">
                               <button type="button" class="btn btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Action</button>
                               <ul class="dropdown-menu">
-                                <li class="dropdown-item"><a href="form_city.php?id=<?= $city['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit City</a>
+                                <li class="dropdown-item">
+                                  <a href="form_city.php?id=<?= $city['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit City</a>
                                 </li>
-                                <li class="dropdown-item"><a type="button" onclick="deleteCity(<?= $city['id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete City</a>
+                                <li class="dropdown-item">
+                                  <a href="javascript:void(0)" type="button" onclick="deleteCity(<?= $city['id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete City</a>
                                 </li>
                               </ul>
                             </div>

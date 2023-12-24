@@ -90,7 +90,7 @@
                     <table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background: #fff; margin: 0; padding: 0; border: 1px solid #e9e9e9;">
                         <tr style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">
                             <td class="alert alert-warning" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; color: #222; font-weight:bold; text-align: center; border-radius: 3px 3px 0 0;  margin: 0; padding: 20px;" align="center" valign="top">
-                                <strong>Estimation Detail for Data Recovery (Inward#<?= $model['id']; ?>)</strong>
+                                <strong>Data tree structure for Data Recovery (Inward#<?= $model['id']; ?>)</strong>
                             </td>
                         </tr>
                         <tr style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">
@@ -103,12 +103,6 @@
                                                 We have completed the recovery process of your media drive.
                                                 Kindly find the attached data tree structure file for your approval.
                                             </p>
-                                            <?php if (isset($model['customer_remarks'])) : ?>
-                                                <strong>Estimation and Details:</strong>
-                                                <p style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; color: #222; font-weight:bold;  margin: 0; padding: 20px;" align="left" valign="top">
-                                                    <?= $model['customer_remarks']; ?>
-                                                </p>
-                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 </table>

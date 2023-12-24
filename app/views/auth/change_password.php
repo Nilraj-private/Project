@@ -171,15 +171,20 @@ $_SESSION['page'] = 'change_password.php';
           current_password: $('#current_password').val(),
           new_password: $('#new_password').val(),
           confirm_password: $('#confirm_password').val(),
-          id: "<?= $_SESSION['user_id'] ?? 0 ?>"
+          id: "<?= (isset($_REQUEST['id'])) ? $_REQUEST['id'] : $_SESSION['user_id'] ?>",
+          reset_type: "<?= (isset($_REQUEST['type'])) ? $_REQUEST['type'] : 'super_admin' ?>"
         },
         dataType: "json",
         success: function(response) {
           if (response.success == false) {
             $('#current_password_error').removeAttr('style').attr('style', "color:red;").html(response.message);
             $('#current_password_error').show();
-          } else if (response.success == true) {
+          } else if (response.success == true && response.reset_type == 'super_admin') {
             window.location.href = "change_password.php";
+          } else if (response.success == true && response.reset_type == 'employee') {
+            window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/administrator/user_index.php";
+          } else if (response.success == true && response.reset_type == 'customer') {
+            window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/customer/customer_index.php";
           }
         },
       });

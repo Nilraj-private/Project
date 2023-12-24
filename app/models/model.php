@@ -27,7 +27,7 @@ class Model
     $_SESSION['smtp_from_email'] = 'recovery@gmail.com';
   }
 
-  function select($tableName, $select = '*', $where = '', $join = '', $data = [], $limit = '',$offset = 0)
+  function select($tableName, $select = '*', $where = '', $join = '', $data = [], $limit = '', $offset = 0)
   {
     $sql = "Select $select From $tableName";
 
@@ -241,7 +241,7 @@ class Model
     }
     if ($result) {
       $_SESSION['success_message'] = $title . ' successfully';
-      if (isset($dataArray['event_name']) && ($dataArray['event_name'] == 'move_to_outward' || $dataArray['event_name'] == 'send_estimate' || $dataArray['event_name'] == 'send_data_tree')) {
+      if (isset($dataArray['event_name']) && ($dataArray['event_name'] == 'move_to_outward' || ($dataArray['event_name'] == 'send_estimate'  && isset($dataArray['send_email'])) || ($dataArray['event_name'] == 'send_data_tree' && isset($dataArray['send_email'])))) {
         $inward_device = $this->select($tableName, '*', 'id=' . $dataArray["inward_register_id"], '', '', 1)[0];
         $customer = $this->select('customer', '*', "id = " . $inward_device['customer_id'] ?? 0)[0];
         $modelArray = array_merge($customer, $inward_device);
@@ -266,7 +266,7 @@ class Model
             $this->generateWhatsappMessage($modelArray, 'Send Estimation');
           }
         } elseif ($dataArray['event_name'] == 'send_data_tree') {
-          $this->sendMail($customer['customer_primary_email_id'], "Device Data Recovery Tree Structure (Inward #{$modelArray['id']}) - Ni-Ki Data Recovery Services", 'email/send_data_tree_structure.php', $modelArray, '', true,$_FILES['dataTreeFile']['tmp_name']);
+          $this->sendMail($customer['customer_primary_email_id'], "Device Data Recovery Tree Structure (Inward #{$modelArray['id']}) - Ni-Ki Data Recovery Services", 'email/send_data_tree_structure.php', $modelArray, '', true, $_FILES['dataTreeFile']['tmp_name'], $_FILES['dataTreeFile']['name']);
 
           $this->generateWhatsappMessage($modelArray, 'Data Tree Structure');
         }
@@ -345,15 +345,14 @@ class Model
   {
     $user = $this->select('user', '*', ' id=' . $data['id'])[0];
     if ($user['password'] == md5($data['current_password'])) {
-      $this->update('user', ['id' => $data['id'], 'password' => md5($data['new_password'])], 'Password changed ');
-
-      return ['success' => true];
+      $this->update('user', ['id' => $data['id'], 'password' => md5($data['new_password'])], 'Password changed');
+      return ['success' => true, 'reset_type' => $data['reset_type']];
     } else {
       return ['success' => false, 'message' => 'Current password is incorrect'];
     }
   }
 
-  function sendMail($to, $subject, $view, $modelArray, $redirect = '', $html = true, $attachment = "")
+  function sendMail($to, $subject, $view, $modelArray, $redirect = '', $html = true, $attachmentTempName = "", $attachmentName = "")
   {
     require_once "../../vendor/autoload.php";
 
@@ -385,8 +384,8 @@ class Model
     $mail->Subject  = $subject;
     $mail->AltBody    = "To view the message, please use an HTML compatible email viewer!";
     $mail->WordWrap   = 80;
-    if (!empty($attachment)) {
-      $mail->AddAttachment($attachment);
+    if (!empty($attachmentTempName)) {
+      $mail->AddAttachment($attachmentTempName, $attachmentName);
     }
 
     $body = $this->render($modelArray, $view);

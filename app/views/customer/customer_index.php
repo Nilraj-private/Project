@@ -164,14 +164,14 @@ $cities = $model->select('city_location');
                                   <a href="customer_form.php?id=<?= $customer['id'] ?>"><i class="fa fa-pencil mr5"></i> Edit Customer</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a onclick="viewCustomerInward(<?= $customer['id'] ?>)" style="cursor: pointer;color: #007bff;"><i class='fa fa-inbox mr5'></i> View Inward</a>
+                                  <a href="javascript:void(0)" onclick="viewCustomerInward(<?= $customer['id'] ?>)" style="cursor: pointer;color: #007bff;"><i class='fa fa-inbox mr5'></i> View Inward</a>
                                 </li>
                                 <li class="dropdown-divider"></li>
                                 <li class="dropdown-item">
-                                  <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a>
+                                  <a href="../auth/change_password.php?id=<?= $customer['user_id'] ?>&type=customer"><i class='fa fa-user mr5'></i> Reset Password</a>
                                 </li>
                                 <li class="dropdown-item">
-                                  <a type="button" onclick="deleteCustomer(<?= $customer['id'] ?>,'<?= $customer['customer_primary_email_id'] ?>')" style="cursor: pointer;color: #007bff;"><i class='fa fa-trash-o mr5'></i> Delete Customer</a>
+                                  <a href="javascript:void(0)" type="button" onclick="deleteCustomer(<?= $customer['id'] ?>,'<?= $customer['customer_primary_email_id'] ?>')" style="cursor: pointer;color: #007bff;"><i class='fa fa-trash-o mr5'></i> Delete Customer</a>
                                 </li>
                               </ul>
                             </div>
