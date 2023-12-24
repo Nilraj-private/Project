@@ -12,6 +12,7 @@ class Model
   var $username = "recovery_demo";
   var $password = "-pW+@vC;soxy";
   var $conn = '';
+  var $API_KEY = 'eGNMdHhRUjlkc2lHZ0FkUVNRZ2pLOW13MENSNGJGSHJROUZIVFRSRmwwRTo=';
 
   function __construct()
   {
@@ -26,7 +27,7 @@ class Model
     $_SESSION['smtp_from_email'] = 'recovery@gmail.com';
   }
 
-  function select($tableName, $select = '*', $where = '', $join = '', $data = [], $limit = '')
+  function select($tableName, $select = '*', $where = '', $join = '', $data = [], $limit = '',$offset = 0)
   {
     $sql = "Select $select From $tableName";
 
@@ -41,7 +42,7 @@ class Model
     $sql .= ' ORDER BY id DESC ';
 
     if (!empty($limit)) {
-      $sql .= " LIMIT 1 OFFSET 0 ";
+      $sql .= " LIMIT $limit OFFSET $offset ";
     }
 
     $result = mysqli_query($this->conn, $sql);
@@ -211,6 +212,9 @@ class Model
           $update .= ' ,case_result = 0';
         }
         $update .= $where;
+      } else if ($dataArray["event_name"] == "send_data_tree" && isset($dataArray['case_result'])) {
+        $update = ' case_result=1 where id =' . $dataArray['inward_register_id'];
+        self::insert('action_history', ['case_register_id' => $dataArray['inward_register_id'], 'action_title' => 'Data Tree', 'action_description' => 'Data recovery file tree has been sent.', 'visibility_type' => 'PRIVATE'], '');
       }
     } else {
       foreach ($dataArray as $column => $data) {
@@ -229,12 +233,15 @@ class Model
       }
       $update .= " WHERE id = " . $dataArray['id'];
     }
-    $sql = "UPDATE $tableName SET $update";
-    $result = mysqli_query($this->conn, $sql);
-
+    if (!empty($update)) {
+      $sql = "UPDATE $tableName SET $update";
+      $result = mysqli_query($this->conn, $sql);
+    } else {
+      $result = 1;
+    }
     if ($result) {
       $_SESSION['success_message'] = $title . ' successfully';
-      if (isset($dataArray['event_name']) && ($dataArray['event_name'] == 'move_to_outward' || $dataArray['event_name'] == 'send_estimate')) {
+      if (isset($dataArray['event_name']) && ($dataArray['event_name'] == 'move_to_outward' || $dataArray['event_name'] == 'send_estimate' || $dataArray['event_name'] == 'send_data_tree')) {
         $inward_device = $this->select($tableName, '*', 'id=' . $dataArray["inward_register_id"], '', '', 1)[0];
         $customer = $this->select('customer', '*', "id = " . $inward_device['customer_id'] ?? 0)[0];
         $modelArray = array_merge($customer, $inward_device);
@@ -258,6 +265,10 @@ class Model
 
             $this->generateWhatsappMessage($modelArray, 'Send Estimation');
           }
+        } elseif ($dataArray['event_name'] == 'send_data_tree') {
+          $this->sendMail($customer['customer_primary_email_id'], "Device Data Recovery Tree Structure (Inward #{$modelArray['id']}) - Ni-Ki Data Recovery Services", 'email/send_data_tree_structure.php', $modelArray, '', true,$_FILES['dataTreeFile']['tmp_name']);
+
+          $this->generateWhatsappMessage($modelArray, 'Data Tree Structure');
         }
       }
 
@@ -351,7 +362,7 @@ class Model
     // $SENDER_USERNAME = "authorise@recoveryourdata.co.in";
     // $SENDER_PWD = "Girirajbawa@nathdwara*";
     $MAIL_HOST = "sandbox.smtp.mailtrap.io";
-    $MAIL_PORT = "2525";
+    $MAIL_PORT = "587";
     $SENDER_USERNAME = "9f51d16c8abf51";
     $SENDER_PWD = "75c10c91473816";
 

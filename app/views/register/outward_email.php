@@ -99,7 +99,7 @@
                                 <table width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">
                                     <tr style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">
                                         <td class="content-block" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">
-                                            <strong>Dear <?= $model['customer_name']; ?></strong><br><br>
+                                            <strong>Dear <?= $model['customer_name']; ?>,</strong><br><br>
                                             <p style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; color: #222; font-weight:bold;  margin: 0; padding: 20px; width:130%;" align="center">
                                                 Your media drive(Inward#<?php echo $model['id']; ?>) has been outward from our office with following details :
                                             </p>

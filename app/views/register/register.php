@@ -154,7 +154,7 @@ $cities = $model->select('city_location');
         </div>
       </div>
 
-      <div class="modal fade" id="modal-send-datatree">
+      <div class="modal fade" id="modal_send_data_tree">
         <div class="modal-dialog modal-sm">
           <div class="modal-content">
             <div class="modal-header">
@@ -164,33 +164,36 @@ $cities = $model->select('city_location');
               </button>
             </div>
             <div class="modal-body">
-              <div class="row">
-                <div class="col-12 mb-3">
-                  <div class="custom-file ">
-                    <input type="file" class="form-control" id="exampleInputFile">
+              <form id="data_tree_form" enctype="multipart/form-data">
+                <input type="hidden" name="inward_register_id" id="inward_register_id_data_tree" value="">
+                <input type="hidden" name="type" id="type" value="<?= (isset($_REQUEST['type']) ? $_REQUEST['type'] : '') ?>">
+                <input type="hidden" name="event_name" id="event_name" value="send_data_tree">
+                <div class="row">
+                  <div class="col-12 mb-3">
+                    <div class="custom-file ">
+                      <input type="file" class="form-control" name="dataTreeFile" id="dataTreeFile">
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12 mb-3">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                    <label class="form-check-label" for="exampleCheck1">Is Data Recovered</label>
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" name="case_result" id="exampleCheck1">
+                      <label class="form-check-label" for="exampleCheck1">Is Data Recovered</label>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12 mb-3">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="exampleCheck2">
-                    <label class="form-check-label" for="exampleCheck1">Send Email</label>
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" name="send_email" id="send_email">
+                      <label class="form-check-label" for="send_email">Send Email</label>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-6">
-                  <div class="form-group">
-                    <input class="submit btn btn-success" type="submit" name="yt0" value="Save">
+                  <div class="col-6">
+                    <button type="button" class="btn btn-success mr10" onclick="sendDataTree();">Save</button>
                   </div>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -482,9 +485,9 @@ $cities = $model->select('city_location');
                                   <li class="dropdown-item">
                                     <a href="#" onclick="addStorageDetailModal('<?= $case_register['id'] ?>','<?= $case_register['sd_hddno'] ?>','<?= $case_register['sd_size'] ?>','<?= $case_register['sd_remarks'] ?>','<?= $case_register['case_result'] ?>')"><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
                                   </li>
-                                  <!-- <li class="dropdown-item">
-                                    <a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a>
-                                  </li> -->
+                                  <li class="dropdown-item">
+                                    <a href="#" onclick="sendDataTreeModal('<?= $case_register['id'] ?>')"><i class='fa fa-cog mr5'></i> Send Data Tree</a>
+                                  </li>
                                   <li class="dropdown-divider"></li>
                                   <li class="dropdown-item">
                                     <a href="javascript:void(0);" onclick="javascript:window.open('print_inward.php?id=<?= $case_register['id'] ?>&customer_id=<?= $case_register['customer_id'] ?>&city_id=<?= $case_register['customer_city_location'] ?>', '_Details', 'width=750, height=500, scrollbars=1, resizable=1');" style="pointer:cursor"><i class='fa fa-print mr5'></i> Print</a>
@@ -535,23 +538,23 @@ $cities = $model->select('city_location');
                                     <?= $i ?>
                                   </a>
                                 </li>
-                          <?php }
+                            <?php }
                             }
-                          }
-                          ?>
-                          <li class="paginate_button page-item active">
-                            <a href="<?= '?page=' . $currentPage ?>" class="page-link">
-                              <?= $currentPage ?>
-                            </a>
-                          </li>
-                          <?php for ($i = 1; $i < $totalPages; $i++) {
-                            if ($i <= ($currentPage + 3) && $i > $currentPage) { ?>
-                              <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                <a href="<?= '?page=' . $i ?>" class="page-link">
-                                  <?= $i ?>
-                                </a>
-                              </li>
+                            ?>
+                            <li class="paginate_button page-item active">
+                              <a href="<?= '?page=' . $currentPage ?>" class="page-link">
+                                <?= $currentPage ?>
+                              </a>
+                            </li>
+                            <?php for ($i = 1; $i < $totalPages; $i++) {
+                              if ($i <= ($currentPage + 3) && $i > $currentPage) { ?>
+                                <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                  <a href="<?= '?page=' . $i ?>" class="page-link">
+                                    <?= $i ?>
+                                  </a>
+                                </li>
                           <?php
+                              }
                             }
                           } ?>
                           <li class="paginate_button page-item <?= ($currentPage == $totalPages) ? 'disabled' : '' ?>">
@@ -666,11 +669,6 @@ $cities = $model->select('city_location');
       }
     });
 
-    function moveToOutwardModal(inward_register_id) {
-      $('#inward_register_id_outward').val(inward_register_id);
-      $('#modal_move_to_outward').modal();
-    }
-
     $('.select-all').click(function() {
       if ($('.select-all:checked')[0]) {
         $('input[name="id[]"]').attr('checked', true);
@@ -700,6 +698,41 @@ $cities = $model->select('city_location');
         // });
       }
     });
+
+    function moveToOutwardModal(inward_register_id) {
+      $('#inward_register_id_outward').val(inward_register_id);
+      $('#modal_move_to_outward').modal();
+    }
+
+    function sendDataTreeModal(inward_register_id) {
+      $('#inward_register_id_data_tree').val(inward_register_id);
+      $('#modal_send_data_tree').modal();
+    }
+
+    $("input[type='file']").on("change", function() {
+      if (this.files[0].size > 15728640) {
+        alert("Please upload file less than 15MB. Thanks!!");
+        $(this).val('');
+      }
+    });
+
+    function sendDataTree() {
+      $(showOverlay);
+      var formData = new FormData($('#data_tree_form')[0]);
+
+      $.ajax({
+        url: '../../controllers/EmailController.php', // PHP script to handle the file upload
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+          console.log(response);
+          $(hideOverlay);
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>";
+        }
+      });
+    }
 
     function sendEstimate() {
       formData = $('#send_estimate_form').serializeArray();

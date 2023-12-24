@@ -210,23 +210,23 @@ $cities = $model->select('city_location');
                                     <?= $i ?>
                                   </a>
                                 </li>
-                          <?php }
+                            <?php }
                             }
-                          }
-                          ?>
-                          <li class="paginate_button page-item active">
-                            <a href="<?= '?page=' . $currentPage ?>" class="page-link">
-                              <?= $currentPage ?>
-                            </a>
-                          </li>
-                          <?php for ($i = 1; $i < $totalPages; $i++) {
-                            if ($i <= ($currentPage + 3) && $i > $currentPage) { ?>
-                              <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                <a href="<?= '?page=' . $i ?>" class="page-link">
-                                  <?= $i ?>
-                                </a>
-                              </li>
+                            ?>
+                            <li class="paginate_button page-item active">
+                              <a href="<?= '?page=' . $currentPage ?>" class="page-link">
+                                <?= $currentPage ?>
+                              </a>
+                            </li>
+                            <?php for ($i = 1; $i < $totalPages; $i++) {
+                              if ($i <= ($currentPage + 3) && $i > $currentPage) { ?>
+                                <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                  <a href="<?= '?page=' . $i ?>" class="page-link">
+                                    <?= $i ?>
+                                  </a>
+                                </li>
                           <?php
+                              }
                             }
                           } ?>
                           <li class="paginate_button page-item <?= ($currentPage == $totalPages) ? 'disabled' : '' ?>">

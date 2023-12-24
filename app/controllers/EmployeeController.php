@@ -11,6 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         return $model->update('employee', $_POST, 'Employee updated');
     } else if (isset($_POST["delete_id"])) {
         return $model->delete('employee', $_POST);
+    } else if (isset($_POST["event_name"])) {
+        return $model->update('user', $_POST);
     } else {
         return $model->insert('employee', $_POST['formData']);
     }

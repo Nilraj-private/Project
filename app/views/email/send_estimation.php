@@ -99,7 +99,7 @@
                                 <table width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">
                                     <tr style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">
                                         <td class="content-block" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
-                                            <strong>Dear <?= $model['customer_name']; ?></strong><br><br>
+                                            <strong>Dear <?= $model['customer_name']; ?>,</strong><br><br>
                                             <p style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; color: #222; font-weight:bold;  margin: 0; padding: 20px;" align="center" valign="top">
                                                 We have completed analysis process of your media drive, and data recovery charges for the same shall be Rs. <?= $model['estimate_amount']; ?> (18% GST extra)
                                             </p>

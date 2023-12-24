@@ -115,6 +115,11 @@ $cities = $model->select('city_location');
                                   <a href="#"><i class='fa fa-user mr5'></i> Reset Password</a>
                                 </li>
                                 <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'SuperAdmin') { ?>
+                                  <!-- <li class="dropdown-item">
+                                    <a type="button" onclick="blockUnblockUser(<?= $employee['id'] ?>,<?= $employee['is_active'] ?>)"><i class='fa fa-trash-o mr5'></i> <?= ($employee['is_active'] == 1) ? 'Block' : 'Unblock' ?></a>
+                                  </li> -->
+                                <?php } ?>
+                                <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'SuperAdmin') { ?>
                                   <li class="dropdown-item">
                                     <a type="button" onclick="deleteEmployee(<?= $employee['id'] ?>,<?= $employee['employee_email_id'] ?>)"><i class='fa fa-trash-o mr5'></i> Delete</a>
                                   </li>
@@ -176,6 +181,27 @@ $cities = $model->select('city_location');
         var unnset = "<?php unset($_SESSION['error_message']); ?>"
       }
     })
+
+    function blockUnblockUser(user_id, block_status) {
+      if (block_status) {
+        var message = 'Block this user';
+      }else{
+        var message = 'Unblock this user';
+      }
+      if (confirm('Are you sure you want to ' + message + '?'))
+        $.ajax({
+          type: "POST",
+          url: "../../controllers/EmployeeController.php",
+          data: {
+            user_id: user_id,
+            block_status: block_status,
+            event_name: 'user_block_unblock'
+          },
+          success: function(response) {
+            location.reload(true);
+          }
+        });
+    }
 
     function deleteEmployee(delete_id, employee_primary_email_id) {
       if (confirm('Are you sure you want to delete employee?'))
