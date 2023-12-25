@@ -727,7 +727,6 @@ $cities = $model->select('city_location');
         processData: false,
         contentType: false,
         success: function(response) {
-          console.log(response);
           $(hideOverlay);
           window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>";
         }

@@ -71,8 +71,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
         </div><!-- /.container-fluid -->
       </section>
 
-      <!-- modal -->
-      <div class="modal fade" id="modal-send-datatree">
+      <div class="modal fade" id="modal_send_data_tree">
         <div class="modal-dialog modal-sm">
           <div class="modal-content">
             <div class="modal-header">
@@ -82,33 +81,36 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
               </button>
             </div>
             <div class="modal-body">
-              <div class="row">
-                <div class="col-12 mb-3">
-                  <div class="custom-file ">
-                    <input type="file" class="form-control" id="exampleInputFile">
+              <form id="data_tree_form" enctype="multipart/form-data">
+                <input type="hidden" name="inward_register_id" id="inward_register_id_data_tree" value="">
+                <input type="hidden" name="type" id="type" value="<?= (isset($_REQUEST['type']) ? $_REQUEST['type'] : '') ?>">
+                <input type="hidden" name="event_name" id="event_name" value="send_data_tree">
+                <div class="row">
+                  <div class="col-12 mb-3">
+                    <div class="custom-file ">
+                      <input type="file" class="form-control" name="dataTreeFile" id="dataTreeFile">
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12 mb-3">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                    <label class="form-check-label" for="exampleCheck1">Is Data Recovered</label>
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" name="case_result" id="exampleCheck1">
+                      <label class="form-check-label" for="exampleCheck1">Is Data Recovered</label>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12 mb-3">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="exampleCheck2">
-                    <label class="form-check-label" for="exampleCheck1">Send Email</label>
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" name="send_email" id="send_email">
+                      <label class="form-check-label" for="send_email">Send Email</label>
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-6">
-                  <div class="form-group">
-                    <input class="submit btn btn-success" type="submit" name="yt0" value="Save">
+                  <div class="col-6">
+                    <button type="button" class="btn btn-success mr10" onclick="sendDataTree();">Save</button>
                   </div>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -299,7 +301,9 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                           <li class="dropdown-item">
                             <a href="#" onclick="addStorageDetailModal('<?= $register['id'] ?>','<?= $register['sd_hddno'] ?>','<?= $register['sd_size'] ?>','<?= $register['sd_remarks'] ?>','<?= $register['case_result'] ?>')"><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
                           </li>
-                          <!-- <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#modal-send-datatree"><i class='fa fa-cog mr5'></i> Send Data Tree</a></li> -->
+                          <li class="dropdown-item">
+                            <a href="#" onclick="sendDataTreeModal('<?= $register['id'] ?>')"><i class='fa fa-cog mr5'></i> Send Data Tree</a>
+                          </li>
                           <li class="dropdown-divider"></li>
                           <li class="dropdown-item">
                             <a href="#" onclick="moveToOutwardModal(<?= $register['id'] ?>)"><i class='fa fa-sign-out mr5'></i> Move to Outward</a>
@@ -619,6 +623,28 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
     function moveToOutwardModal(inward_register_id) {
       $('#inward_register_id_outward').val(inward_register_id);
       $('#modal_move_to_outward').modal();
+    }
+
+    function sendDataTreeModal(inward_register_id) {
+      $('#inward_register_id_data_tree').val(inward_register_id);
+      $('#modal_send_data_tree').modal();
+    }
+
+    function sendDataTree() {
+      $(showOverlay);
+      var formData = new FormData($('#data_tree_form')[0]);
+
+      $.ajax({
+        url: '../../controllers/EmailController.php', // PHP script to handle the file upload
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+          $(hideOverlay);
+          window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/see_details.php" + "<?= isset($_GET['id']) ? '?id=' . $_GET['id'] : '' ?>";
+        }
+      });
     }
 
     function sendEstimateModal(inward_register_id, customer_id, estimate_amount, customer_details, approval_status) {

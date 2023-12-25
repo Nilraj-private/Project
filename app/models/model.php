@@ -214,7 +214,12 @@ class Model
         $update .= $where;
       } else if ($dataArray["event_name"] == "send_data_tree" && isset($dataArray['case_result'])) {
         $update = ' case_result=1 where id =' . $dataArray['inward_register_id'];
-        self::insert('action_history', ['case_register_id' => $dataArray['inward_register_id'], 'action_title' => 'Data Tree', 'action_description' => 'Data recovery file tree has been sent.', 'visibility_type' => 'PRIVATE'], '');
+        if (isset($dataArray['send_email'])) {
+          $action_description = "Data recovery file tree has been sent.";
+        } else {
+          $action_description = "Register status updated successfully.";
+        }
+        self::insert('action_history', ['case_register_id' => $dataArray['inward_register_id'], 'action_title' => 'Data Tree', 'action_description' => $action_description, 'visibility_type' => 'PRIVATE'], '');
       }
     } else {
       foreach ($dataArray as $column => $data) {
@@ -318,24 +323,28 @@ class Model
       while ($row = mysqli_fetch_assoc($result)) {
         $data[] = $row;
       }
+      if ($data[0]['is_active']) {
+        if ($data[0]['user_type'] == 'Employee') {
+          $user = "SELECT employee_name as user_name,employee_city_location as city FROM employee Where user_id= '" . $data[0]['id'] . "'";
+        } elseif ($data[0]['user_type'] == 'Customer') {
+          $user = "SELECT company_name as user_name,customer_city_location as city FROM customer Where user_id= '" . $data[0]['id'] . "'";
+        }
 
-      if ($data[0]['user_type'] == 'Employee') {
-        $user = "SELECT employee_name as user_name,employee_city_location as city FROM employee Where user_id= '" . $data[0]['id'] . "'";
-      } elseif ($data[0]['user_type'] == 'Customer') {
-        $user = "SELECT company_name as user_name,customer_city_location as city FROM customer Where user_id= '" . $data[0]['id'] . "'";
+        if (isset($user)) {
+          $userResult = mysqli_query($this->conn, $user);
+          $userData = mysqli_fetch_assoc($userResult);
+          $_SESSION['user_name'] = $userData['user_name'];
+          $_SESSION['user_city'] = $userData['city'];
+        }
+
+        $_SESSION['success_message'] = 'Login successfully';
+        $_SESSION['user_id'] = $data[0]['id'];
+        $_SESSION['user_type'] = $data[0]['user_type'];
+        return true;
+      } else {
+        $_SESSION['error_message'] = 'Please contact admin to UnBlock your user!!';
+        return ['success' => 'false'];
       }
-
-      if (isset($user)) {
-        $userResult = mysqli_query($this->conn, $user);
-        $userData = mysqli_fetch_assoc($userResult);
-        $_SESSION['user_name'] = $userData['user_name'];
-        $_SESSION['user_city'] = $userData['city'];
-      }
-
-      $_SESSION['success_message'] = 'Login successfully';
-      $_SESSION['user_id'] = $data[0]['id'];
-      $_SESSION['user_type'] = $data[0]['user_type'];
-      return true;
     } else {
       return ['success' => 'false'];
     }
