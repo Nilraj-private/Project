@@ -45,6 +45,7 @@ $_SESSION['url_path'] = 'https://recoveryourdata.co.in/module1';
   <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.css">
   <script src="https://kit.fontawesome.com/016e38d5fa.js" crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-
   
+  <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/select2/css/select2.min.css">
+  <link rel="stylesheet" href="<?= $_SESSION['url_path'] ?>/public/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 </head>

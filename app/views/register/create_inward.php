@@ -16,8 +16,9 @@ $customers = $model->select("customer", '*', $where);
 $manufacturers = $model->select("device_manufacturer");
 $cities = $model->select("city_location");
 
-if (isset($_GET['id'])) {
-  $inward = $model->select('case_register', '*', ' id=' . $_GET['id'])[0];
+if (isset($_REQUEST['id'])) {
+  $join = ' left join customer as c on c.id=cr.customer_id ';
+  $inward = $model->select('case_register as cr', 'cr.*, c.company_name', ' cr.id=' . $_REQUEST['id'], $join)[0];
 }
 ?>
 <style>
@@ -104,11 +105,7 @@ if (isset($_GET['id'])) {
                       <div class="col-6">
                         <select class="form-control" name="customer_id" id="customer_id" required>
                           <option value="">Select Client</option>
-                          <?php foreach ($customers as $customer) { ?>
-                            <option value="<?= $customer['id'] ?>" <?= (($inward['customer_id'] ?? '') == $customer['id']) ? 'selected' : '' ?>><?= $customer['company_name'] ?></option>
-                          <?php } ?>
                         </select>
-                        <!-- <input class="lh30" name="customer_id" id="CaseRegister_customer_id" type="search" /> -->
                         <div class="errorMessage" id="customer_id_error" style="display:none"></div>
                       </div>
 
@@ -116,7 +113,7 @@ if (isset($_GET['id'])) {
                         <button type="button" class="btn btn-primary wid100" data-toggle="modal" data-target="#modal-lg"><i class="fa fa-plus"></i> Add Customer </button>
                       </div>
                       <div class="col-2 res_mt10 new_col">
-                        <a type="button" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] : '' ?>" class="btn btn-default wid100"><i class="fa fa-inbox"></i> Inward List</a>
+                        <a type="button" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_REQUEST['type'])) ? '?type=' . $_REQUEST['type'] : '' ?>" class="btn btn-default wid100"><i class="fa fa-inbox"></i> Inward List</a>
                       </div>
                     </div>
                   </div>
@@ -274,13 +271,13 @@ if (isset($_GET['id'])) {
                       </div>
                     <?php } ?>
                     <div class="row mt25px res_auto_btn res_mb12 ">
-                      <?php if (!isset($_GET['id'])) { ?>
+                      <?php if (!isset($_REQUEST['id'])) { ?>
                         <button type="button" class="btn btn-success mr10" onClick="addInward(0);">Save & Add New </button>
                         <button type="button" class="btn btn-success mr10" onClick="addInward(1);">Save & Exit</button>
                       <?php } else { ?>
                         <button type="button" class="btn btn-success mr10" onClick="addInward(1);">Update</button>
                       <?php } ?>
-                      <a type="button" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_GET['type'])) ? '?type=' . $_GET['type'] : '' ?>" class="btn btn-danger">Cancel</a>
+                      <a type="button" href="<?= $_SESSION['url_path'] ?>/app/views/register/register.php<?= (isset($_REQUEST['type'])) ? '?type=' . $_REQUEST['type'] : '' ?>" class="btn btn-danger">Cancel</a>
                     </div>
                   </div>
                 </div>
@@ -413,13 +410,47 @@ if (isset($_GET['id'])) {
   <script src="<?= $_SESSION['url_path'] ?>/public/js/adminlte.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/js/demo.js"></script>
   <!-- Page specific script -->
-
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+  <script src="<?= $_SESSION['url_path'] ?>/public/plugins/select2/js/select2.full.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/moment/moment.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/daterangepicker/daterangepicker.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    if ("<?= isset($inward) ?>") {
+      var newOption = new Option("<?= ($inward['company_name'] ?? '') ?>", "<?= ($inward['customer_id'] ?? '') ?>", true, true);
+      $('#customer_id').append(newOption).trigger('change');
+    }
+    $("#customer_id").select2({
+      theme: 'bootstrap4',
+      minimumInputLength: 3,
+      ajax: {
+        url: '../../controllers/CustomerController.php',
+        dataType: 'json',
+        type: "POST",
+        quietMillis: 50,
+        data: function(term) {
+          return {
+            token: "<?= $_SESSION['token'] ?>",
+            term: term
+          };
+        },
+        processResults: function(data) {
+          var arr = []
+          $.each(data, function(index, value) {
+            arr.push({
+              id: value.id,
+              text: $.parseHTML('<h4>' + value.company_name + ' <small> (' + value.customer_name + ')</small></h4><p><b>E:</b>' + value.customer_primary_email_id + ' |  <b>M:</b> ' + value.customer_mobile_no1 + '</p>'),
+            })
+          })
+          return {
+            results: arr
+          };
+        }
+      }
+    });
+
     $('#deliver_through_courier').change(function() {
       if ($('#deliver_through_courier:checked').val() == 'on') {
         $('.courier_details').removeAttr('style');
@@ -441,7 +472,7 @@ if (isset($_GET['id'])) {
       if ("<?= isset($_SESSION['success_message']) ? 1 : 0 ?>" == 1) {
         toastr.success("<?= $_SESSION['success_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['success_message']); ?>"
-      } 
+      }
       if ("<?= isset($_SESSION['error_message']) ? 1 : 0 ?>" == 1) {
         toastr.error("<?= $_SESSION['error_message'] ?? '' ?>")
         var unnset = "<?php unset($_SESSION['error_message']); ?>"
@@ -490,13 +521,13 @@ if (isset($_GET['id'])) {
         type: 'POST',
         data: {
           formData: formData,
-          id: "<?= $_GET['id'] ?? 0 ?>",
-          type: "<?= $_GET['type'] ?? 0 ?>"
+          id: "<?= $_REQUEST['id'] ?? 0 ?>",
+          type: "<?= $_REQUEST['type'] ?? 0 ?>"
         },
         success: function(response) {
           $(hideOverlay);
           if (retry == 1) {
-            window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_GET['type']) ? '?type=' . $_GET['type'] : '' ?>";
+            window.location.href = "<?= $_SESSION['url_path'] ?>/app/views/register/register.php" + "<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>";
           } else {
             location.reload(true);
           }

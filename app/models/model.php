@@ -307,7 +307,7 @@ class Model
 
   function user_authentication($data)
   {
-    $sql = "SELECT id,user_type FROM user Where";
+    $sql = "SELECT id,user_type,is_active FROM user Where";
     $data['password'] = md5($data['password']);
     for ($i = 0; $i < count($data); $i++) {
       if ($i != 0) {
@@ -323,6 +323,7 @@ class Model
       while ($row = mysqli_fetch_assoc($result)) {
         $data[] = $row;
       }
+      
       if ($data[0]['is_active']) {
         if ($data[0]['user_type'] == 'Employee') {
           $user = "SELECT employee_name as user_name,employee_city_location as city FROM employee Where user_id= '" . $data[0]['id'] . "'";
@@ -337,6 +338,7 @@ class Model
           $_SESSION['user_city'] = $userData['city'];
         }
 
+        $_SESSION['token'] = md5(uniqid(mt_rand(), true));
         $_SESSION['success_message'] = 'Login successfully';
         $_SESSION['user_id'] = $data[0]['id'];
         $_SESSION['user_type'] = $data[0]['user_type'];
