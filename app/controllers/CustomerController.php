@@ -15,14 +15,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else if (isset($_POST["delete_id"])) {
         return $model->delete('customer', $_POST, 'Customer');
     } else {
-        $model->insert('customer', $_POST['formData'], 'Customer');
-        $user['formData'][0]['name'] = 'username';
-        $user['formData'][0]['value'] = '';
-        $user['formData'][1]['name'] = 'password';
-        $user['formData'][1]['value'] = '';
-        $user['formData'][2]['name'] = 'user_type';
-        $user['formData'][2]['value'] = '';
-        return $model->insert('user', $user['formData'], 'Customer');
+        if (isset($_POST['formData'])) {
+            $customer = $model->select('customer', 'customer_primary_email_id,customer_mobile_no1', ' customer_primary_email_id="' . $_POST['formData'][2]['value'] . '" and customer_mobile_no1="' . $_POST['formData'][3]['value'] . '"');
+
+            if (empty($customer)) {
+                $model->insert('customer', $_POST['formData'], 'Customer');
+                $user['formData'][0]['name'] = 'username';
+                $user['formData'][0]['value'] = '';
+                $user['formData'][1]['name'] = 'password';
+                $user['formData'][1]['value'] = '';
+                $user['formData'][2]['name'] = 'user_type';
+                $user['formData'][2]['value'] = '';
+                return $model->insert('user', $user['formData'], 'Customer');
+            } else {
+                $_SESSION['error_message'] = 'Customer with same email and mobile no. already exist!!';
+                echo json_encode(['success' => false]);
+            }
+        }
     }
     // }else{
     //     $_SESSION['error_message'] = 'Please contact admin to UnBlock your user!!';

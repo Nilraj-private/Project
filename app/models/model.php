@@ -271,8 +271,8 @@ class Model
             $this->generateWhatsappMessage($modelArray, 'Send Estimation');
           }
         } elseif ($dataArray['event_name'] == 'send_data_tree') {
-          $this->sendMail($customer['customer_primary_email_id'], "Device Data Recovery Tree Structure (Inward #{$modelArray['id']}) - Ni-Ki Data Recovery Services", 'email/send_data_tree_structure.php', $modelArray, '', true, $_FILES['dataTreeFile']['tmp_name'], $_FILES['dataTreeFile']['name']);
-
+          $this->sendMail($customer['customer_primary_email_id'], "Device Data Recovery Tree Structure (Inward #{$modelArray['id']}) - Ni-Ki Data Recovery Services", 'email/send_data_tree_structure.php', $modelArray, '', true, $_POST['target_file']);
+          $modelArray['target_file'] = $_POST['target_file'];
           $this->generateWhatsappMessage($modelArray, 'Data Tree Structure');
         }
       }
@@ -323,7 +323,7 @@ class Model
       while ($row = mysqli_fetch_assoc($result)) {
         $data[] = $row;
       }
-      
+
       if ($data[0]['is_active']) {
         if ($data[0]['user_type'] == 'Employee') {
           $user = "SELECT employee_name as user_name,employee_city_location as city FROM employee Where user_id= '" . $data[0]['id'] . "'";
@@ -363,7 +363,7 @@ class Model
     }
   }
 
-  function sendMail($to, $subject, $view, $modelArray, $redirect = '', $html = true, $attachmentTempName = "", $attachmentName = "")
+  function sendMail($to, $subject, $view, $modelArray, $redirect = '', $html = true, $attachment = "")
   {
     require_once "../../vendor/autoload.php";
 
@@ -395,8 +395,8 @@ class Model
     $mail->Subject  = $subject;
     $mail->AltBody    = "To view the message, please use an HTML compatible email viewer!";
     $mail->WordWrap   = 80;
-    if (!empty($attachmentTempName)) {
-      $mail->AddAttachment($attachmentTempName, $attachmentName);
+    if (!empty($attachment)) {
+      $mail->AddAttachment($attachment);
     }
 
     $body = $this->render($modelArray, $view);
@@ -431,11 +431,18 @@ class Model
 
     $bodyValues = $header = '';
     foreach ($bodyVariableArray as $variableValue) {
-      $bodyValues .= (empty($bodyValues)) ? '"' . $variableValue . '"' : ',"' . $variableValue . '"';
+      $bodyValues .= (empty($bodyValues)) ? '"bodyValues": ["' . $variableValue . '"' : ',"' . $variableValue . '"';
+    }
+    if (!empty($bodyValues)) {
+      $bodyValues .= '],';
     }
     if (isset($data['header_1']) && $data['header_1'] != '') {
       $header = '"headerValues": [ "' . $data['header_1'] . '" ],';
     }
+    if (isset($data['attachment_1']) && $data['attachment_1'] != '') {
+      $button = '"buttonValues": {"1": ["' . $data['attachment_1'] . '"]}';
+    }
+
     curl_setopt_array($curl, array(
       CURLOPT_URL => 'https://api.interakt.ai/v1/public/message/',
       CURLOPT_RETURNTRANSFER => true,
@@ -454,9 +461,8 @@ class Model
                     "name": "' . $data['template_name'] . '",
                     "languageCode": "en",
                     ' . $header . '
-                    "bodyValues": [
-                        ' . $bodyValues . '
-                        ]
+                    ' . $bodyValues . '
+                    ' . $button . '
                     }
                 }',
       CURLOPT_HTTPHEADER => array(
@@ -491,7 +497,9 @@ class Model
     $params['customer_mobile_no'] = $modelArray['customer_mobile_no1'];
     $params['template_name'] = $template_slug;
     $params['header_1'] = (isset($modelArray['id']) && !empty($modelArray['id'])) ? $modelArray['id'] : 'N/A';
-
+    if ($template_name == 'Data Tree Structure') {
+      $params['attachment_1'] = (isset($modelArray['target_file']) && !empty($modelArray['target_file'])) ? $modelArray['target_file'] : 'some error occured File is not available!!';
+    }
     $bodyVariableArray['1'] = (isset($modelArray['customer_name']) && !empty($modelArray['customer_name'])) ? $modelArray['customer_name'] : 'N/A';
     $bodyVariableArray['2'] = (isset($modelArray['device_serial_number']) && !empty($modelArray['device_serial_number'])) ? $modelArray['device_serial_number'] : 'N/A';
     $bodyVariableArray['3'] = (isset($modelArray['manufacturer_name']) && !empty($modelArray['manufacturer_name'])) ? $modelArray['manufacturer_name'] : 'N/A';
@@ -510,6 +518,8 @@ class Model
     } elseif ($template_name == 'Send Estimation') {
       $bodyVariableArray['9'] = (isset($modelArray['estimate_amount']) && !empty($modelArray['estimate_amount'])) ? $modelArray['estimate_amount'] : 'N/A';
       $bodyVariableArray['10'] = (isset($modelArray['customer_remarks']) && !empty($modelArray['customer_remarks'])) ? $modelArray['customer_remarks'] : 'N/A';
+    } elseif ($template_name == 'Data Tree Structure') {
+      $bodyVariableArray['9'] = (isset($modelArray['target_file']) && !empty($modelArray['target_file']) && $modelArray['target_file'] != '0000-00-00 00:00:00') ? date('d M, Y h:m a', strtotime($modelArray['target_file'])) : 'N/A';
     }
 
     $api_response = json_decode($this->sendWhatsAppMessage($params, $bodyVariableArray));

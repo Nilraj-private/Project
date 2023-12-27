@@ -196,7 +196,11 @@ $cities = $model->select('city_location');
             id: "<?= $_GET['id'] ?? 0 ?>"
           },
           success: function(response) {
-            window.location.href = "customer_index.php";
+            if (response.success) {
+              window.location.href = "customer_index.php";
+            } else {
+              window.location.href = "customer_form.php";
+            }
           }
         });
       });
