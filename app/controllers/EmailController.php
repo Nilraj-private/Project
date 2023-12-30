@@ -14,10 +14,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($_POST['send_email'])) {
             $target_dir = $_SESSION['url_path'] . "/public/uploads/";
             // $target_dir = 'C:/xampp/htdocs' . $_SESSION['url_path'] . "/public/uploads/";
-            $target_file = $target_dir . basename($_FILES["dataTreeFile"]["name"]);
+            $target_file = $target_dir . date('YmdHms') . basename($_FILES["dataTreeFile"]["name"]);
 
             if (move_uploaded_file($_FILES["dataTreeFile"]["tmp_name"], $target_file)) {
                 $_POST['target_file'] = $target_file;
+                $_POST['file_name'] = date('YmdHms') . basename($_FILES["dataTreeFile"]["name"]);
                 $_SESSION['success_message'] = "The file " . htmlspecialchars(basename($_FILES["dataTreeFile"]["name"])) . " has been uploaded.";
                 return $model->update('case_register', array_merge($_POST, $_FILES), 'Data Tree send');
             } else {

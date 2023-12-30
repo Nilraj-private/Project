@@ -272,7 +272,7 @@ class Model
           }
         } elseif ($dataArray['event_name'] == 'send_data_tree') {
           $this->sendMail($customer['customer_primary_email_id'], "Device Data Recovery Tree Structure (Inward #{$modelArray['id']}) - Ni-Ki Data Recovery Services", 'email/send_data_tree_structure.php', $modelArray, '', true, $_POST['target_file']);
-          $modelArray['target_file'] = $_POST['target_file'];
+          $modelArray['file_name'] = $_POST['file_name'];
           $this->generateWhatsappMessage($modelArray, 'Data Tree Structure');
         }
       }
@@ -440,7 +440,7 @@ class Model
       $header = '"headerValues": [ "' . $data['header_1'] . '" ],';
     }
     if (isset($data['attachment_1']) && $data['attachment_1'] != '') {
-      $button = '"buttonValues": {"1": ["' . $data['attachment_1'] . '"]}';
+      $button = '"buttonValues": {"0": ["' . $data['attachment_1'] . '"]}';
     }
 
     curl_setopt_array($curl, array(
@@ -474,7 +474,7 @@ class Model
     $response = curl_exec($curl);
 
     curl_close($curl);
-    return $response;
+    echo $response;
   }
 
   public function generateWhatsappMessage($modelArray, $template_name)
@@ -497,9 +497,11 @@ class Model
     $params['customer_mobile_no'] = $modelArray['customer_mobile_no1'];
     $params['template_name'] = $template_slug;
     $params['header_1'] = (isset($modelArray['id']) && !empty($modelArray['id'])) ? $modelArray['id'] : 'N/A';
+
     if ($template_name == 'Data Tree Structure') {
       $params['attachment_1'] = (isset($modelArray['target_file']) && !empty($modelArray['target_file'])) ? $modelArray['target_file'] : 'some error occured File is not available!!';
     }
+
     $bodyVariableArray['1'] = (isset($modelArray['customer_name']) && !empty($modelArray['customer_name'])) ? $modelArray['customer_name'] : 'N/A';
     $bodyVariableArray['2'] = (isset($modelArray['device_serial_number']) && !empty($modelArray['device_serial_number'])) ? $modelArray['device_serial_number'] : 'N/A';
     $bodyVariableArray['3'] = (isset($modelArray['manufacturer_name']) && !empty($modelArray['manufacturer_name'])) ? $modelArray['manufacturer_name'] : 'N/A';
@@ -518,8 +520,6 @@ class Model
     } elseif ($template_name == 'Send Estimation') {
       $bodyVariableArray['9'] = (isset($modelArray['estimate_amount']) && !empty($modelArray['estimate_amount'])) ? $modelArray['estimate_amount'] : 'N/A';
       $bodyVariableArray['10'] = (isset($modelArray['customer_remarks']) && !empty($modelArray['customer_remarks'])) ? $modelArray['customer_remarks'] : 'N/A';
-    } elseif ($template_name == 'Data Tree Structure') {
-      $bodyVariableArray['9'] = (isset($modelArray['target_file']) && !empty($modelArray['target_file']) && $modelArray['target_file'] != '0000-00-00 00:00:00') ? date('d M, Y h:m a', strtotime($modelArray['target_file'])) : 'N/A';
     }
 
     $api_response = json_decode($this->sendWhatsAppMessage($params, $bodyVariableArray));
