@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use DateTime;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class Model

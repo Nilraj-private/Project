@@ -441,15 +441,24 @@ if (isset($_REQUEST['id'])) {
           $.each(data, function(index, value) {
             arr.push({
               id: value.id,
-              text: $.parseHTML('<h4>' + value.company_name + ' <small> (' + value.customer_name + ')</small></h4><p><b>E:</b>' + value.customer_primary_email_id + ' |  <b>M:</b> ' + value.customer_mobile_no1 + '</p>'),
+              company_name: value.company_name,
+              customer_name: value.customer_name,
+              customer_primary_email_id: value.customer_primary_email_id,
+              customer_mobile_no1: value.customer_mobile_no1,
+              text: value.company_name,
             })
           })
           return {
             results: arr
           };
         }
-      }
+      },
+      templateResult: formatResult
     });
+
+    function formatResult(result) {
+      return $.parseHTML('<h4>' + result.company_name + ' <small> (' + result.customer_name + ')</small></h4><p><b>E:</b>' + result.customer_primary_email_id + ' |  <b>M:</b> ' + result.customer_mobile_no1 + '</p>');
+    }
 
     $('#deliver_through_courier').change(function() {
       if ($('#deliver_through_courier:checked').val() == 'on') {
