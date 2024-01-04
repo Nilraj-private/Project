@@ -5,7 +5,7 @@ require("../../models/model.php");
 
 use app\models\Model;
 
-$_SESSION['page'] = 'register.php' . (isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '');
+$_SESSION['page'] = 'register.php';
 
 $model = (new Model());
 $where = '';
@@ -48,12 +48,12 @@ if (isset($_SESSION['user_type']) && $_SESSION['user_type'] != 'SuperAdmin') {
 $join = ' LEFT JOIN customer as c on c.id=cr.customer_id ';
 // 'c.customer_city_location as customer_city_id',
 
-$recordsPerPage = 10;
+$recordsPerPage = $_REQUEST['perpage'] ?? 10;
 $currentPage = (isset($_GET['page'])) ? $_GET['page'] : 1;
 $totalCount = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name, c.customer_city_location,COUNT(*) AS total', $where, $join)[0]['total'];
 $totalPages = ceil($totalCount / $recordsPerPage);
 
-$case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name, c.customer_city_location', $where, $join, [], 10, (($currentPage * $recordsPerPage) - 10));
+$case_registers = $model->select('case_register as cr', 'cr.*,c.company_name,c.customer_name, c.customer_city_location', $where, $join, [], $recordsPerPage, (($currentPage * $recordsPerPage) - $recordsPerPage));
 $manufacturers = $model->select('device_manufacturer');
 $cities = $model->select('city_location');
 ?>
@@ -315,7 +315,7 @@ $cities = $model->select('city_location');
                   <h3 class="float-left res_mt5 res_fs22">Search Device</h3>
                   <a type="button" class="btn btn-primary float-right" href="<?= $_SESSION['url_path'] ?>/app/views/register/create_inward.php<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>">Create Inward</a>
                 </div>
-                <form id="register_filter_form" method="post" action="register.php<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>">
+                <form method="post" action="register.php<?= isset($_REQUEST['type']) ? '?type=' . $_REQUEST['type'] : '' ?>">
                   <div class="card-body res_col_form">
                     <div class="row">
                       <div class="col-2">
@@ -510,13 +510,19 @@ $cities = $model->select('city_location');
 
                   <div class="row">
                     <div class="col-6">
-                      Total Pages: <?= $totalPages ?>
+                      View <select id="pageSize">
+                        <option value="10" <?= ($recordsPerPage == 10) ? 'selected' : '' ?>>10</option>
+                        <option value="20" <?= ($recordsPerPage == 20) ? 'selected' : '' ?>>20</option>
+                        <option value="50" <?= ($recordsPerPage == 50) ? 'selected' : '' ?>>50</option>
+                        <option value="100" <?= ($recordsPerPage == 100) ? 'selected' : '' ?>>100</option>
+                        <option value="<?= $totalCount ?>" <?= ($recordsPerPage == $totalCount) ? 'selected' : '' ?>>All</option>
+                      </select> Per Page
                     </div>
                     <div class="col-6">
                       <div class="paginator float-right">
                         <ul class="pagination mb-1">
                           <li class="paginate_button page-item <?= ($currentPage == 1) ? 'disabled' : '' ?>">
-                            <a href="<?= '?page=' . ($currentPage - 1) ?>" class="page-link">
+                            <a href="<?= '?page=' . ($currentPage - 1) . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                               Previous
                             </a>
                           </li>
@@ -524,7 +530,7 @@ $cities = $model->select('city_location');
                             for ($i = 1; $i <= $totalPages; $i++) {
                           ?>
                               <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                <a href="<?= '?page=' . $i ?>" class="page-link">
+                                <a href="<?= '?page=' . $i . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                                   <?= $i ?>
                                 </a>
                               </li>
@@ -534,7 +540,7 @@ $cities = $model->select('city_location');
                               if ($i >= ($currentPage - 3) && $i < $currentPage) {
                               ?>
                                 <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                  <a href="<?= '?page=' . $i ?>" class="page-link">
+                                  <a href="<?= '?page=' . $i . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                                     <?= $i ?>
                                   </a>
                                 </li>
@@ -542,14 +548,14 @@ $cities = $model->select('city_location');
                             }
                             ?>
                             <li class="paginate_button page-item active">
-                              <a href="<?= '?page=' . $currentPage ?>" class="page-link">
+                              <a href="<?= '?page=' . $currentPage . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                                 <?= $currentPage ?>
                               </a>
                             </li>
                             <?php for ($i = 1; $i < $totalPages; $i++) {
                               if ($i <= ($currentPage + 3) && $i > $currentPage) { ?>
                                 <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                  <a href="<?= '?page=' . $i ?>" class="page-link">
+                                  <a href="<?= '?page=' . $i . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                                     <?= $i ?>
                                   </a>
                                 </li>
@@ -558,7 +564,7 @@ $cities = $model->select('city_location');
                             }
                           } ?>
                           <li class="paginate_button page-item <?= ($currentPage == $totalPages) ? 'disabled' : '' ?>">
-                            <a href="<?= '?page=' . ($currentPage + 1) ?>" class="page-link">
+                            <a href="<?= '?page=' . ($currentPage + 1) . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                               Next
                             </a>
                           </li>
@@ -628,6 +634,29 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    $('#pageSize').change(function() {
+      var perpage = $(this).val();
+      console.log(window.location.href.split("?").length)
+      if (window.location.href.split("?").length > 1) {
+        if (window.location.href.split("?")[1].search('perpage') == -1) {
+          window.location.href = window.location.href + '&perpage=' + perpage;
+        } else {
+          var url = window.location.href.split("?")[0] + '?';
+          $.each(window.location.href.split("?")[1].split("&"), function(key, val) {
+            console.log(url)
+            if (val.search('perpage') == -1) {
+              (key == 0) ? (url += val) : (url += '&' + val);
+            } else {
+              (key == 0) ? (url += 'perpage=' + perpage) : (url += '&perpage=' + perpage);
+            }
+          })
+          window.location.href = url;
+        }
+      } else {
+        window.location.href = window.location.href + '?perpage=' + perpage;
+      }
+    });
+
     var page_overlay = jQuery('<div id="overlay"> </div>');
 
     function showOverlay() {

@@ -5,7 +5,7 @@ require("../../models/model.php");
 
 use app\models\Model;
 
-$_SESSION['page'] = 'register.php' . (isset($_GET['type']) ? '?type=' . $_GET['type'] : '');
+$_SESSION['page'] = 'register.php';
 
 $model = (new Model());
 $customers = $model->select("customer");

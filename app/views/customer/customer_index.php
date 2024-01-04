@@ -20,12 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $where .= ($where == '') ? " $key LIKE '%" . $value . "%' " : " AND $key LIKE '%" . $value . "%' ";
   }
 }
-$recordsPerPage = 10;
+$recordsPerPage = $_REQUEST['perpage'] ?? 10;
 $currentPage = (isset($_GET['page'])) ? $_GET['page'] : 1;
 $totalCount = $model->select('customer as c', ' c.*,cl.city_name,COUNT(1) AS total', $where, $join)[0]['total'];
 $totalPages = ceil($totalCount / $recordsPerPage);
 
-$customers = $model->select('customer as c', ' c.*,cl.city_name ', $where, $join, [], 10, (($currentPage * $recordsPerPage) - 10));
+$customers = $model->select('customer as c', ' c.*,cl.city_name ', $where, $join, [], $recordsPerPage, (($currentPage * $recordsPerPage) - $recordsPerPage));
 
 $templates = $model->select('templates');
 
@@ -182,13 +182,19 @@ $cities = $model->select('city_location');
                   </table>
                   <div class="row">
                     <div class="col-6">
-                      Total Pages: <?= $totalPages ?>
+                      View <select id="pageSize">
+                        <option value="10" <?= ($recordsPerPage == 10) ? 'selected' : '' ?>>10</option>
+                        <option value="20" <?= ($recordsPerPage == 20) ? 'selected' : '' ?>>20</option>
+                        <option value="50" <?= ($recordsPerPage == 50) ? 'selected' : '' ?>>50</option>
+                        <option value="100" <?= ($recordsPerPage == 100) ? 'selected' : '' ?>>100</option>
+                        <option value="<?= $totalCount ?>" <?= ($recordsPerPage == $totalCount) ? 'selected' : '' ?>>All</option>
+                      </select> Per Page
                     </div>
                     <div class="col-6">
                       <div class="paginator float-right">
                         <ul class="pagination mb-1">
                           <li class="paginate_button page-item <?= ($currentPage == 1) ? 'disabled' : '' ?>">
-                            <a href="<?= '?page=' . ($currentPage - 1) ?>" class="page-link">
+                            <a href="<?= '?page=' . ($currentPage - 1)  . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                               Previous
                             </a>
                           </li>
@@ -196,7 +202,7 @@ $cities = $model->select('city_location');
                             for ($i = 1; $i <= $totalPages; $i++) {
                           ?>
                               <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                <a href="<?= '?page=' . $i ?>" class="page-link">
+                                <a href="<?= '?page=' . $i  . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                                   <?= $i ?>
                                 </a>
                               </li>
@@ -206,7 +212,7 @@ $cities = $model->select('city_location');
                               if ($i >= ($currentPage - 3) && $i < $currentPage) {
                               ?>
                                 <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                  <a href="<?= '?page=' . $i ?>" class="page-link">
+                                  <a href="<?= '?page=' . $i  . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                                     <?= $i ?>
                                   </a>
                                 </li>
@@ -214,14 +220,14 @@ $cities = $model->select('city_location');
                             }
                             ?>
                             <li class="paginate_button page-item active">
-                              <a href="<?= '?page=' . $currentPage ?>" class="page-link">
+                              <a href="<?= '?page=' . $currentPage  . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                                 <?= $currentPage ?>
                               </a>
                             </li>
                             <?php for ($i = 1; $i < $totalPages; $i++) {
                               if ($i <= ($currentPage + 3) && $i > $currentPage) { ?>
                                 <li class="paginate_button page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                  <a href="<?= '?page=' . $i ?>" class="page-link">
+                                  <a href="<?= '?page=' . $i  . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                                     <?= $i ?>
                                   </a>
                                 </li>
@@ -230,7 +236,7 @@ $cities = $model->select('city_location');
                             }
                           } ?>
                           <li class="paginate_button page-item <?= ($currentPage == $totalPages) ? 'disabled' : '' ?>">
-                            <a href="<?= '?page=' . ($currentPage + 1) ?>" class="page-link">
+                            <a href="<?= '?page=' . ($currentPage + 1)  . (isset($_REQUEST['perpage']) ? '&perpage=' . $_REQUEST['perpage'] : '') ?>" class="page-link">
                               Next
                             </a>
                           </li>
@@ -318,6 +324,27 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    $('#pageSize').change(function() {
+      var perpage = $(this).val();
+      console.log(window.location.href.split("?").length)
+      if (window.location.href.split("?").length > 1) {
+        if (window.location.href.split("?")[1].search('perpage') == -1) {
+          window.location.href = window.location.href + '&perpage=' + perpage;
+        } else {
+          var url = window.location.href.split("?")[0] + '?';
+          $.each(window.location.href.split("?")[1].split("&"), function(key, val) {
+            if (val.search('perpage') == -1) {
+              (key == 0) ? (url += val) : (url += '&' + val);
+            } else {
+              (key == 0) ? (url += 'perpage=' + perpage) : (url += '&perpage=' + perpage);
+            }
+          })
+          window.location.href = url;
+        }
+      } else {
+        window.location.href = window.location.href + '?perpage=' + perpage;
+      }
+    });
     // function sendMessageModal(customer_name, customer_mobile_no) {
     //   $('#send_message_customer_name').val(customer_name);
     //   $('#send_message_customer_mobile_no').val(customer_mobile_no);
