@@ -634,16 +634,25 @@ $cities = $model->select('city_location');
   <script src="<?= $_SESSION['url_path'] ?>/public/plugins/toastr/toastr.min.js"></script>
 
   <script>
+    
+    var page_overlay = jQuery('<div id="overlay"> </div>');
+
+    function showOverlay() {
+      $('body').attr('id', 'overlay');
+    }
+
+    function hideOverlay() {
+      $('body').removeAttr('id');
+    }
+    
     $('#pageSize').change(function() {
       var perpage = $(this).val();
-      console.log(window.location.href.split("?").length)
       if (window.location.href.split("?").length > 1) {
         if (window.location.href.split("?")[1].search('perpage') == -1) {
           window.location.href = window.location.href + '&perpage=' + perpage;
         } else {
           var url = window.location.href.split("?")[0] + '?';
           $.each(window.location.href.split("?")[1].split("&"), function(key, val) {
-            console.log(url)
             if (val.search('perpage') == -1) {
               (key == 0) ? (url += val) : (url += '&' + val);
             } else {
@@ -656,16 +665,6 @@ $cities = $model->select('city_location');
         window.location.href = window.location.href + '?perpage=' + perpage;
       }
     });
-
-    var page_overlay = jQuery('<div id="overlay"> </div>');
-
-    function showOverlay() {
-      page_overlay.appendTo(document.body);
-    }
-
-    function hideOverlay() {
-      page_overlay.remove();
-    }
 
     function sendEstimateModal(inward_register_id, customer_id, estimate_amount, customer_remarks, approval_status) {
       $('#customer_id').val(customer_id);
