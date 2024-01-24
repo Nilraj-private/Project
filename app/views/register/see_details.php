@@ -296,10 +296,10 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                           </li>
                           <li class="dropdown-divider"></li>
                           <li class="dropdown-item">
-                            <a href="#" onclick="sendEstimateModal('<?= $register['id'] ?>','<?= $register['customer_id'] ?>','<?= $register['estimate_amount'] ?>','<?= $register['customer_remarks'] ?>','<?= $register['estimate_approved_by_customer'] ?>')" style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
+                            <a href="#" onclick='sendEstimateModal("<?= $register["id"] ?>","<?= $register["customer_id"] ?>","<?= $register["estimate_amount"] ?>",<?= json_encode($register["customer_remarks"]) ?>,"<?= $register["estimate_approved_by_customer"] ?>")' style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
                           </li>
                           <li class="dropdown-item">
-                            <a href="#" onclick="addStorageDetailModal('<?= $register['id'] ?>','<?= $register['sd_hddno'] ?>','<?= $register['sd_size'] ?>','<?= $register['sd_remarks'] ?>','<?= $register['case_result'] ?>')"><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
+                            <a href="#" onclick='addStorageDetailModal("<?= $register["id"] ?>","<?= $register["sd_hddno"] ?>","<?= $register["sd_size"] ?>",<?= json_encode($register["sd_remarks"]) ?>,"<?= $register["case_result"] ?>")'><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
                           </li>
                           <li class="dropdown-item">
                             <a href="#" onclick="sendDataTreeModal('<?= $register['id'] ?>')"><i class='fa fa-cog mr5'></i> Send Data Tree</a>
@@ -356,7 +356,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                           <?php } ?>
 
                           <div class="flex_center">
-                            <button type="button" class="btn btn-primary mr10" onclick="addStorageDetailModal('<?= $register['id'] ?>','<?= $register['sd_hddno'] ?>','<?= $register['sd_size'] ?>','<?= $register['sd_remarks'] ?>','<?= $register['case_result'] ?>')" title="Update Storage Details"> Update Storage Details</button>
+                            <button type="button" class="btn btn-primary mr10" onclick='addStorageDetailModal("<?= $register["id"] ?>","<?= $register["sd_hddno"] ?>","<?= $register["sd_size"] ?>",<?= json_encode($register["sd_remarks"]) ?>,"<?= $register["case_result"] ?>")' title="Update Storage Details"> Update Storage Details</button>
                           </div>
                         </div>
                       </div>
@@ -525,7 +525,7 @@ $recovery_status_color = [0 => 'secondary', 1 => 'success'];
                           </div>
                         <?php } ?>
                         <div class="flex_center">
-                          <button type="button" class="btn btn-primary mr10" onclick="sendEstimateModal('<?= $register['id'] ?>','<?= $register['customer_id'] ?>','<?= $register['estimate_amount'] ?>','<?= $register['customer_remarks'] ?>','<?= $register['estimate_approved_by_customer'] ?>')" title="Send Estimate"> Send Estimate</button>
+                          <button type="button" class="btn btn-primary mr10" onclick='sendEstimateModal("<?= $register["id"] ?>","<?= $register["customer_id"] ?>","<?= $register["estimate_amount"] ?>",<?= json_encode($register["customer_remarks"]) ?>,"<?= $register["estimate_approved_by_customer"] ?>")' title="Send Estimate"> Send Estimate</button>
                           <!-- <button type="button" class="btn btn-primary " title="Send Data Tree"><i class='fa fa-file'></i> Send File</button> -->
                         </div>
                       </div>

@@ -480,10 +480,10 @@ $cities = $model->select('city_location');
                                   </li>
                                   <li class="dropdown-divider"></li>
                                   <li class="dropdown-item">
-                                    <a href="#" onclick="sendEstimateModal('<?= $case_register['id'] ?>','<?= $case_register['customer_id'] ?>','<?= $case_register['estimate_amount'] ?>','<?= $case_register['customer_remarks'] ?>','<?= $case_register['estimate_approved_by_customer'] ?>')" style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
+                                    <a href="#" onclick='sendEstimateModal("<?= $case_register["id"] ?>","<?= $case_register["customer_id"] ?>","<?= $case_register["estimate_amount"] ?>",<?= json_encode($case_register["customer_remarks"]) ?>,"<?= $case_register["estimate_approved_by_customer"] ?>")' style="pointer:cursor"><i class='fa fa-inr mr5'></i> Send Estimate</a>
                                   </li>
                                   <li class="dropdown-item">
-                                    <a href="#" onclick="addStorageDetailModal('<?= $case_register['id'] ?>','<?= $case_register['sd_hddno'] ?>','<?= $case_register['sd_size'] ?>','<?= $case_register['sd_remarks'] ?>','<?= $case_register['case_result'] ?>')"><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
+                                    <a href="#" onclick='addStorageDetailModal("<?= $case_register["id"] ?>","<?= $case_register["sd_hddno"] ?>","<?= $case_register["sd_size"] ?>",<?= json_encode($case_register["sd_remarks"]) ?>,"<?= $case_register["case_result"] ?>")'><i class='fa fa-cog mr5'></i> Add Storage Detail</a>
                                   </li>
                                   <li class="dropdown-item">
                                     <a href="#" onclick="sendDataTreeModal('<?= $case_register['id'] ?>')"><i class='fa fa-cog mr5'></i> Send Data Tree</a>

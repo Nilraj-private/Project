@@ -239,7 +239,7 @@ if (isset($_REQUEST['id'])) {
                       <div class="col-6">
                         <div class="form-group">
                           <label>Files and Directories to be recovered</label>
-                          <textarea class="form-control" rows="2" name="files_to_recover" id="files_to_recover" placeholder="Enter Files to bis Recovered Details"><?= $inward['files_to_recover'] ?? '' ?></textarea>
+                          <textarea class="form-control" rows="2" name="files_to_recover" id="files_to_recover" placeholder="Enter Files to be Recovered Details"><?= $inward['files_to_recover'] ?? '' ?></textarea>
                         </div>
                       </div>
                       <input type="hidden" name="case_register_state" value="1">
